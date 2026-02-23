@@ -4,6 +4,11 @@
 default:
     @just --list
 
+# Install all dependencies
+install:
+    just backend-install
+    just mobile-install
+
 # Backend commands
 backend-install:
     cd backend && pip install -r requirements.txt
@@ -66,6 +71,9 @@ check-backend: backend-lint backend-test
 check-mobile: mobile-typecheck mobile-lint
 
 check: check-backend check-mobile
+
+# CI (runs all checks, same as GitHub Actions)
+ci: install check
 
 # Clean commands
 clean-backend:
