@@ -35,3 +35,20 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - stressPattern uses boolean array: True=stressed, False=unstressed
   - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
   - Professional vocabulary examples: greetings, meeting expressions, feedback phrases
+---
+
+## [2026-02-23] - US-003
+- Created Day 2 curriculum content with theme 'Linking Words Together'
+- Implemented 4 exercises: 2 linking practice, 1 chunk speaking, 1 stress drill
+- Linking exercises demonstrate consonant-to-vowel and same-consonant connections
+- All exercises include tips for smooth linking and natural rhythm
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-02.json (Day 2 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Linking exercises should show connected forms in instruction/tips using underscores (pick_it_up) or tie character (pick‿it‿up)
+  - Common linking patterns: consonant+vowel, same consonant at word boundaries
+  - Chunk exercises combine linking with thought group practice
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
