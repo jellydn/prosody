@@ -36,6 +36,12 @@ mobile-dev:
 mobile-typecheck:
     cd mobile && npx tsc --noEmit
 
+mobile-lint:
+    cd mobile && oxlint .
+
+mobile-format:
+    cd mobile && oxfmt .
+
 mobile-test:
     cd mobile && npx jest
 
@@ -51,7 +57,7 @@ dev: backend-dev mobile-dev
 
 # Quality checks
 check-backend: backend-lint backend-test
-check-mobile: mobile-typecheck
+check-mobile: mobile-typecheck mobile-lint
 
 check: check-backend check-mobile
 

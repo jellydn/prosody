@@ -21,6 +21,7 @@ This file provides coding guidelines for AI agents working on English Rhythm Coa
 | Run single test       | `just backend-test-single "test_name"`                               |
 | Lint/format backend   | `just backend-lint` or `cd backend && ruff check . && ruff format .` |
 | TypeScript check      | `just mobile-typecheck` or `cd mobile && npx tsc --noEmit`           |
+| Lint/format mobile    | `just mobile-lint` / `just mobile-format` (uses oxlint/oxfmt)        |
 | Run all checks        | `just check`                                                         |
 
 > **Tip**: Run `just` or `just --list` to see all available commands.
