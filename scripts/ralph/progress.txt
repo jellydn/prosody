@@ -666,3 +666,31 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Stats calculation: Average across all sessions for each category, overall average across all categories
   - Progress summary structure: {streak, averages: {rhythm, stress, pacing, intonation}, total_sessions, trend}
   - Session structure: {id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at}
+
+## [2026-02-24] - US-026
+- Implemented meeting phrase library screen with 4 category sections
+- Created accordion-style interface for phrase display with practice option
+- Integrated with ExerciseScreen for practicing meeting phrases
+- Copied meetings.json from backend to mobile/assets/phrases/
+- Updated TabNavigator to include ExerciseScreen in LibraryStack
+- Files changed:
+  - mobile/screens/LibraryScreen.tsx (Full implementation)
+  - mobile/navigation/TabNavigator.tsx (Added LibraryStack, ExerciseScreen)
+  - mobile/assets/phrases/meetings.json (Copied from backend)
+  - AGENTS.md (Auto-formatting updates)
+  - mobile/app.json (Auto-formatting updates)
+- Quality checks: npx tsc --noEmit passed (except pre-existing expo-audio errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Library stack navigation: Each tab can have its own stack navigator
+  - Export navigation param types from screen files for use in TabNavigator
+  - LibraryStackParamList: Define separate param lists for each stack navigator
+  - Accordion pattern: Use useState with expandedId to track which item is expanded
+  - Category sections: Group data by category property for organized display
+  - Practice flow: Navigate to ExerciseScreen with dynamically constructed exercise object
+  - Meeting phrases use shadow type exercise for rhythm and intonation practice
+  - Loading bundled JSON: Use require() with type assertion (as MeetingsData)
+  - Color coding: Use consistent colors for categories (blue, orange, green, purple)
+  - TypeScript imports: Import useEffect and useState from 'react', not 'react-native'
+  - Unused parameter fix: Remove unused parameters or prefix with underscore
+  - Error handling: console.error for caught errors before showing user-facing alert
