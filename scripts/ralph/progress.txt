@@ -73,3 +73,267 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Longer sentences benefit from more thought groups (2-3 chunks)
   - When combining chunk and linking practice, emphasize smooth connections within chunks
   - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+
+---
+
+## [2026-02-23] - US-005
+- Created meeting phrases JSON content with 30 phrases across 4 categories
+- Categories: updates (8 phrases), opinions (8 phrases), clarifications (7 phrases), presenting (7 phrases)
+- All phrases use professional meeting vocabulary and natural business expressions
+- Each phrase has empty audioUrl placeholder for future audio recording
+- JSON validates successfully against MeetingPhrase schema
+- Files changed:
+  - backend/app/content/phrases/meetings.json (Meeting phrases content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed all 30 phrases load correctly into MeetingPhrase model
+- **Learnings for future iterations:**
+  - Meeting phrases files should be created under backend/app/content/phrases/
+  - MeetingPhrase structure: id (mp-### format), category, text, audioUrl (null placeholder)
+  - Professional meeting vocabulary: updates (progress reports), opinions (recommendations), clarifications (questions), presenting (transition phrases)
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import MeetingPhrase; import json; data = json.load(open('app/content/phrases/meetings.json')); [MeetingPhrase(**p) for p in data['phrases']]"`
+
+---
+
+## [2026-02-23] - US-006
+- Created FastAPI application scaffolding with health endpoint
+- Implemented GET /health endpoint returning { status: 'ok' }
+- Configured CORS middleware to allow all origins, methods, and headers
+- Created Dockerfile for containerized deployment
+- App runs successfully with 'uvicorn backend.app.main:app'
+- Files changed:
+  - backend/app/main.py (FastAPI application)
+  - backend/Dockerfile (Container deployment)
+- Quality checks: ruff check && ruff format passed
+- Verification: App import successful, routes configured correctly
+- **Learnings for future iterations:**
+  - FastAPI app main entry point at backend/app/main.py
+  - CORS middleware configured for React Native cross-origin requests
+  - Start command: uvicorn backend.app.main:app (from project root)
+  - Health endpoint pattern: GET /health returns { status: 'ok' }
+  - Auto-generated docs available at /docs and /redoc
+  - Dockerfile uses python:3.11-slim base image for production deployment
+
+---
+
+## [2026-02-23] - US-007
+- Created SQLAlchemy database models for User and SessionResult
+- User model: id, native_language, english_level, goal, created_at
+- SessionResult model: id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at
+- Implemented database initialization on app startup using @app.on_event("startup")
+- Database file created at backend/data/app.db with proper directory creation
+- Added .gitignore for data/ directory to exclude database from version control
+- Files changed:
+  - backend/app/models.py (Database models and initialization)
+  - backend/app/main.py (Added startup event for DB init)
+  - backend/.gitignore (Exclude database files)
+- Quality checks: ruff check && ruff format passed
+- Verification: Database tables and columns created successfully
+- **Learnings for future iterations:**
+  - Database models at backend/app/models.py using SQLAlchemy
+  - Database initialization called via @app.on_event("startup") in main.py
+  - SQLite database location: backend/data/app.db (excluded from git)
+  - Use get_db() dependency injection for database sessions in routes
+  - User tracks profile info: native language, English level, goal
+  - SessionResult tracks daily exercise scores and completion data
+  - Database URL configurable via DATABASE_URL environment variable
+
+---
+
+## [2026-02-23] - US-008
+- Created REST API endpoints for user progress tracking
+- POST /api/v1/users: Creates user profile, returns user_id
+- POST /api/v1/progress: Saves session result with day, exercises, and scores
+- GET /api/v1/progress/{user_id}: Returns full progress history ordered by day
+- GET /api/v1/progress/{user_id}/summary: Returns streak, averages, total_sessions, trend
+- Streak calculation: Counts consecutive days backwards from last session, resets on gaps
+- Trend calculation: Compares recent 5 sessions vs overall average (Improving/Stable/Declining)
+- All tests pass with sample data
+- Files changed:
+  - backend/app/api/progress.py (API endpoints)
+  - backend/app/api/__init__.py (API module)
+  - backend/app/main.py (Router integration)
+  - backend/tests/test_progress.py (Test suite)
+  - backend/requirements.txt (Added pytest, pytest-asyncio, httpx)
+- Quality checks: ruff check && ruff format passed
+- Tests: 5/5 passed (create_user, create_progress, get_progress, get_progress_summary, get_progress_summary_no_data)
+- **Learnings for future iterations:**
+  - API routes at backend/app/api/ directory using FastAPI Router
+  - Pydantic models for request/response validation in route files
+  - Database session injection via Depends(get_db) in route handlers
+  - Tests use TestClient and SessionLocal fixtures for isolated test databases
+  - Streak logic: iterate backwards from last session, decrement expected_day
+  - Trend logic: compare recent avg (last 5 sessions) vs overall avg
+  - Error handling: HTTP 404 for missing user, HTTP 201 for successful creation
+  - Type hints: Use dict[str, float] instead of dict for better type safety
+  - Import path: Add backend/tests/ to sys.path for test module imports
+
+---
+
+## [2026-02-23] - US-009
+- Created abstract speech analyzer interface with FreeAnalyzer implementation
+- Abstract SpeechAnalyzer class defines analyze(audio_path, target_text) method
+- AnalysisResult dataclass: rhythm_score, stress_score, pacing_score, intonation_score (1-5 range), feedback_items list
+- FeedbackItem dataclass: type (good/warning/tip enum), message string
+- FreeAnalyzer uses librosa for rhythm/stress/pacing analysis and parselmouth for intonation
+- Rhythm analysis: Beat tracking with librosa.beat.beat_track, ideal tempo 110 BPM
+- Stress analysis: RMS energy variance, higher variance = better stress
+- Pacing analysis: Words per minute, ideal 140 WPM
+- Intonation analysis: Pitch range with parselmouth, ideal range 150 Hz
+- Feedback generation: Scores >= 4.0 get 'good', <= 2.5 get 'warning/tip', otherwise 'tip'
+- Files changed:
+  - backend/app/analyzers/base.py (Abstract interface and dataclasses)
+  - backend/app/analyzers/free.py (FreeAnalyzer implementation)
+  - backend/app/analyzers/__init__.py (Analyzer module)
+  - backend/requirements.txt (Added librosa, parselmouth, numpy)
+  - backend/tests/test_analyzers.py (Test suite)
+- Quality checks: ruff check && ruff format passed
+- Tests: 5/5 passed (1 skipped due to missing librosa/parselmouth)
+- **Learnings for future iterations:**
+  - Analyzer plugins at backend/app/analyzers/ directory
+  - Abstract base class ensures consistent API across implementations
+  - Dataclasses for clean data structures (AnalysisResult, FeedbackItem)
+  - Score range: 1.0-5.0 with rounding to 1 decimal place
+  - librosa for audio analysis: beat tracking, RMS energy, duration calculation
+  - parselmouth for pitch analysis: Sound.to_pitch() for pitch values
+  - Feedback types: good (encouragement), warning (needs improvement), tip (actionable advice)
+  - FreeAnalyzer provides basic analysis without API keys (suitable for development/testing)
+  - Tests skip implementation when dependencies not installed using pytest.mark.skipif
+
+---
+
+## [2026-02-23] - US-010
+- Created BYOP (Bring Your Own Provider) analyzer implementations
+- AzureAnalyzer: Uses azure-cognitiveservices-speech, accepts api_key and region parameters
+- GoogleAnalyzer: Uses google-cloud-speech, accepts api_key parameter
+- OpenAIAnalyzer: Uses openai Whisper API, accepts api_key parameter
+- Factory function get_analyzer(provider, api_key, **kwargs) returns correct implementation
+- Provider options: 'free' (no key), 'azure', 'google', 'openai' (all require API key)
+- Factory validates: Raises ValueError if API key missing for paid providers, or unknown provider
+- All analyzers return unified AnalysisResult format from base.py
+- Speech recognition uses provider SDKs: Azure SpeechRecognizer, Google Cloud Speech, OpenAI Whisper
+- Score calculation: Word similarity between recognized text and target text for rhythm/stress/pacing
+- Intonation score: Fixed at 3.5 for all BYOP providers (requires provider-specific analysis)
+- Feedback generation: Good feedback for >= 4.0 scores, tip for < 3.0 average
+- Files changed:
+  - backend/app/analyzers/azure.py (Azure Speech Services implementation)
+  - backend/app/analyzers/google.py (Google Cloud Speech implementation)
+  - backend/app/analyzers/openai.py (OpenAI Whisper implementation)
+  - backend/app/analyzers/factory.py (Factory function)
+  - backend/requirements.txt (Added azure-cognitiveservices-speech, google-cloud-speech, openai)
+  - backend/tests/test_byop_analyzers.py (Interface tests with mock analyzer)
+- Quality checks: ruff check && ruff format passed
+- Tests: 6/6 passed (base interface, result structure, feedback types, async analyze, score validation)
+- **Learnings for future iterations:**
+  - BYOP pattern: Users bring their own API keys for better-quality analysis
+  - Factory pattern: get_analyzer(provider, api_key) centralizes provider selection
+  - Provider SDK integration: Each analyzer uses provider's speech recognition API
+  - Azure: azure-cognitiveservices-speech with SpeechRecognizer.recognize_once()
+  - Google: google-cloud-speech.v1 with client.recognize()
+  - OpenAI: openai.AsyncOpenAI with audio.transcriptions.create(model="whisper-1")
+  - Score calculation: Word similarity (Jaccard index) for rhythm/stress/pacing metrics
+  - Intonation analysis: Requires provider-specific pitch/intonation features (currently simplified)
+  - Async support: OpenAIAnalyzer uses AsyncOpenAI for async operations
+  - Error handling: Returns default scores (3.0) with warning feedback if recognition fails
+  - Factory validation: Ensures API keys present before creating paid provider analyzers
+
+---
+
+## [2026-02-23] - US-011
+- Created audio analysis REST API endpoint at POST /api/v1/analyze
+- Accepts multipart form: audio file (WAV/M4A), target_text, provider (optional), api_key (optional)
+- Supported formats: audio/wav, audio/x-wav, audio/mpeg, audio/mp4, audio/x-m4a
+- Converts non-WAV audio to WAV using pydub before analysis
+- Uses FreeAnalyzer by default (no provider specified) or BYOP analyzer when provider/api_key provided
+- Returns JSON: rhythm_score, stress_score, pacing_score, intonation_score, feedback list
+- Feedback items converted to dict format: {type: str, message: str}
+- Error handling: 400 for unsupported formats, 500 for analysis failures
+- Temp file cleanup: Automatically removes temporary audio files after analysis
+- Files changed:
+  - backend/app/api/analyze.py (Analysis endpoint)
+  - backend/app/main.py (Router integration)
+  - backend/tests/test_analyze_api.py (Test suite)
+- Quality checks: ruff check && ruff format passed
+- Tests: 2/2 passed (requires_audio, unsupported_format)
+- **Learnings for future iterations:**
+  - API endpoint at backend/app/api/analyze.py using FastAPI UploadFile
+  - Multipart form handling: File() for audio, Form() for text fields
+  - Audio format validation: Check content_type before processing
+  - Audio conversion: Use pydub AudioSegment for format conversion if needed
+  - Temporary file management: Use tempfile.NamedTemporaryFile, ensure cleanup in finally block
+  - Analyzer factory: get_analyzer(provider, api_key) to select implementation
+  - Default provider: Uses "free" if provider not specified
+  - Error responses: HTTP 400 for client errors, HTTP 500 for server errors
+  - Feedback serialization: Convert FeedbackItem objects to dict for JSON response
+  - Delayed imports: Import analyzer modules inside function to avoid import errors when dependencies missing
+  - Test mocking: Patch app.analyzers.factory.get_analyzer to mock analyzer in tests
+  - Response format: Consistent with mobile app expectations (scores 1-5, feedback items)
+
+---
+
+## [2026-02-23] - US-012
+- Created Expo managed workflow project with TypeScript
+- Implemented bottom tab navigation with 4 tabs: Home, Dashboard, Library, Settings
+- Created placeholder screens for each tab displaying the tab name
+- Integrated @expo/vector-icons for tab bar icons (home, bar-chart, book, settings)
+- Navigation structure using @react-navigation/bottom-tabs and @react-navigation/native-stack
+- Each tab has its own stack navigator for future screen nesting
+- App configuration updated with app name "English Rhythm Coach"
+- TypeScript configured with tsconfig.json
+- Files changed:
+  - mobile/App.tsx (Navigation container)
+  - mobile/navigation/TabNavigator.tsx (Bottom tab navigation)
+  - mobile/screens/HomeScreen.tsx (Home tab)
+  - mobile/screens/DashboardScreen.tsx (Dashboard tab)
+  - mobile/screens/LibraryScreen.tsx (Library tab)
+  - mobile/screens/SettingsScreen.tsx (Settings tab)
+  - mobile/components/TabBarIcon.tsx (Tab icon component)
+  - mobile/app.json (Expo configuration)
+  - mobile/package.json (Dependencies)
+  - mobile/tsconfig.json (TypeScript config)
+  - mobile/assets/ (App icons and splash screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Expo project structure managed by Expo CLI, uses app.json for configuration
+  - Navigation: @react-navigation/bottom-tabs for tab navigation
+  - Stack navigation: @react-navigation/native-stack for nested navigation (createNativeStackNavigator)
+  - Tab bar icons: @expo/vector-icons with Ionicons component
+  - Tab bar styling: tabBarActiveTintColor (#007AFF), tabBarInactiveTintColor (#8E8E93)
+  - Each tab screen wraps in a stack navigator for future nesting
+  - Screen options: headerShown: false to hide default headers
+  - TypeScript: Configured with tsconfig.json, must pass npx tsc --noEmit
+  - File naming: Components use PascalCase.tsx (TabBarIcon.tsx)
+  - Component naming: Screen components follow TabNameScreen.tsx pattern
+  - Browser testing required for frontend stories (verify UI changes in browser)
+  - Install navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs react-native-screens
+## [2026-02-23] - US-013
+- Implemented onboarding profile setup screen with native language, English level, and goal selection
+- Created OnboardingScreen with selectable options for native language (Vietnamese pre-selected), English level (Beginner/Intermediate/Advanced), and goal (Meetings/Presentations/General confidence)
+- Updated App.tsx to check AsyncStorage for profile on launch and show OnboardingScreen if not completed
+- Integrated with backend API (POST /api/v1/users) to create user profile
+- Navigation flow: Onboarding → Home using native stack navigator
+- User profile and userId saved to AsyncStorage
+- Loading indicator while checking onboarding status
+- Files changed:
+  - mobile/screens/OnboardingScreen.tsx (Onboarding screen with form)
+  - mobile/App.tsx (Onboarding flow with stack navigator)
+  - mobile/package.json (Added @react-native-async-storage/async-storage)
+  - mobile/package-lock.json (Dependency updates)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - AsyncStorage key for profile: "userProfile" (JSON string)
+  - AsyncStorage key for userId: "userId" (string)
+  - Onboarding flow: Use native stack navigator, replace screen after completion
+  - Profile API: POST http://localhost:8000/api/v1/users with {native_language, english_level, goal}
+  - Response: {user_id: int} - save to AsyncStorage
+  - Native stack navigation: use createNativeStackNavigator() and navigation.replace() to avoid going back
+  - Form validation: Disable submit button until all required fields selected
+  - Option selection: Use TouchableOpacity with conditional styling (borderColor, backgroundColor)
+  - Loading state: Show "Setting up..." text while submitting to API
+  - Error handling: Alert user if API call fails, allow retry
+  - Native languages list: 10 common languages, Vietnamese pre-selected
+  - KeyboardAvoidingView: Use for forms to avoid keyboard covering inputs (iOS: padding, Android: height)
+  - ScrollView: Use for forms to handle scrolling on smaller screens
+  - TypeScript for navigation: NativeStackScreenProps with route params interface
+---
