@@ -27,7 +27,7 @@ export default function AudioPlayer({
   useEffect(() => {
     return sound
       ? () => {
-          sound.unloadAsync();
+          void sound.unloadAsync().catch(() => {});
         }
       : undefined;
   }, [sound]);
@@ -41,7 +41,7 @@ export default function AudioPlayer({
           await sound.pauseAsync();
           setIsPlaying(false);
         } else {
-          await sound.replayAsync();
+          await sound.playAsync();
           setIsPlaying(true);
         }
       } else {
