@@ -502,8 +502,8 @@
 				"Typecheck passes"
 			],
 			"priority": 30,
-			"passes": false,
-			"notes": "BUG: HomeScreen hardcodes day01Data — users can never advance past Day 1"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-031",
@@ -516,8 +516,8 @@
 				"Typecheck passes"
 			],
 			"priority": 31,
-			"passes": false,
-			"notes": "BUG: Currently navigates to HomeMain without telling it which day to load"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-032",
@@ -531,8 +531,8 @@
 				"Typecheck passes"
 			],
 			"priority": 32,
-			"passes": false,
-			"notes": "BUG: All exercise screens always use free analyzer — BYOP settings never read"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-033",
@@ -546,8 +546,8 @@
 				"Typecheck passes"
 			],
 			"priority": 33,
-			"passes": false,
-			"notes": "CODE QUALITY: FeedbackItem, AnalysisResult, Exercise duplicated in 5+ files"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-034",
