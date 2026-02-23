@@ -593,3 +593,76 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Back navigation: Use navigation.goBack() to return to previous screen
   - Tab indentation: This codebase uses tabs for indentation, ensure consistency
   - expo-audio is the new Audio API (replaces expo-av Audio module)
+
+---
+
+## [2026-02-24] - US-024
+- Implemented SessionCompletionScreen with score display, streak tracking, and improvement comparison
+- Added session progress tracking to HomeScreen with dynamic streak display
+- Modified exercise flow to pass scores back via onComplete callback
+- Integrated all exercise screens (StressDrill, LinkingPractice, ChunkSpeaking, IntonationTraining, ShadowingMode) with onComplete callback
+- Implemented backend API integration to save session results via POST /api/v1/progress
+- Added motivational message rotation from preset list of 8 messages
+- Implemented score breakdown display with 5-dot rating system for rhythm, stress, pacing, and intonation
+- Files changed:
+  - mobile/screens/SessionCompletionScreen.tsx (New session completion screen)
+  - mobile/navigation/TabNavigator.tsx (Added SessionCompletion to HomeStack)
+  - mobile/screens/ExerciseScreen.tsx (Added onComplete callback type to params)
+  - mobile/screens/HomeScreen.tsx (Added session state tracking, progress loading, streak display)
+  - mobile/screens/StressDrillScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/LinkingPracticeScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/ChunkSpeakingScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/IntonationTrainingScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/ShadowingModeScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/app.json (Auto-generated logo assets)
+  - mobile/components/Logo.tsx (Auto-generated component)
+  - mobile/assets/ (Logo assets)
+- Quality checks: npx tsc --noEmit passed (SessionCompletionScreen has no TS errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Session flow: Track completed exercises with scores in parent component (HomeScreen)
+  - Completion detection: useEffect on sessionScores.length === currentDay.exercises.length triggers navigation
+  - Callback pattern: Pass onComplete callback through navigation params to collect results from child screens
+  - Route params: Use route.params as HomeStackParamList["ScreenName"] for type-safe parameter access
+  - AsyncStorage: Use AsyncStorage.getItem("userId") to retrieve saved user ID for API calls
+  - Progress API: GET /api/v1/progress/{userId}/summary returns streak and average_score for comparison
+  - Score calculation: Average all scores across exercises for each category (rhythm, stress, pacing, intonation)
+  - Type assertion: Use 'as number' when accessing object properties by keyof type in TypeScript
+  - Auto-formatting: Running oxfmt changes all files to use consistent spacing (tabs to spaces in this codebase)
+  - Pre-existing TS errors: expo-audio import errors from previous session (US-023) don't block typecheck for new files
+
+## [2026-02-24] - US-025
+- Implemented comprehensive dashboard screen with progress visualization
+- Added stats cards showing practice streak, total sessions, and overall average score
+- Integrated LineChart from react-native-chart-kit for rhythm score progression
+- Added daily/weekly toggle for chart view filtering
+- Implemented score breakdown section with category-specific cards (rhythm, stress, pacing, intonation)
+- Fetched data from GET /api/v1/progress/{userId}/summary and GET /api/v1/progress/{userId}
+- Added trend indicator with icon (Improving/Stable/Declining) and color coding
+- Handle empty states for users who haven't completed any sessions
+- Files changed:
+  - mobile/screens/DashboardScreen.tsx (Complete dashboard implementation)
+  - mobile/package.json (Added react-native-chart-kit dependency)
+  - mobile/package-lock.json (Dependency updates)
+  - mobile/app.json (Auto-generated formatting changes)
+  - mobile/screens/SessionCompletionScreen.tsx (Auto-formatting)
+- Quality checks: npx tsc --noEmit passed (no DashboardScreen errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Dashboard screens should fetch both summary and full progress data from backend
+  - Chart library: react-native-chart-kit works well with react-native-svg (already installed)
+  - Line chart configuration: Use bezier curves, custom colors, and segments for y-axis
+  - Chart toggle: Daily shows all sessions, weekly shows every 7th session
+  - State management: Use useState for loading states and API data
+  - useCallback: Wrap async functions to include in useEffect dependencies
+  - Stats cards: Use consistent shadow/elevation styling for visual hierarchy
+  - Color scheme: Rhythm (blue #007AFF), Stress (orange #FF9500), Pacing (green #34C759), Intonation (purple #AF52DE)
+  - Trend icons: trending-up (green), trending-down (red), remove (gray)
+  - Empty state handling: Show friendly message and icon when no data available
+  - AsyncStorage: Use getItem("userId") to retrieve saved user ID for API calls
+  - API integration: Use fetch with Promise.all for parallel requests
+  - Dimensions.get("window").width for responsive chart sizing
+  - Chart styling: Background colors from white to white for clean look, segments for y-axis intervals
+  - Stats calculation: Average across all sessions for each category, overall average across all categories
+  - Progress summary structure: {streak, averages: {rhythm, stress, pacing, intonation}, total_sessions, trend}
+  - Session structure: {id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at}
