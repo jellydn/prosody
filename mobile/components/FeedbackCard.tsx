@@ -1,20 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
-
-type FeedbackType = "good" | "warning" | "tip";
-
-interface FeedbackItem {
-  type: FeedbackType;
-  message: string;
-}
-
-interface AnalysisResult {
-  rhythm_score: number;
-  stress_score: number;
-  pacing_score: number;
-  intonation_score: number;
-  feedback: FeedbackItem[];
-}
+import type { AnalysisResult, FeedbackItem } from "../types/analysis";
 
 interface FeedbackCardProps {
   result: AnalysisResult | null;
