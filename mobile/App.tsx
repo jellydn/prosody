@@ -49,12 +49,12 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {hasCompletedOnboarding ? (
-          <Stack.Screen name="Main" component={TabNavigator} />
-        ) : (
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        )}
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName={hasCompletedOnboarding ? "Main" : "Onboarding"}
+      >
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
