@@ -17,7 +17,7 @@ backend-lock-check:
     cd backend && uv lock --check
 
 backend-dev:
-    cd backend && uv run uvicorn app.main:app --reload
+    cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 backend-test:
     cd backend && uv run pytest -v

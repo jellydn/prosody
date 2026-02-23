@@ -142,7 +142,7 @@ english-rhythm-coach/
 ```bash
 cd backend
 uv sync --dev --frozen
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 When you change dependencies:
