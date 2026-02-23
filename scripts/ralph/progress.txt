@@ -464,3 +464,28 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Tips rendering: Yellow background (#FFF9E6) with bulb icon for visual consistency
   - Component props: exercise object, onNext callback, onBack callback
   - Keyboard handling: keyboardShouldPersistTaps="handled" on ScrollView
+
+## [2026-02-23] - US-019
+- Implemented LinkingPracticeScreen for linking practice exercises
+- Screen structure identical to StressDrillScreen for consistency
+- Connected speech display section with title "Connected Speech"
+- Render linked text with tie character (‿) between words in orange (#FF9500)
+- Words displayed in flex-wrap layout for responsive text display
+- Same exercise flow: instruction → linked text → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as stress drills
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/LinkingPracticeScreen.tsx (Linking practice screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as StressDrillScreen for consistency
+  - Visual difference: Connected speech section replaces standard AudioPlayer text display
+  - Linking visual: Use tie character (‿) U+203F for visual word connection
+  - Flex-wrap layout: Allows words to wrap naturally on smaller screens
+  - Word wrapper: Each word and tie character in a row for horizontal alignment
+  - Orange color (#FF9500) for link symbol to make connections visible
+  - Component props: exercise, onNext, onBack - same interface as other screens
+  - API integration: Same FormData upload pattern across all exercise types
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
+  - Cleanup pattern: useCallback with recordedUri dependency, cleanup in useEffect
