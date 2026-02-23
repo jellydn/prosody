@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 
@@ -24,7 +24,7 @@ class User(Base):
     native_language = Column(String, nullable=False)
     english_level = Column(String, nullable=False)
     goal = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class SessionResult(Base):
@@ -38,7 +38,7 @@ class SessionResult(Base):
     stress_score = Column(Float, nullable=False)
     pacing_score = Column(Float, nullable=False)
     intonation_score = Column(Float, nullable=False)
-    completed_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 def init_db():
