@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models import get_db, User, SessionResult
 
@@ -20,13 +20,13 @@ class UserCreateResponse(BaseModel):
 
 
 class ProgressCreateRequest(BaseModel):
-    user_id: int
-    day: int
-    exercises_completed: int
-    rhythm_score: float
-    stress_score: float
-    pacing_score: float
-    intonation_score: float
+    user_id: int = Field(..., gt=0)
+    day: int = Field(..., gt=0)
+    exercises_completed: int = Field(..., ge=0)
+    rhythm_score: float = Field(..., ge=1.0, le=5.0)
+    stress_score: float = Field(..., ge=1.0, le=5.0)
+    pacing_score: float = Field(..., ge=1.0, le=5.0)
+    intonation_score: float = Field(..., ge=1.0, le=5.0)
 
 
 class ProgressResponse(BaseModel):
@@ -88,23 +88,6 @@ async def create_progress(
     return {"message": "Progress saved successfully", "id": session_result.id}
 
 
-@router.get("/progress/{user_id}", response_model=List[ProgressResponse])
-async def get_progress(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-
-    sessions = (
-        db.query(SessionResult)
-        .filter(SessionResult.user_id == user_id)
-        .order_by(SessionResult.completed_at)
-        .all()
-    )
-    return sessions
-
-
 @router.get("/progress/{user_id}/summary", response_model=ProgressSummary)
 async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -134,9 +117,10 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
 
     streak = 0
     if sessions:
-        expected_day = sessions[-1].day
-        for session in reversed(sessions):
-            if session.day == expected_day:
+        unique_days = sorted({s.day for s in sessions}, reverse=True)
+        expected_day = unique_days[0]
+        for day in unique_days:
+            if day == expected_day:
                 streak += 1
                 expected_day -= 1
             else:
@@ -167,3 +151,20 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
         total_sessions=total_sessions,
         trend=trend,
     )
+
+
+@router.get("/progress/{user_id}", response_model=List[ProgressResponse])
+async def get_progress(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    sessions = (
+        db.query(SessionResult)
+        .filter(SessionResult.user_id == user_id)
+        .order_by(SessionResult.completed_at)
+        .all()
+    )
+    return sessions
