@@ -1,0 +1,494 @@
+{
+	"project": "EnglishRhythmCoach",
+	"branchName": "ralph/english-rhythm-coach",
+	"description": "A React Native app that helps non-native English speakers improve rhythm, stress, linking, and prosody through daily exercises, AI feedback, and real-world speaking scenarios.",
+	"userStories": [
+		{
+			"id": "US-001",
+			"title": "Define curriculum JSON schema with Pydantic models",
+			"description": "As a developer, I need a validated schema for curriculum content so exercises load consistently.",
+			"acceptanceCriteria": [
+				"Create content/schema/ directory with Pydantic models for Day, Exercise, and MeetingPhrase",
+				"Exercise types enum: 'stress' | 'linking' | 'chunk' | 'shadow' | 'intonation'",
+				"Day structure: { day: int, theme: str, exercises: list[Exercise] }",
+				"Exercise structure: { id: str, type: ExerciseType, title: str, instruction: str, targetText: str, stressPattern: optional list, chunks: optional list, audioUrl: optional str, tips: list[str] }",
+				"MeetingPhrase structure: { id: str, category: str, text: str, audioUrl: optional str }",
+				"JSON Schema file exported to content/schema/curriculum.json",
+				"Typecheck passes"
+			],
+			"priority": 1,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-002",
+			"title": "Create Day 1 curriculum content — Word Stress Basics",
+			"description": "As a user, I want Day 1 exercises on word stress so I can start learning immediately.",
+			"acceptanceCriteria": [
+				"Create content/curriculum/day-01.json with theme 'Word Stress Basics'",
+				"Contains 4 exercises: 2 stress drills, 1 chunk speaking, 1 intonation",
+				"Each exercise has targetText, stressPattern (array of booleans for stressed syllables), instruction, and tips",
+				"Example sentences use common professional vocabulary",
+				"JSON validates against the schema from US-001",
+				"Typecheck passes"
+			],
+			"priority": 2,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-003",
+			"title": "Create Day 2 curriculum content — Linking Words Together",
+			"description": "As a user, I want Day 2 exercises on linking so I stop speaking word-by-word.",
+			"acceptanceCriteria": [
+				"Create content/curriculum/day-02.json with theme 'Linking Words Together'",
+				"Contains 4 exercises: 2 linking practice, 1 chunk speaking, 1 stress drill",
+				"Linking exercises show connected forms (e.g., 'pick_it_up')",
+				"JSON validates against schema",
+				"Typecheck passes"
+			],
+			"priority": 3,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-004",
+			"title": "Create Day 3 curriculum content — Speaking in Chunks",
+			"description": "As a user, I want Day 3 exercises on thought groups so my speech flows naturally.",
+			"acceptanceCriteria": [
+				"Create content/curriculum/day-03.json with theme 'Speaking in Chunks'",
+				"Contains 4 exercises: 2 chunk speaking, 1 shadowing, 1 linking",
+				"Chunk exercises have 'chunks' array dividing sentences into thought groups",
+				"JSON validates against schema",
+				"Typecheck passes"
+			],
+			"priority": 4,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-005",
+			"title": "Create meeting phrases JSON content",
+			"description": "As a user, I want common meeting phrases so I can practice real work situations.",
+			"acceptanceCriteria": [
+				"Create content/phrases/meetings.json",
+				"4 categories: 'updates', 'opinions', 'clarifications', 'presenting'",
+				"Each category has 5-8 phrases with text and empty audioUrl placeholder",
+				"JSON validates against schema",
+				"Typecheck passes"
+			],
+			"priority": 5,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-006",
+			"title": "FastAPI project scaffolding with health endpoint",
+			"description": "As a developer, I need the backend project structure so other APIs can be built on top.",
+			"acceptanceCriteria": [
+				"Create backend/ directory with FastAPI app in backend/app/main.py",
+				"GET /health returns { status: 'ok' }",
+				"CORS middleware configured for React Native requests",
+				"Requirements file: fastapi, uvicorn, sqlalchemy, pydub, python-multipart",
+				"Dockerfile for containerized deployment",
+				"App runs with 'uvicorn backend.app.main:app'",
+				"Typecheck passes"
+			],
+			"priority": 6,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-007",
+			"title": "User progress database schema and models",
+			"description": "As a developer, I need database models to store user progress.",
+			"acceptanceCriteria": [
+				"Create backend/app/models.py with SQLAlchemy models",
+				"User model: id, native_language, english_level, goal, created_at",
+				"SessionResult model: id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at",
+				"SQLite database created at backend/data/app.db",
+				"Database initialization on app startup",
+				"Typecheck passes"
+			],
+			"priority": 7,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-008",
+			"title": "User progress REST API endpoints",
+			"description": "As a developer, I need endpoints to store and retrieve user progress.",
+			"acceptanceCriteria": [
+				"POST /api/v1/users creates user profile, returns user_id",
+				"POST /api/v1/progress saves session result (day, scores, exercises completed)",
+				"GET /api/v1/progress/{user_id} returns full progress history",
+				"GET /api/v1/progress/{user_id}/summary returns aggregated stats: streak, averages, total_sessions, trend",
+				"Streak resets when a day is skipped (no difficulty adjustment)",
+				"Tests pass with sample data",
+				"Typecheck passes"
+			],
+			"priority": 8,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-009",
+			"title": "Speech analyzer abstract interface and free analyzer",
+			"description": "As a developer, I need the speech analysis abstraction and a free implementation.",
+			"acceptanceCriteria": [
+				"Create backend/app/analyzers/base.py with abstract SpeechAnalyzer class",
+				"Analysis result dataclass: rhythm_score (1-5), stress_score (1-5), pacing_score (1-5), intonation_score (1-5), feedback_items (list of {type, message})",
+				"Create backend/app/analyzers/free.py implementing FreeAnalyzer",
+				"FreeAnalyzer uses librosa for tempo/rhythm analysis and parselmouth for pitch/intonation",
+				"Accepts WAV/M4A audio + target text, returns analysis result",
+				"Feedback types: 'good', 'warning', 'tip' with actionable messages",
+				"Add librosa, parselmouth, numpy to requirements",
+				"Typecheck passes"
+			],
+			"priority": 9,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-010",
+			"title": "BYOP analyzer implementations",
+			"description": "As a developer, I need provider-specific analyzers for users who bring their own API keys.",
+			"acceptanceCriteria": [
+				"Create backend/app/analyzers/azure.py implementing AzureAnalyzer using Azure Speech Services",
+				"Create backend/app/analyzers/google.py implementing GoogleAnalyzer using Google Cloud Speech",
+				"Create backend/app/analyzers/openai.py implementing OpenAIAnalyzer using OpenAI Whisper API",
+				"Each accepts API key as constructor parameter",
+				"All return the same unified AnalysisResult format from base.py",
+				"Factory function get_analyzer(provider, api_key) returns correct implementation",
+				"Typecheck passes"
+			],
+			"priority": 10,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-011",
+			"title": "Audio analysis REST API endpoint",
+			"description": "As a developer, I need the endpoint that accepts audio recordings and returns feedback.",
+			"acceptanceCriteria": [
+				"POST /api/v1/analyze accepts multipart form: audio file (WAV/M4A) + target_text + provider (optional) + api_key (optional)",
+				"Converts audio to WAV using pydub if needed",
+				"Uses FreeAnalyzer by default, or BYOP analyzer if provider and api_key provided",
+				"Returns JSON: { rhythm_score, stress_score, pacing_score, intonation_score, feedback: [{type, message}] }",
+				"Response time < 5 seconds for 10-second audio clip",
+				"Returns 400 for invalid audio format",
+				"Typecheck passes"
+			],
+			"priority": 11,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-012",
+			"title": "Expo project setup with bottom tab navigation",
+			"description": "As a developer, I need the React Native app structure with navigation.",
+			"acceptanceCriteria": [
+				"Create mobile/ directory with Expo managed workflow (npx create-expo-app)",
+				"Bottom tab navigation with 4 tabs: Home, Dashboard, Library, Settings",
+				"Each tab shows a placeholder screen with the tab name",
+				"Tab icons using @expo/vector-icons",
+				"TypeScript configured",
+				"App builds and runs without errors",
+				"Typecheck passes"
+			],
+			"priority": 12,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-013",
+			"title": "Onboarding profile setup screen",
+			"description": "As a new user, I want to set up my profile so the app can tailor exercises to my level.",
+			"acceptanceCriteria": [
+				"Onboarding screen shown on first launch (check AsyncStorage for profile)",
+				"Select native language (Vietnamese pre-selected)",
+				"Select English level: Beginner / Intermediate / Advanced",
+				"Select goal: Meetings / Presentations / General confidence",
+				"Profile saved to AsyncStorage and POST to backend /api/v1/users",
+				"After completing, navigates to Home tab",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 13,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-014",
+			"title": "Daily lesson home screen",
+			"description": "As a user, I want to see today's lesson when I open the app.",
+			"acceptanceCriteria": [
+				"Home screen shows current day (e.g., 'Day 3 of 14')",
+				"Displays lesson theme, estimated time (~10 min), and exercise list",
+				"Each exercise shows title, type icon, and completion status",
+				"Practice streak counter displayed at top",
+				"Curriculum data loaded from bundled JSON files",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 14,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-015",
+			"title": "Audio playback component for example sentences",
+			"description": "As a user, I want to hear example audio so I know the target rhythm.",
+			"acceptanceCriteria": [
+				"Reusable AudioPlayer component using expo-av",
+				"Play/pause button with visual state indicator",
+				"Displays sentence text with stressed syllables in bold",
+				"Chunk boundaries shown with slashes or spacing",
+				"Accepts audioUrl and sentence metadata as props",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 15,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-016",
+			"title": "Audio recording component",
+			"description": "As a user, I want to record myself speaking and play it back.",
+			"acceptanceCriteria": [
+				"Reusable AudioRecorder component using expo-av",
+				"Tap-to-record button with red pulsing indicator while recording",
+				"Auto-stops after 10 seconds of silence or manual stop",
+				"Playback button to hear own recording",
+				"Re-record option before submitting",
+				"Requests microphone permission with clear explanation text",
+				"Returns recorded audio URI to parent component",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 16,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-017",
+			"title": "Feedback display component",
+			"description": "As a user, I want to see clear feedback on my recording.",
+			"acceptanceCriteria": [
+				"Reusable FeedbackCard component",
+				"Shows scores as 1-5 dots for: rhythm, stress, pacing, intonation",
+				"Displays feedback items with indicators: ✅ good (green), ⚠️ warning (yellow), 💡 tip (blue)",
+				"Loading state while analysis runs",
+				"Accepts analysis result as props",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 17,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-018",
+			"title": "Stress drill exercise screen",
+			"description": "As a user, I want to practice word and sentence stress.",
+			"acceptanceCriteria": [
+				"Exercise screen for type='stress'",
+				"Shows instruction text at top",
+				"Displays sentence with stressed syllables highlighted (bold + color)",
+				"Integrates AudioPlayer for example, AudioRecorder for user, FeedbackCard for results",
+				"Flow: listen example → record → get feedback (calls /api/v1/analyze)",
+				"'Next exercise' button after viewing feedback",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 18,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-019",
+			"title": "Linking practice exercise screen",
+			"description": "As a user, I want to practice linking words together.",
+			"acceptanceCriteria": [
+				"Exercise screen for type='linking'",
+				"Shows connected speech with underscores or ties between linked words",
+				"Visual indicators showing where words link (e.g., 'pick‿it‿up')",
+				"Same listen → record → feedback flow as stress drills",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 19,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-020",
+			"title": "Chunk speaking exercise screen",
+			"description": "As a user, I want to practice speaking in thought groups.",
+			"acceptanceCriteria": [
+				"Exercise screen for type='chunk'",
+				"Sentence displayed divided into chunks with visual separators (slashes or cards)",
+				"Example audio demonstrates natural pauses between chunks",
+				"Same listen → record → feedback flow",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 20,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-021",
+			"title": "Intonation training exercise screen",
+			"description": "As a user, I want to practice rising/falling intonation patterns.",
+			"acceptanceCriteria": [
+				"Exercise screen for type='intonation'",
+				"Shows sentence with intonation arrows: ↗ rising, ↘ falling",
+				"Covers question vs statement patterns",
+				"Same listen → record → feedback flow",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 21,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-022",
+			"title": "Shadowing mode exercise screen",
+			"description": "As a user, I want to speak along with model audio and compare rhythm.",
+			"acceptanceCriteria": [
+				"Exercise screen for type='shadow'",
+				"Play button starts model audio while simultaneously recording user",
+				"After completion, shows simplified rhythm dots comparing model vs user timing",
+				"Side-by-side playback: model audio then user recording",
+				"Submits to /api/v1/analyze for feedback",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 22,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-023",
+			"title": "Exercise router — render correct screen by exercise type",
+			"description": "As a developer, I need a router that renders the right exercise screen based on type.",
+			"acceptanceCriteria": [
+				"ExerciseScreen component accepts exercise data and renders correct type screen",
+				"Routes: stress → StressDrill, linking → LinkingPractice, chunk → ChunkSpeaking, shadow → ShadowingMode, intonation → IntonationTraining",
+				"Tapping exercise on Home screen navigates to ExerciseScreen with exercise data",
+				"Back button returns to Home screen",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 23,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-024",
+			"title": "Session completion screen",
+			"description": "As a user, I want a satisfying completion screen after finishing a daily session.",
+			"acceptanceCriteria": [
+				"Shown after completing all exercises for the day",
+				"Displays: today's average score, streak count, improvement vs yesterday",
+				"Rotated motivational message from a preset list",
+				"'Done for today' button returns to Home",
+				"Saves session result to backend via POST /api/v1/progress",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 24,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-025",
+			"title": "Rhythm score dashboard screen",
+			"description": "As a user, I want to see my progress over time so I stay motivated.",
+			"acceptanceCriteria": [
+				"Dashboard tab screen fetches data from GET /api/v1/progress/{user_id}/summary",
+				"Line chart showing overall rhythm score over days (react-native-chart-kit or victory-native)",
+				"Stats cards: practice streak, total sessions, average score",
+				"Breakdown by category: rhythm, stress, pacing, intonation",
+				"Daily/weekly toggle for chart view",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 25,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-026",
+			"title": "Meeting phrase library screen",
+			"description": "As a user, I want to browse and practice common meeting phrases.",
+			"acceptanceCriteria": [
+				"Library tab screen loads data from bundled meetings.json",
+				"4 category sections: Updates, Opinions, Clarifications, Presenting",
+				"Each phrase shows text, tap to expand with practice option",
+				"Tapping 'Practice' opens exercise flow (listen → record → feedback)",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 26,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-027",
+			"title": "14-day program overview screen",
+			"description": "As a user, I want to see the full 14-day program and my progress through it.",
+			"acceptanceCriteria": [
+				"Accessible from Home screen via 'View Program' link",
+				"Shows all 14 days with day number, theme, and completion status",
+				"Completed days marked with checkmark",
+				"Days unlock sequentially (tapping locked day shows confirmation to skip)",
+				"Tapping unlocked day navigates to that day's lesson",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 27,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-028",
+			"title": "Settings screen with BYOP API key configuration",
+			"description": "As a user, I want to configure my own speech API key for better feedback.",
+			"acceptanceCriteria": [
+				"Settings tab screen with 'Speech API' section",
+				"Provider dropdown: Free (default) / Azure / Google / OpenAI",
+				"API key text input (shown only when non-free provider selected)",
+				"API key stored in expo-secure-store (encrypted)",
+				"Test button that calls /api/v1/analyze with a sample to verify the key works",
+				"Success/error feedback after test",
+				"Typecheck passes",
+				"Verify in browser using dev-browser skill"
+			],
+			"priority": 28,
+			"passes": false,
+			"notes": ""
+		},
+		{
+			"id": "US-029",
+			"title": "Create remaining curriculum content — Days 4-14",
+			"description": "As a user, I want the full 14-day program of exercises.",
+			"acceptanceCriteria": [
+				"Create content/curriculum/day-04.json through day-14.json",
+				"Day 4-5: Shadowing exercises introduced",
+				"Day 6-7: Meeting phrases and professional scenarios",
+				"Day 8-10: Mixed drills combining all exercise types",
+				"Day 11-13: Advanced linking, reduction, and natural speech patterns",
+				"Day 14: Final review with all exercise types",
+				"Each day has 3-5 exercises, all validate against schema",
+				"Typecheck passes"
+			],
+			"priority": 29,
+			"passes": false,
+			"notes": ""
+		}
+	]
+}

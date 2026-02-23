@@ -1,0 +1,353 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "English Rhythm Coach Curriculum Schema",
+  "description": "Schema for curriculum content including days, exercises, and meeting phrases",
+  "definitions": {
+    "Exercise": {
+      "$defs": {
+        "ExerciseType": {
+          "enum": [
+            "stress",
+            "linking",
+            "chunk",
+            "shadow",
+            "intonation"
+          ],
+          "title": "ExerciseType",
+          "type": "string"
+        }
+      },
+      "example": {
+        "audioUrl": "/audio/stress-001.mp3",
+        "chunks": null,
+        "id": "ex-001",
+        "instruction": "Listen and repeat, emphasizing the bold syllables",
+        "stressPattern": [
+          false,
+          false,
+          true,
+          false,
+          false,
+          true
+        ],
+        "targetText": "Hello, how are you today?",
+        "tips": [
+          "Keep unstressed syllables short and quiet",
+          "Pronounce stressed syllables clearly and slightly longer"
+        ],
+        "title": "Word Stress Practice",
+        "type": "stress"
+      },
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the exercise",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/ExerciseType",
+          "description": "Type of exercise"
+        },
+        "title": {
+          "description": "Display title of the exercise",
+          "title": "Title",
+          "type": "string"
+        },
+        "instruction": {
+          "description": "Instructions for the user",
+          "title": "Instruction",
+          "type": "string"
+        },
+        "targetText": {
+          "description": "The sentence/text to practice",
+          "title": "Targettext",
+          "type": "string"
+        },
+        "stressPattern": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "boolean"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Array indicating stressed syllables (True) vs unstressed (False)",
+          "title": "Stresspattern"
+        },
+        "chunks": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of text chunks for thought group exercises",
+          "title": "Chunks"
+        },
+        "audioUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "URL or path to example audio file",
+          "title": "Audiourl"
+        },
+        "tips": {
+          "description": "Tips for the user",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tips",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "title",
+        "instruction",
+        "targetText"
+      ],
+      "title": "Exercise",
+      "type": "object"
+    },
+    "Day": {
+      "$defs": {
+        "Exercise": {
+          "example": {
+            "audioUrl": "/audio/stress-001.mp3",
+            "chunks": null,
+            "id": "ex-001",
+            "instruction": "Listen and repeat, emphasizing the bold syllables",
+            "stressPattern": [
+              false,
+              false,
+              true,
+              false,
+              false,
+              true
+            ],
+            "targetText": "Hello, how are you today?",
+            "tips": [
+              "Keep unstressed syllables short and quiet",
+              "Pronounce stressed syllables clearly and slightly longer"
+            ],
+            "title": "Word Stress Practice",
+            "type": "stress"
+          },
+          "properties": {
+            "id": {
+              "description": "Unique identifier for the exercise",
+              "title": "Id",
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/ExerciseType",
+              "description": "Type of exercise"
+            },
+            "title": {
+              "description": "Display title of the exercise",
+              "title": "Title",
+              "type": "string"
+            },
+            "instruction": {
+              "description": "Instructions for the user",
+              "title": "Instruction",
+              "type": "string"
+            },
+            "targetText": {
+              "description": "The sentence/text to practice",
+              "title": "Targettext",
+              "type": "string"
+            },
+            "stressPattern": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "boolean"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Array indicating stressed syllables (True) vs unstressed (False)",
+              "title": "Stresspattern"
+            },
+            "chunks": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "List of text chunks for thought group exercises",
+              "title": "Chunks"
+            },
+            "audioUrl": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "URL or path to example audio file",
+              "title": "Audiourl"
+            },
+            "tips": {
+              "description": "Tips for the user",
+              "items": {
+                "type": "string"
+              },
+              "title": "Tips",
+              "type": "array"
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "title",
+            "instruction",
+            "targetText"
+          ],
+          "title": "Exercise",
+          "type": "object"
+        },
+        "ExerciseType": {
+          "enum": [
+            "stress",
+            "linking",
+            "chunk",
+            "shadow",
+            "intonation"
+          ],
+          "title": "ExerciseType",
+          "type": "string"
+        }
+      },
+      "example": {
+        "day": 1,
+        "exercises": [
+          {
+            "audioUrl": "/audio/ex-001.mp3",
+            "id": "ex-001",
+            "instruction": "Practice the stress pattern",
+            "stressPattern": [
+              false,
+              false,
+              true,
+              false,
+              true
+            ],
+            "targetText": "Hello, how are you?",
+            "tips": [
+              "Keep unstressed syllables short"
+            ],
+            "title": "Basic Stress Patterns",
+            "type": "stress"
+          }
+        ],
+        "theme": "Word Stress Basics"
+      },
+      "properties": {
+        "day": {
+          "description": "Day number in the curriculum (1-14)",
+          "title": "Day",
+          "type": "integer"
+        },
+        "theme": {
+          "description": "Theme or topic for the day",
+          "title": "Theme",
+          "type": "string"
+        },
+        "exercises": {
+          "description": "List of exercises for the day",
+          "items": {
+            "$ref": "#/$defs/Exercise"
+          },
+          "title": "Exercises",
+          "type": "array"
+        }
+      },
+      "required": [
+        "day",
+        "theme",
+        "exercises"
+      ],
+      "title": "Day",
+      "type": "object"
+    },
+    "MeetingPhrase": {
+      "example": {
+        "audioUrl": "/audio/mp-001.mp3",
+        "category": "updates",
+        "id": "mp-001",
+        "text": "I'd like to provide an update on the project."
+      },
+      "properties": {
+        "id": {
+          "description": "Unique identifier for the phrase",
+          "title": "Id",
+          "type": "string"
+        },
+        "category": {
+          "description": "Category of the meeting phrase",
+          "title": "Category",
+          "type": "string"
+        },
+        "text": {
+          "description": "The phrase text",
+          "title": "Text",
+          "type": "string"
+        },
+        "audioUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "URL or path to example audio file",
+          "title": "Audiourl"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "text"
+      ],
+      "title": "MeetingPhrase",
+      "type": "object"
+    }
+  }
+}
