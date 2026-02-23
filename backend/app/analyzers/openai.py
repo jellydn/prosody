@@ -11,7 +11,7 @@ class OpenAIAnalyzer(SpeechAnalyzer):
         with open(audio_path, "rb") as audio_file:
             transcription_response = await self.client.audio.transcriptions.create(
                 model="whisper-1",
-                file=audio_file,
+                file=(audio_path, audio_file, "audio/wav"),
             )
 
         recognized_text = transcription_response.text

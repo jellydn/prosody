@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from unittest.mock import AsyncMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -88,6 +89,70 @@ def test_score_validation():
     assert 1.0 <= result.stress_score <= 5.0
     assert 1.0 <= result.pacing_score <= 5.0
     assert 1.0 <= result.intonation_score <= 5.0
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 8),
+    reason="Mock requires Python 3.8+",
+)
+def test_openai_analyzer_instantiation():
+    try:
+        from app.analyzers.openai import OpenAIAnalyzer
+        from openai import AsyncOpenAI
+
+        analyzer = OpenAIAnalyzer(api_key="test-key")
+        assert isinstance(analyzer, SpeechAnalyzer)
+        assert hasattr(analyzer, "analyze")
+        assert isinstance(analyzer.client, AsyncOpenAI)
+    except ImportError:
+        pytest.skip("openai package not installed")
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 8),
+    reason="Mock requires Python 3.8+",
+)
+@pytest.mark.asyncio
+async def test_openai_analyze_signature():
+    try:
+        from app.analyzers.openai import OpenAIAnalyzer
+        from unittest.mock import patch, MagicMock
+
+        analyzer = OpenAIAnalyzer(api_key="test-key")
+
+        mock_transcription = MagicMock()
+        mock_transcription.text = "hello world"
+
+        with patch.object(
+            analyzer.client.audio.transcriptions, "create", new_callable=AsyncMock
+        ) as mock_create:
+            mock_create.return_value = mock_transcription
+            with patch("builtins.open", MagicMock()) as mock_open:
+                mock_open.return_value.__enter__ = MagicMock()
+                mock_open.return_value.__exit__ = MagicMock()
+                mock_open.return_value.read = MagicMock(return_value=b"fake audio data")
+
+                result = await analyzer.analyze("test.wav", "hello world")
+
+                assert isinstance(result, AnalysisResult)
+                assert 1.0 <= result.rhythm_score <= 5.0
+                assert 1.0 <= result.stress_score <= 5.0
+                assert 1.0 <= result.pacing_score <= 5.0
+                assert 1.0 <= result.intonation_score <= 5.0
+
+                mock_create.assert_called_once()
+                call_args = mock_create.call_args
+                assert "file" in call_args.kwargs
+                assert "model" in call_args.kwargs
+                assert call_args.kwargs["model"] == "whisper-1"
+
+                file_arg = call_args.kwargs["file"]
+                assert isinstance(file_arg, tuple)
+                assert len(file_arg) == 3
+                assert file_arg[0] == "test.wav"
+                assert file_arg[2] == "audio/wav"
+    except ImportError:
+        pytest.skip("openai package not installed")
 
 
 if __name__ == "__main__":
