@@ -694,3 +694,34 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - TypeScript imports: Import useEffect and useState from 'react', not 'react-native'
   - Unused parameter fix: Remove unused parameters or prefix with underscore
   - Error handling: console.error for caught errors before showing user-facing alert
+
+## [2026-02-24] - US-027
+- Implemented 14-day program overview screen with all 14 days displayed
+- Added "View Program" button to HomeScreen that navigates to ProgramOverviewScreen
+- Created ProgramOverviewScreen with day cards showing day number, theme, and completion status
+- Implemented progress tracking by fetching from GET /api/v1/progress/{userId}
+- Implemented sequential day unlocking: Day N is unlocked if user completed days 1 to N-1
+- Added confirmation dialog when trying to access locked days (Alert.alert with skip option)
+- Added visual indicators: checkmark for completed days, lock icon for locked days
+- Added stats section showing unlocked days count, completed days count, total days
+- Themes for all 14 days: Word Stress Basics, Linking Words Together, Speaking in Chunks, Shadowing Practice, Advanced Shadowing, Meeting Scenarios, Professional Phrases, Mixed Drills I/II/III, Advanced Linking, Word Reductions, Natural Speech, Final Review
+- Updated HomeStackParamList to include ProgramOverview route
+- Updated HomeStack navigator to include ProgramOverviewScreen
+- Updated AGENTS.md with navigation patterns and progress tracking documentation
+- Files changed:
+  - mobile/screens/ProgramOverviewScreen.tsx (New program overview screen)
+  - mobile/screens/HomeScreen.tsx (Added View Program button)
+  - mobile/screens/ExerciseScreen.tsx (Added ProgramOverview to HomeStackParamList)
+  - mobile/navigation/TabNavigator.tsx (Added ProgramOverview to HomeStack)
+  - AGENTS.md (Added navigation patterns and progress tracking sections)
+- Quality checks: npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Program overview screens should display progress from backend API (GET /api/v1/progress/{userId})
+  - Day locking logic: Track completed days in a Set, calculate max completed day, unlock sequentially
+  - Confirmation dialogs: Use Alert.alert(title, message, [{text, onPress, style}, ...]) with destructive style for destructive actions
+  - Visual status indicators: Checkmark circle for completed, lock closed for locked, gray opacity for unavailable
+  - Stats cards: Use consistent shadow/elevation styling for visual hierarchy
+  - Theme mapping: Use Record<number, string> for day themes when curriculum JSON files may not exist for all days
+  - Progress API: Session data includes day number which can be used to track completion status
+  - Day theme names: Use descriptive titles that match exercise focus (e.g., "Word Reductions", "Natural Speech")
