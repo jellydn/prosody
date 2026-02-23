@@ -614,8 +614,8 @@
 				"All JSON files validate correctly"
 			],
 			"priority": 38,
-			"passes": false,
-			"notes": "BUG: day01-ex02 has 4 words but 7 stressPattern booleans (syllable-level vs word-level)"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-039",
