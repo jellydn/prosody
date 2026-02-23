@@ -1,3 +1,22 @@
 # Ralph Progress Log
 Started: Mon Feb 23 23:13:14 +08 2026
 ---
+
+## [2026-02-23] - US-001
+- Implemented Pydantic models for curriculum content (Exercise, Day, MeetingPhrase)
+- Created ExerciseType enum with five types: stress, linking, chunk, shadow, intonation
+- Generated JSON schemas from Pydantic models using custom generation script
+- Schema files exported to backend/app/content/schema/
+- Files changed:
+  - backend/app/content/schema/models.py (Pydantic models)
+  - backend/app/content/schema/curriculum.json (combined schema)
+  - backend/app/content/schema/{exercise,day,meetingphrase}.json (individual schemas)
+  - scripts/generate_schema.py (schema generation script)
+  - backend/requirements.txt (dependencies)
+- Quality checks: ruff check && ruff format passed
+- **Learnings for future iterations:**
+  - Use Pydantic for type-safe data models and automatic JSON schema generation
+  - Schema generation script at scripts/generate_schema.py should be run after model changes
+  - All Python code must pass ruff check and format before committing
+  - LSP errors about unresolved imports are expected before pip install
+---
