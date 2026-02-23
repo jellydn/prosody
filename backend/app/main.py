@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import init_db
 from app.api.progress import router as progress_router
+from app.api.analyze import router as analyze_router
 
 app = FastAPI(
     title="English Rhythm Coach API",
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(progress_router)
+app.include_router(analyze_router)
 
 
 @app.on_event("startup")

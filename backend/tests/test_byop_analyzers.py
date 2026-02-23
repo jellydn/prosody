@@ -10,7 +10,6 @@ from app.analyzers.base import (
     FeedbackItem,
     FeedbackType,
 )
-from unittest.mock import Mock, AsyncMock
 
 
 class MockAnalyzer(SpeechAnalyzer):
