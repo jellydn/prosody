@@ -600,8 +600,8 @@
 				"Typecheck passes"
 			],
 			"priority": 37,
-			"passes": false,
-			"notes": "BUG: renderTextForChunk uses local index instead of global word offset"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-038",
