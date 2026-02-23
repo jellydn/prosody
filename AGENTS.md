@@ -51,6 +51,8 @@ cd mobile
 npx expo install           # Install dependencies
 npx expo start             # Start dev server
 npx tsc --noEmit           # TypeScript check
+oxlint .                   # Lint (uses oxlint)
+oxfmt .                    # Format (uses oxfmt)
 npx jest                   # Run all tests
 npx jest --testNamePattern="test_name"    # Run single test
 npx jest --testPathPattern="filename"      # Run tests in specific file
