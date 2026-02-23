@@ -21,11 +21,18 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.RECORD_AUDIO", "android.permission.MODIFY_AUDIO_SETTINGS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-audio"]
+    "plugins": ["expo-audio"],
+    "extra": {
+      "eas": {
+        "projectId": "3b25ceb8-1c89-4b6e-a10b-a0750be1e6d7"
+      }
+    },
+    "owner": "dunghd"
   }
 }
