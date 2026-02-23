@@ -4,7 +4,7 @@ import TabBarIcon from "../components/TabBarIcon";
 import DashboardScreen from "../screens/DashboardScreen";
 import ExerciseScreen, { type HomeStackParamList } from "../screens/ExerciseScreen";
 import HomeScreen from "../screens/HomeScreen";
-import LibraryScreen from "../screens/LibraryScreen";
+import LibraryScreen, { type LibraryStackParamList } from "../screens/LibraryScreen";
 import SessionCompletionScreen from "../screens/SessionCompletionScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const DashboardStack = createNativeStackNavigator();
-const LibraryStack = createNativeStackNavigator();
+const LibraryStack = createNativeStackNavigator<LibraryStackParamList>();
 const SettingsStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
@@ -33,6 +33,23 @@ function HomeStackScreen() {
   );
 }
 
+function LibraryStackScreen() {
+  return (
+    <LibraryStack.Navigator>
+      <LibraryStack.Screen
+        name="LibraryMain"
+        component={LibraryScreen}
+        options={{ headerShown: false }}
+      />
+      <LibraryStack.Screen
+        name="ExerciseScreen"
+        component={ExerciseScreen}
+        options={{ headerShown: false }}
+      />
+    </LibraryStack.Navigator>
+  );
+}
+
 function DashboardStackScreen() {
   return (
     <DashboardStack.Navigator>
@@ -42,18 +59,6 @@ function DashboardStackScreen() {
         options={{ headerShown: false }}
       />
     </DashboardStack.Navigator>
-  );
-}
-
-function LibraryStackScreen() {
-  return (
-    <LibraryStack.Navigator>
-      <LibraryStack.Screen
-        name="LibraryMain"
-        component={LibraryScreen}
-        options={{ headerShown: false }}
-      />
-    </LibraryStack.Navigator>
   );
 }
 
