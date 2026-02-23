@@ -1,5 +1,9 @@
 # 🎵 English Rhythm Coach
 
+<div align="center">
+  <img src="logo.svg" width="200" alt="English Rhythm Coach Logo" />
+</div>
+
 > _"Fitness app for English speaking rhythm"_
 
 A mobile app that helps non-native English speakers sound more natural and confident through short daily exercises, AI feedback, and real-world speaking scenarios. Starting with Vietnamese professionals.
@@ -173,3 +177,32 @@ Vietnamese professionals working in English environments — engineers, knowledg
 - Rhythm score improvement after 14 days
 - ≥ 40% users record 5+ sessions/week
 - Audio analysis response < 5 seconds (p95)
+
+---
+
+## Connect
+
+<div id="badges">
+  <a href="https://www.linkedin.com/in/dunghd">
+    <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
+  </a>
+  <a href="https://www.youtube.com/c/ITManVietnam">
+    <img src="https://img.shields.io/badge/YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Youtube Badge"/>
+  </a>
+  <a href="https://www.twitter.com/jellydn">
+    <img src="https://img.shields.io/badge/Twitter-blue?style=for-the-badge&logo=twitter&logoColor=white" alt="Twitter Badge"/>
+  </a>
+  <a href="https://blog.productsway.com">
+    <img src="https://img.shields.io/badge/Blog-FF5722?style=for-the-badge&logo=blogger&logoColor=white" alt="Blog Badge"/>
+  </a>
+</div>
+
+---
+
+## Show Your Support
+
+If you find this project helpful, consider supporting the development:
+
+[![kofi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
+[![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd)
+[![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)
