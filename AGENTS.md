@@ -21,6 +21,9 @@ This file provides coding guidelines for AI agents working on English Rhythm Coa
 | Run single test       | `just backend-test-single "test_name"`                               |
 | Lint/format backend   | `just backend-lint` or `cd backend && ruff check . && ruff format .` |
 | TypeScript check      | `just mobile-typecheck` or `cd mobile && npx tsc --noEmit`           |
+| Run all checks        | `just check`                                                         |
+
+> **Tip**: Run `just` or `just --list` to see all available commands.
 
 ---
 
@@ -117,6 +120,44 @@ async def analyze(request: AnalyzeRequest):
 - Use try/catch for async operations
 - Display user-friendly error messages with toast/alert
 - Log errors to console for debugging
+
+---
+
+## Mobile-Specific Patterns
+
+### AsyncStorage
+
+- **Key naming**: Use descriptive keys (e.g., `"userProfile"`, `"userId"`)
+- **Data format**: Store JSON objects as strings (use `JSON.stringify()` / `JSON.parse()`)
+- **API keys**: Store API keys in `expo-secure-store` (encrypted), not AsyncStorage
+- **Error handling**: Try/catch around all AsyncStorage operations
+
+### Onboarding Flow
+
+- **Check status**: Use `useEffect` + `useCallback` to check AsyncStorage on app mount
+- **Navigation**: Use native stack navigator (`createNativeStackNavigator`) for onboarding
+- **Screen transition**: Use `navigation.replace()` to prevent going back to onboarding
+- **Form validation**: Disable submit button until all required fields are selected
+- **Loading state**: Show loading indicator while checking status or submitting API calls
+
+### API Integration
+
+- **Base URL**: Use `http://localhost:8000` for development
+- **Endpoints**:
+  - POST `/api/v1/users` - Create user profile (returns `{user_id: int}`)
+  - POST `/api/v1/progress` - Save session result
+  - GET `/api/v1/progress/{user_id}` - Get progress history
+  - GET `/api/v1/progress/{user_id}/summary` - Get progress summary
+- **Request format**: JSON with `Content-Type: application/json` header
+- **Error handling**: Show user-friendly alert, log error for debugging
+
+### Form UI Patterns
+
+- **KeyboardAvoidingView**: Wrap forms in `KeyboardAvoidingView` (iOS: `behavior="padding"`, Android: `behavior="height"`)
+- **ScrollView**: Use with `keyboardShouldPersistTaps="handled"` for scrollable forms
+- **Option selection**: Use `TouchableOpacity` with conditional styling (border color, background color)
+- **Selected state**: Change text color to white when option is selected
+- **Disabled state**: Use lower opacity for disabled buttons
 
 ---
 
