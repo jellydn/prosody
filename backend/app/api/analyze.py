@@ -1,8 +1,9 @@
+import logging
+import os
+import tempfile
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
 from pydantic import BaseModel
 from typing import Optional, List
-import tempfile
-import os
 
 
 class AnalysisResponse(BaseModel):
@@ -14,6 +15,7 @@ class AnalysisResponse(BaseModel):
 
 
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
+logger = logging.getLogger(__name__)
 
 
 SUPPORTED_FORMATS = {
@@ -44,7 +46,24 @@ async def analyze_audio(
     ),
     api_key: Optional[str] = Form(None, description="API key for paid providers"),
 ):
+    resolved_provider = (provider or "free").lower()
+    audio_size_bytes: Optional[int] = None
+
+    logger.info(
+        "Analyze request received provider=%s content_type=%s filename=%s target_length=%d",
+        resolved_provider,
+        audio.content_type,
+        audio.filename,
+        len(target_text),
+    )
+
     if audio.content_type not in SUPPORTED_FORMATS:
+        logger.warning(
+            "Unsupported audio format provider=%s content_type=%s filename=%s",
+            resolved_provider,
+            audio.content_type,
+            audio.filename,
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported audio format. Supported formats: {', '.join(SUPPORTED_FORMATS)}",
@@ -56,10 +75,22 @@ async def analyze_audio(
         from app.analyzers.factory import get_analyzer
         from app.analyzers.base import AnalysisResult
 
-        analyzer = get_analyzer(provider or "free", api_key)
+        analyzer = get_analyzer(resolved_provider, api_key)
 
         audio_content = await audio.read()
-        if len(audio_content) > MAX_AUDIO_SIZE_BYTES:
+        audio_size_bytes = len(audio_content)
+        logger.info(
+            "Audio payload loaded provider=%s size_bytes=%d",
+            resolved_provider,
+            audio_size_bytes,
+        )
+        if audio_size_bytes > MAX_AUDIO_SIZE_BYTES:
+            logger.warning(
+                "Audio payload too large provider=%s size_bytes=%d max_size_bytes=%d",
+                resolved_provider,
+                audio_size_bytes,
+                MAX_AUDIO_SIZE_BYTES,
+            )
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail=f"Audio file exceeds maximum size of {MAX_AUDIO_SIZE_BYTES // (1024 * 1024)}MB",
@@ -77,6 +108,11 @@ async def analyze_audio(
 
             source_format = CONTENT_TYPE_TO_FORMAT.get(audio.content_type)
             if not source_format:
+                logger.warning(
+                    "Unsupported audio conversion content type provider=%s content_type=%s",
+                    resolved_provider,
+                    audio.content_type,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Unsupported conversion content type: {audio.content_type}",
@@ -85,13 +121,31 @@ async def analyze_audio(
             try:
                 audio_segment = AudioSegment.from_file(temp_path, format=source_format)
                 audio_segment.export(temp_path, format="wav")
+                logger.info(
+                    "Audio converted to wav provider=%s source_format=%s",
+                    resolved_provider,
+                    source_format,
+                )
             except Exception:
+                logger.exception(
+                    "Audio conversion failed provider=%s source_format=%s",
+                    resolved_provider,
+                    source_format,
+                )
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Failed to convert audio format",
                 )
 
         result: AnalysisResult = await analyzer.analyze(temp_path, target_text)
+        logger.info(
+            "Analysis completed provider=%s rhythm=%.2f stress=%.2f pacing=%.2f intonation=%.2f",
+            resolved_provider,
+            result.rhythm_score,
+            result.stress_score,
+            result.pacing_score,
+            result.intonation_score,
+        )
 
         feedback_list = [
             {"type": item.type.value, "message": item.message}
@@ -108,7 +162,23 @@ async def analyze_audio(
 
     except HTTPException:
         raise
+    except ValueError as exc:
+        logger.warning(
+            "Analysis request rejected provider=%s reason=%s",
+            resolved_provider,
+            str(exc),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
     except Exception:
+        logger.exception(
+            "Unexpected analysis failure provider=%s content_type=%s audio_size_bytes=%s",
+            resolved_provider,
+            audio.content_type,
+            audio_size_bytes,
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Analysis failed",
