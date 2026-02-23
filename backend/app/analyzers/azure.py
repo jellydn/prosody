@@ -1,3 +1,4 @@
+import asyncio
 from azure.cognitiveservices.speech import (
     AudioConfig,
     SpeechConfig,
@@ -21,7 +22,7 @@ class AzureAnalyzer(SpeechAnalyzer):
             speech_config=speech_config, audio_config=audio_config
         )
 
-        result = recognizer.recognize_once()
+        result = await asyncio.to_thread(recognizer.recognize_once)
 
         if result.reason == ResultReason.RecognizedSpeech:
             recognized_text = result.text
@@ -42,7 +43,7 @@ class AzureAnalyzer(SpeechAnalyzer):
         rhythm_score = self._calculate_rhythm(recognized_text, target_text)
         stress_score = self._calculate_stress(recognized_text, target_text)
         pacing_score = self._calculate_pacing(recognized_text, target_text)
-        intonation_score = self._calculate_intonation()
+        intonation_score = self._calculate_intonation(recognized_text, target_text)
 
         feedback_items = self._generate_feedback(
             rhythm_score, stress_score, pacing_score, intonation_score
@@ -74,8 +75,19 @@ class AzureAnalyzer(SpeechAnalyzer):
         ratio = min(recognized_words, target_words) / max(target_words, 1)
         return round(max(1.0, min(5.0, ratio * 5)), 1)
 
-    def _calculate_intonation(self) -> float:
-        return 3.5
+    def _calculate_intonation(self, recognized: str, target: str) -> float:
+        score = 3.0
+        target_has_question = "?" in target
+        recognized_has_question = "?" in recognized
+        if target_has_question == recognized_has_question:
+            score += 1.0
+
+        recognized_words = recognized.lower().split()
+        if recognized_words:
+            lexical_variety = len(set(recognized_words)) / len(recognized_words)
+            score += min(1.0, lexical_variety)
+
+        return round(max(1.0, min(5.0, score)), 1)
 
     def _word_similarity(self, text1: str, text2: str) -> float:
         words1 = set(text1.lower().split())

@@ -9,13 +9,10 @@ class OpenAIAnalyzer(SpeechAnalyzer):
 
     async def analyze(self, audio_path: str, target_text: str) -> AnalysisResult:
         with open(audio_path, "rb") as audio_file:
-            audio_file.seek(0)
-            audio_data = audio_file.read()
-
-        transcription_response = await self.client.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio_data,
-        )
+            transcription_response = await self.client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+            )
 
         recognized_text = transcription_response.text
 
@@ -36,7 +33,7 @@ class OpenAIAnalyzer(SpeechAnalyzer):
         rhythm_score = self._calculate_rhythm(recognized_text, target_text)
         stress_score = self._calculate_stress(recognized_text, target_text)
         pacing_score = self._calculate_pacing(recognized_text, target_text)
-        intonation_score = self._calculate_intonation()
+        intonation_score = self._calculate_intonation(recognized_text, target_text)
 
         feedback_items = self._generate_feedback(
             rhythm_score, stress_score, pacing_score, intonation_score
@@ -68,8 +65,19 @@ class OpenAIAnalyzer(SpeechAnalyzer):
         ratio = min(recognized_words, target_words) / max(target_words, 1)
         return round(max(1.0, min(5.0, ratio * 5)), 1)
 
-    def _calculate_intonation(self) -> float:
-        return 3.5
+    def _calculate_intonation(self, recognized: str, target: str) -> float:
+        score = 3.0
+        target_has_question = "?" in target
+        recognized_has_question = "?" in recognized
+        if target_has_question == recognized_has_question:
+            score += 1.0
+
+        recognized_words = recognized.lower().split()
+        if recognized_words:
+            lexical_variety = len(set(recognized_words)) / len(recognized_words)
+            score += min(1.0, lexical_variety)
+
+        return round(max(1.0, min(5.0, score)), 1)
 
     def _word_similarity(self, text1: str, text2: str) -> float:
         words1 = set(text1.lower().split())
