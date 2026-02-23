@@ -156,6 +156,15 @@ async def analyze(request: AnalyzeRequest):
 - Display progress with visual indicators (checkmarks, lock icons, status badges)
 - Confirm day skipping with Alert.alert() for locked days
 
+### API Key Management
+
+- BYOP (Bring Your Own Provider) pattern: Users can configure their own API keys for Azure/Google/OpenAI
+- Use `expo-secure-store` for encrypted storage of sensitive data (API keys)
+- SecureStore keys: Use descriptive names like "speech_api_key", "speech_provider"
+- API key validation: Test button calls POST /api/v1/analyze with provider and api_key parameters
+- Dropdown pattern: Use TouchableOpacity with state management for custom dropdowns in React Native
+- Conditional UI: Only show API key input field when provider !== "free"
+
 ---
 
 ## Project Structure
