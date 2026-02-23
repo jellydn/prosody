@@ -18,19 +18,24 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Install dependencies
         working-directory: backend
-        run: |
-          pip install -r requirements.txt
-          pip install ruff
+        run: uv sync --dev --frozen
+
+      - name: Lockfile up-to-date
+        working-directory: backend
+        run: uv lock --check
 
       - name: Lint
         working-directory: backend
-        run: ruff check . && ruff format --check .
+        run: uv run ruff check . && uv run ruff format --check .
 
       - name: Run tests
         working-directory: backend
-        run: pytest -v
+        run: uv run pytest -v
 
   mobile:
     name: Mobile Tests

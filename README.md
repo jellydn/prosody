@@ -141,8 +141,17 @@ english-rhythm-coach/
 
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+uv sync --dev --frozen
+uv run uvicorn app.main:app --reload
+```
+
+When you change dependencies:
+
+```bash
+cd backend
+uv add <package>              # or: uv remove <package>
+uv lock
+uv sync --dev --frozen
 ```
 
 ### Mobile App

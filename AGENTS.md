@@ -28,12 +28,14 @@ Run `just` or `just --list` to see all commands.
 
 ```bash
 cd backend
-uvicorn app.main:app --reload     # Dev server
-pytest -v                         # All tests
-pytest -k "test_name"             # Single test by pattern
-pytest tests/test_file.py::func   # Specific function
-ruff check . && ruff format .     # Lint + format
-python scripts/generate_schema.py # Generate JSON schema
+uv sync --dev --frozen             # Install from lockfile
+uv lock --check                    # Verify lockfile is current
+uv run uvicorn app.main:app --reload     # Dev server
+uv run pytest -v                         # All tests
+uv run pytest -k "test_name"             # Single test by pattern
+uv run pytest tests/test_file.py::func   # Specific function
+uv run ruff check . && uv run ruff format .     # Lint + format
+uv run python scripts/generate_schema.py # Generate JSON schema
 ```
 
 ### Mobile
@@ -178,7 +180,8 @@ backend/
 │   ├── models.py         # Database models
 │   └── main.py           # FastAPI entry
 ├── tests/
-└── requirements.txt
+├── pyproject.toml
+└── uv.lock
 
 mobile/
 ├── app/                  # Screens & navigation

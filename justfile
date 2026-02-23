@@ -11,25 +11,28 @@ install:
 
 # Backend commands
 backend-install:
-    cd backend && pip install -r requirements.txt
+    cd backend && uv sync --dev --frozen
+
+backend-lock-check:
+    cd backend && uv lock --check
 
 backend-dev:
-    cd backend && uvicorn app.main:app --reload
+    cd backend && uv run uvicorn app.main:app --reload
 
 backend-test:
-    cd backend && pytest -v
+    cd backend && uv run pytest -v
 
 backend-test-single TEST:
-    cd backend && pytest -k "{{TEST}}"
+    cd backend && uv run pytest -k "{{TEST}}"
 
 backend-test-file FILE:
-    cd backend && pytest {{FILE}} -v
+    cd backend && uv run pytest {{FILE}} -v
 
 backend-lint:
-    cd backend && ruff check . && ruff format .
+    cd backend && uv run ruff check . && uv run ruff format .
 
 backend-schema:
-    cd backend && python ../scripts/generate_schema.py
+    cd backend && uv run python ../scripts/generate_schema.py
 
 # Mobile commands
 mobile-install:
@@ -67,7 +70,7 @@ dev: backend-dev mobile-dev
     echo "Started both backend and mobile dev servers"
 
 # Quality checks
-check-backend: backend-lint backend-test
+check-backend: backend-lock-check backend-lint backend-test
 check-mobile: mobile-typecheck mobile-lint
 
 check: check-backend check-mobile
