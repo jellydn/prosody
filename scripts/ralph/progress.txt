@@ -489,3 +489,28 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - API integration: Same FormData upload pattern across all exercise types
   - State management: recordedUri, isAnalyzing, analysisResult pattern
   - Cleanup pattern: useCallback with recordedUri dependency, cleanup in useEffect
+
+## [2026-02-23] - US-020
+- Implemented ChunkSpeakingScreen for thought group practice
+- Screen structure identical to StressDrillScreen and LinkingPracticeScreen for consistency
+- Thought groups section with title "Thought Groups"
+- Chunks rendered as numbered cards with visual separation
+- Each chunk card has: numbered circle (blue background), chunk text
+- Chunks displayed in vertical stack with gap for clear separation
+- Same exercise flow: instruction → chunks → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as previous screens
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/ChunkSpeakingScreen.tsx (Chunk speaking screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as StressDrillScreen and LinkingPracticeScreen
+  - Chunk rendering: Each chunk in a separate card with numbered indicator
+  - Visual separation: Gray background (#F8F8F8) for chunk cards
+  - Numbered indicator: Blue circle (#007AFF) with white bold number
+  - Gap styling: Use gap: 12 for consistent spacing between chunks
+  - Component props: exercise, onNext, onBack - same interface across all screens
+  - API integration: Same FormData upload pattern with target_text
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
+  - Chunk data: exercise.chunks array contains thought group strings
