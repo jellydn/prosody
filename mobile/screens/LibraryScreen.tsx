@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import type { Exercise } from "./ExerciseScreen";
+import type { Exercise, ExerciseScreenParams } from "./ExerciseScreen";
 
 interface MeetingPhrase {
   id: string;
@@ -17,18 +17,7 @@ interface MeetingsData {
 
 export type LibraryStackParamList = {
   LibraryMain: undefined;
-  ExerciseScreen: {
-    exercise: Exercise;
-    onComplete: (
-      exerciseId: string,
-      scores: {
-        rhythm_score: number;
-        stress_score: number;
-        pacing_score: number;
-        intonation_score: number;
-      },
-    ) => void;
-  };
+  ExerciseScreen: ExerciseScreenParams;
 };
 
 type LibraryScreenProps = NativeStackScreenProps<LibraryStackParamList, "LibraryMain">;
@@ -69,7 +58,7 @@ export default function LibraryScreen({ navigation }: LibraryScreenProps) {
   useEffect(() => {
     const loadMeetingsData = async () => {
       try {
-        const data = (await require("../assets/phrases/meetings.json")) as MeetingsData;
+        const data = require("../assets/phrases/meetings.json") as MeetingsData;
         setMeetingsData(data);
       } catch (error) {
         console.error("Failed to load meeting phrases:", error);
@@ -94,11 +83,7 @@ export default function LibraryScreen({ navigation }: LibraryScreenProps) {
       ],
     };
 
-    const onComplete = () => {
-      navigation.goBack();
-    };
-
-    navigation.navigate("ExerciseScreen", { exercise, onComplete });
+    navigation.navigate("ExerciseScreen", { exercise, source: "library" });
   };
 
   const togglePhrase = (phraseId: string) => {

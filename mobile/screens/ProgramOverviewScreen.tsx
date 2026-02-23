@@ -4,13 +4,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
-  Alert as RNAlert,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { API_BASE_URL } from "../config/api";
 import type { HomeStackParamList } from "./ExerciseScreen";
 
 export type ProgramOverviewScreenProps = NativeStackScreenProps<
@@ -53,7 +53,7 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
         return;
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/progress/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/progress/${userId}`);
       if (!response.ok) {
         return;
       }
@@ -87,7 +87,7 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
   const handleDayPress = useCallback(
     (dayCard: DayCardData) => {
       if (dayCard.isLocked) {
-        RNAlert.alert(
+        Alert.alert(
           "Day Locked",
           "Complete previous days to unlock this one. Do you want to skip anyway?",
           [
@@ -96,7 +96,7 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
               text: "Skip",
               style: "destructive",
               onPress: () => {
-                navigation.navigate("HomeMain");
+                navigation.navigate("HomeMain", { selectedDay: dayCard.day });
               },
             },
           ],
@@ -109,7 +109,7 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
         return;
       }
 
-      navigation.navigate("HomeMain");
+      navigation.navigate("HomeMain", { selectedDay: dayCard.day });
     },
     [navigation],
   );
@@ -152,7 +152,6 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
                 dayCard.isLocked && styles.dayCardLocked,
               ]}
               onPress={() => handleDayPress(dayCard)}
-              disabled={dayCard.isLocked && !dayCard.isCompleted}
             >
               <View style={styles.dayHeader}>
                 <View style={styles.dayNumber}>

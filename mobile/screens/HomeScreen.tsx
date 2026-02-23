@@ -2,10 +2,17 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import day01Data from "../assets/curriculum/day-01.json";
-import type { Exercise, ExerciseType, HomeStackParamList } from "./ExerciseScreen";
+import { CURRICULUM_BY_DAY } from "../assets/curriculum";
+import { API_BASE_URL } from "../config/api";
+import type {
+  Exercise,
+  ExerciseType,
+  HomeStackParamList,
+  ExerciseScores,
+} from "./ExerciseScreen";
 
 type DayData = {
   day: number;
@@ -21,10 +28,13 @@ const EXERCISE_ICONS: Record<ExerciseType, string> = {
   intonation: "trending-up",
 };
 
-export default function HomeScreen() {
+type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "HomeMain">;
+const LAST_AVAILABLE_DAY = Math.max(...Object.keys(CURRICULUM_BY_DAY).map(Number));
+
+export default function HomeScreen({ route }: HomeScreenProps) {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [currentDay, setCurrentDay] = useState<DayData | null>(null);
-  const [completedExercises, _setCompletedExercises] = useState<Set<string>>(new Set());
+  const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set());
   const [sessionScores, setSessionScores] = useState<
     Array<{
       exerciseId: string;
@@ -34,47 +44,91 @@ export default function HomeScreen() {
       intonation_score: number;
     }>
   >([]);
-  const [streak, setStreak] = useState<number>(5);
+  const [streak, setStreak] = useState<number>(0);
   const [previousAverage, setPreviousAverage] = useState<number | undefined>(undefined);
+  const [lastCompletedAtHandled, setLastCompletedAtHandled] = useState<number | null>(null);
 
   const loadProgress = useCallback(async () => {
     try {
       const userId = await AsyncStorage.getItem("userId");
-      if (userId) {
-        const response = await fetch(`http://localhost:8000/api/v1/progress/${userId}/summary`);
-        if (response.ok) {
-          const data = await response.json();
-          setStreak(data.streak || 0);
+      if (!userId) {
+        setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
+        return;
+      }
 
-          if (data.average_score !== null) {
-            setPreviousAverage(data.average_score);
-          }
+      const [summaryResponse, sessionsResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/v1/progress/${userId}/summary`),
+        fetch(`${API_BASE_URL}/api/v1/progress/${userId}`),
+      ]);
+
+      if (summaryResponse.ok) {
+        const data = await summaryResponse.json();
+        setStreak(data.streak || 0);
+
+        if (data.average_score !== null) {
+          setPreviousAverage(data.average_score);
         }
+      }
+
+      if (sessionsResponse.ok) {
+        const sessions = (await sessionsResponse.json()) as Array<{ day: number }>;
+        const completedDays = new Set(sessions.map((session) => session.day));
+        const highestCompletedDay =
+          completedDays.size > 0 ? Math.max(...Array.from(completedDays)) : 0;
+        const nextDay = Math.min(highestCompletedDay + 1, 14);
+        const selectedDay = route.params?.selectedDay ?? nextDay;
+        const dayToLoad = selectedDay in CURRICULUM_BY_DAY ? selectedDay : LAST_AVAILABLE_DAY;
+        setCurrentDay(CURRICULUM_BY_DAY[dayToLoad as keyof typeof CURRICULUM_BY_DAY] as DayData);
+      } else {
+        setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
       }
     } catch (err) {
       console.error("Error loading progress:", err);
+      setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
     }
-  }, []);
+  }, [route.params?.selectedDay]);
 
   useEffect(() => {
-    setCurrentDay(day01Data as DayData);
     loadProgress();
   }, [loadProgress]);
 
   const handleExerciseComplete = useCallback(
-    (
-      exerciseId: string,
-      scores: {
-        rhythm_score: number;
-        stress_score: number;
-        pacing_score: number;
-        intonation_score: number;
-      },
-    ) => {
+    (exerciseId: string, scores: ExerciseScores) => {
       setSessionScores((prev) => [...prev, { exerciseId, ...scores }]);
     },
     [],
   );
+
+  useEffect(() => {
+    const completedExercise = route.params?.completedExercise;
+    const completedAt = route.params?.completedAt;
+    const selectedDay = route.params?.selectedDay;
+
+    if (selectedDay && currentDay?.day !== selectedDay) {
+      const dayToLoad =
+        selectedDay in CURRICULUM_BY_DAY
+          ? (selectedDay as keyof typeof CURRICULUM_BY_DAY)
+          : (LAST_AVAILABLE_DAY as keyof typeof CURRICULUM_BY_DAY);
+      setCurrentDay(CURRICULUM_BY_DAY[dayToLoad] as DayData);
+      navigation.setParams({ selectedDay: undefined });
+      return;
+    }
+
+    if (!completedExercise || !completedAt || completedAt === lastCompletedAtHandled) {
+      return;
+    }
+
+    setCompletedExercises((prev) => new Set(prev).add(completedExercise.exerciseId));
+    handleExerciseComplete(completedExercise.exerciseId, completedExercise);
+    setLastCompletedAtHandled(completedAt);
+    navigation.setParams({ completedExercise: undefined, completedAt: undefined });
+  }, [
+    route.params,
+    currentDay?.day,
+    lastCompletedAtHandled,
+    navigation,
+    handleExerciseComplete,
+  ]);
 
   useEffect(() => {
     if (currentDay && sessionScores.length === currentDay.exercises.length) {
@@ -131,7 +185,7 @@ export default function HomeScreen() {
                 onPress={() =>
                   navigation.navigate("ExerciseScreen", {
                     exercise,
-                    onComplete: handleExerciseComplete,
+                    source: "home",
                   })
                 }
               >

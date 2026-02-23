@@ -1,3 +1,4 @@
+import { CommonActions } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import ChunkSpeakingScreen from "../screens/ChunkSpeakingScreen";
 import IntonationTrainingScreen from "../screens/IntonationTrainingScreen";
@@ -19,29 +20,36 @@ export interface Exercise {
   tips: string[];
 }
 
+export interface ExerciseScores {
+  rhythm_score: number;
+  stress_score: number;
+  pacing_score: number;
+  intonation_score: number;
+}
+
+export interface ExerciseCompletionPayload extends ExerciseScores {
+  exerciseId: string;
+}
+
+export type ExerciseSource = "home" | "library";
+
+export interface ExerciseScreenParams {
+  exercise: Exercise;
+  source: ExerciseSource;
+}
+
 export type HomeStackParamList = {
-  HomeMain: undefined;
-  ExerciseScreen: {
-    exercise: Exercise;
-    onComplete: (
-      exerciseId: string,
-      scores: {
-        rhythm_score: number;
-        stress_score: number;
-        pacing_score: number;
-        intonation_score: number;
-      },
-    ) => void;
-  };
+  HomeMain:
+    | {
+        completedExercise?: ExerciseCompletionPayload;
+        completedAt?: number;
+        selectedDay?: number;
+      }
+    | undefined;
+  ExerciseScreen: ExerciseScreenParams;
   SessionCompletion: {
     day: number;
-    scores: Array<{
-      exerciseId: string;
-      rhythm_score: number;
-      stress_score: number;
-      pacing_score: number;
-      intonation_score: number;
-    }>;
+    scores: ExerciseCompletionPayload[];
     streak: number;
     previousAverage?: number;
   };
@@ -51,7 +59,7 @@ export type HomeStackParamList = {
 type ExerciseScreenProps = NativeStackScreenProps<HomeStackParamList, "ExerciseScreen">;
 
 export default function ExerciseScreen({ route, navigation }: ExerciseScreenProps) {
-  const { exercise, onComplete } = route.params;
+  const { exercise, source } = route.params;
 
   const handleNext = () => {
     navigation.goBack();
@@ -61,6 +69,25 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
     navigation.goBack();
   };
 
+  const handleComplete = (exerciseId: string, scores: ExerciseScores) => {
+    if (source !== "home") {
+      return;
+    }
+
+    const parentRoute = navigation.getState().routes.find((r) => r.name === "HomeMain");
+    if (!parentRoute) {
+      return;
+    }
+
+    navigation.dispatch({
+      ...CommonActions.setParams({
+        completedExercise: { exerciseId, ...scores },
+        completedAt: Date.now(),
+      }),
+      source: parentRoute.key,
+    });
+  };
+
   switch (exercise.type) {
     case "stress":
       return (
@@ -68,7 +95,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
     case "linking":
@@ -77,7 +104,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
     case "chunk":
@@ -86,7 +113,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
     case "shadow":
@@ -95,7 +122,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
     case "intonation":
@@ -104,7 +131,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
     default:
@@ -113,7 +140,7 @@ export default function ExerciseScreen({ route, navigation }: ExerciseScreenProp
           exercise={exercise}
           onNext={handleNext}
           onBack={handleBack}
-          onComplete={onComplete}
+          onComplete={handleComplete}
         />
       );
   }
