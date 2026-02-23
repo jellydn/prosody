@@ -7,12 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CURRICULUM_BY_DAY } from "../assets/curriculum";
 import { API_BASE_URL } from "../config/api";
-import type {
-  Exercise,
-  ExerciseType,
-  HomeStackParamList,
-  ExerciseScores,
-} from "./ExerciseScreen";
+import type { Exercise, ExerciseType, HomeStackParamList, ExerciseScores } from "./ExerciseScreen";
 
 type DayData = {
   day: number;
@@ -92,12 +87,9 @@ export default function HomeScreen({ route }: HomeScreenProps) {
     loadProgress();
   }, [loadProgress]);
 
-  const handleExerciseComplete = useCallback(
-    (exerciseId: string, scores: ExerciseScores) => {
-      setSessionScores((prev) => [...prev, { exerciseId, ...scores }]);
-    },
-    [],
-  );
+  const handleExerciseComplete = useCallback((exerciseId: string, scores: ExerciseScores) => {
+    setSessionScores((prev) => [...prev, { exerciseId, ...scores }]);
+  }, []);
 
   useEffect(() => {
     const completedExercise = route.params?.completedExercise;
@@ -122,13 +114,7 @@ export default function HomeScreen({ route }: HomeScreenProps) {
     handleExerciseComplete(completedExercise.exerciseId, completedExercise);
     setLastCompletedAtHandled(completedAt);
     navigation.setParams({ completedExercise: undefined, completedAt: undefined });
-  }, [
-    route.params,
-    currentDay?.day,
-    lastCompletedAtHandled,
-    navigation,
-    handleExerciseComplete,
-  ]);
+  }, [route.params, currentDay?.day, lastCompletedAtHandled, navigation, handleExerciseComplete]);
 
   useEffect(() => {
     if (currentDay && sessionScores.length === currentDay.exercises.length) {

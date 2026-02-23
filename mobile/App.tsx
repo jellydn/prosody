@@ -35,9 +35,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    LogBox.ignoreLogs([
-      "[expo-av]: Expo AV has been deprecated and will be removed in SDK 54.",
-    ]);
+    LogBox.ignoreLogs(["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54."]);
     checkOnboardingStatus();
   }, [checkOnboardingStatus]);
 
