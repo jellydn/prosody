@@ -725,3 +725,61 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Theme mapping: Use Record<number, string> for day themes when curriculum JSON files may not exist for all days
   - Progress API: Session data includes day number which can be used to track completion status
   - Day theme names: Use descriptive titles that match exercise focus (e.g., "Word Reductions", "Natural Speech")
+
+## [2026-02-24] - US-028
+- Implemented Settings screen with BYOP API key configuration
+- Added provider dropdown with options: Free (default), Azure, Google, OpenAI
+- API key text input shown only when non-free provider selected
+- API keys stored securely using expo-secure-store
+- Test button verifies API key by calling backend /api/v1/analyze endpoint
+- Success/error feedback displayed to user via Alert
+- Files changed:
+  - mobile/screens/SettingsScreen.tsx (Complete Settings screen implementation)
+  - mobile/package.json (Added expo-secure-store dependency)
+  - AGENTS.md (Added API Key Management section with BYOP pattern documentation)
+- Quality checks: npx tsc --noEmit passed (no SettingsScreen errors), npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - expo-secure-store is required for encrypted storage of sensitive data like API keys
+  - BYOP (Bring Your Own Provider) pattern: Users configure their own API keys for premium speech analysis
+  - Dropdown pattern: Use TouchableOpacity with state management for custom dropdowns in React Native
+  - Test button pattern: Call backend API with FormData to validate credentials before saving
+  - SecureStore keys: Use descriptive names like "speech_api_key" and "speech_provider"
+  - Conditional UI: Show/hide API key input based on provider selection (only show when provider !== "free")
+   - API integration: POST /api/v1/analyze with provider, api_key, and target_text fields for testing
+   - AGENTS.md already documented expo-secure-store usage - added more specific BYOP and dropdown patterns
+
+## [2026-02-24] - US-029
+- Created complete 14-day curriculum with Days 4-14 (11 new day files)
+- Day 4-5: Shadowing exercises introduced with basic and advanced shadowing
+- Day 6-7: Meeting phrases and professional scenarios with business communication patterns
+- Day 8-10: Mixed drills combining all exercise types (stress, linking, chunk, shadow, intonation)
+- Day 11-13: Advanced linking, word reductions, and natural speech patterns
+- Day 14: Final review with comprehensive exercises covering all concepts
+- Each day has exactly 5 exercises following the established schema
+- All 11 new day files validated successfully against Pydantic models
+- Curriculum files copied to both backend and mobile assets directories
+- Files changed:
+  - backend/app/content/curriculum/day-04.json through day-14.json (11 new curriculum files)
+  - mobile/assets/curriculum/day-04.json through day-14.json (11 new curriculum files)
+- Quality checks: ruff check && ruff format passed, oxlint passed (0 warnings, 0 errors)
+- Validation: Python script confirmed all 11 new day files load correctly into Day model
+- Typecheck: Pre-existing TS errors (expo-audio) unrelated to changes, mobile lint passed
+- **Learnings for future iterations:**
+  - Curriculum progression follows clear themes: Shadowing → Meeting Phrases → Mixed Drills → Advanced Patterns → Final Review
+  - Each day consistently uses 5 exercises for balanced learning
+  - Exercise type distribution per day: Mix of stress, linking, chunk, shadow, intonation based on theme
+  - Linking notation: Use underscores for connected forms (pick_it_up), tie character (‿) for visual linking
+  - Stress pattern: boolean array where True=stressed syllable
+  - Chunks: array of strings for thought groups with natural pauses
+  - Shadowing exercises: stressPattern required for rhythm matching guidance
+  - Professional vocabulary: Use business terminology in days 6-7 for meeting scenarios
+  - Reduction patterns: Teach natural speech reductions (gonna, wanna, wanna, contractions) in days 11-12
+  - Complex sentences: Days 13-14 feature longer, multi-clause sentences with multiple thought groups
+  - Validation command: `cd backend && python -c "from app.content.schema.models import Day; import json; Day(**json.load(open('path/to/file')))"`
+  - Curriculum workflow: Create in backend/app/content/curriculum/, validate, then copy to mobile/assets/curriculum/
+  - JSON quality: Ensure all strings are properly quoted, arrays use commas, no trailing commas
+  - Day themes: Use descriptive titles that communicate the focus (e.g., "Advanced Linking", "Natural Speech")
+  - Final review (Day 14): Comprehensive exercises covering all exercise types for consolidation
+
+---
