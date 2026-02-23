@@ -1,3 +1,5 @@
+import asyncio
+
 import librosa
 import numpy as np
 import parselmouth
@@ -7,6 +9,9 @@ from typing import List
 
 class FreeAnalyzer(SpeechAnalyzer):
     async def analyze(self, audio_path: str, target_text: str) -> AnalysisResult:
+        return await asyncio.to_thread(self._analyze_sync, audio_path, target_text)
+
+    def _analyze_sync(self, audio_path: str, target_text: str) -> AnalysisResult:
         y, sr = librosa.load(audio_path)
 
         rhythm_score = self._analyze_rhythm(y, sr)
