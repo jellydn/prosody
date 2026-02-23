@@ -514,3 +514,30 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - API integration: Same FormData upload pattern with target_text
   - State management: recordedUri, isAnalyzing, analysisResult pattern
   - Chunk data: exercise.chunks array contains thought group strings
+
+## [2026-02-23] - US-021
+- Implemented IntonationTrainingScreen for rising/falling intonation practice
+- Screen structure identical to previous exercise screens for consistency
+- Intonation pattern section with title "Intonation Pattern"
+- Sentence displayed in large text at top of pattern section
+- Question detection: Checks if targetText contains "?" to determine pattern
+- Visual indicator: Icon + arrow text in gray badge
+- Question pattern: Arrow-up-circle icon (orange #FF9500) + "↗ Rising" text
+- Statement pattern: Arrow-down-circle icon (blue #007AFF) + "↘ Falling" text
+- Same exercise flow: instruction → intonation pattern → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as previous screens
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/IntonationTrainingScreen.tsx (Intonation training screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as all previous exercise screens
+  - Intonation detection: Simple "?" check to identify questions vs statements
+  - Visual pattern: Use Ionicons arrow-up-circle/arrow-down-circle for intonation
+  - Color coding: Orange (#FF9500) for rising (questions), blue (#007AFF) for falling (statements)
+  - Badge styling: Gray background (#F8F8F8) with rounded corners (borderRadius: 20)
+  - Unicode arrows: ↗ U+2197 for rising, ↘ U+2198 for falling
+  - Component props: exercise, onNext, onBack - same interface across all screens
+  - API integration: Same FormData upload pattern with target_text
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
