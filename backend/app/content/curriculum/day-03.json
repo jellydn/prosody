@@ -45,7 +45,17 @@
       "title": "Natural Rhythm",
       "instruction": "Listen to the model and speak along with it. Match the timing and pauses.",
       "targetText": "I'll get back to you, as soon as possible.",
-      "stressPattern": [true, false, false, false, false, true, true, false, false, false],
+      "stressPattern": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -60,7 +70,12 @@
       "title": "Linking Within Chunks",
       "instruction": "Practice linking words within thought groups. Link smoothy: back_to you.",
       "targetText": "get back to you",
-      "stressPattern": [true, true, false, true],
+      "stressPattern": [
+        true,
+        true,
+        false,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [

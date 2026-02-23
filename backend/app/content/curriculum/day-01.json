@@ -8,7 +8,12 @@
       "title": "Professional Greetings",
       "instruction": "Listen and repeat. Emphasize the bold syllables clearly and keep unstressed syllables short.",
       "targetText": "Nice to meet you.",
-      "stressPattern": [true, false, false, true, false],
+      "stressPattern": [
+        true,
+        false,
+        false,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -20,9 +25,14 @@
       "id": "day01-ex02",
       "type": "stress",
       "title": "Meeting Expressions",
-      "instruction": "Practice the stress pattern. Important words are stressed.",
+      "instruction": "Practice of stress pattern. Important words are stressed.",
       "targetText": "Let's discuss the proposal.",
-      "stressPattern": [false, true, false, false, true, true, false],
+      "stressPattern": [
+        false,
+        true,
+        false,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -57,8 +67,8 @@
       "chunks": null,
       "audioUrl": null,
       "tips": [
-        "Your voice should rise at the end: ↗",
-        "Statements end with a falling tone: ↘"
+        "Your voice should rise at the end: \u2197",
+        "Statements end with a falling tone: \u2198"
       ]
     }
   ]

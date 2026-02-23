@@ -8,7 +8,18 @@
       "title": "Giving Updates",
       "instruction": "Shadow these update phrases. Use a clear, confident tone.",
       "targetText": "I'd like to provide an update on the project status.",
-      "stressPattern": [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false],
+      "stressPattern": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -23,7 +34,16 @@
       "title": "Connecting Ideas",
       "instruction": "Practice linking words when connecting ideas in meetings.",
       "targetText": "Based_on that, I think_we_should proceed with the plan.",
-      "stressPattern": [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false],
+      "stressPattern": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -38,7 +58,13 @@
       "title": "Emphasizing Key Points",
       "instruction": "Practice stressing the most important words to highlight key points.",
       "targetText": "The critical issue is timing.",
-      "stressPattern": [false, true, true, false, false, true, false, false],
+      "stressPattern": [
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -53,7 +79,24 @@
       "title": "Organizing Updates",
       "instruction": "Break this update into clear thought groups.",
       "targetText": "First, let me summarize the current situation. Next, I'll outline the challenges. Finally, I'll propose solutions.",
-      "stressPattern": [true, false, false, true, false, false, false, true, false, true, false, false, false, false, true, false, false, true, false, true, false, false, false, true, false, false, true, false, false, true, false],
+      "stressPattern": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true
+      ],
       "chunks": [
         "First, let me summarize the current situation.",
         "Next, I'll outline the challenges.",
@@ -72,11 +115,25 @@
       "title": "Requesting Clarification",
       "instruction": "Shadow these clarification phrases. Use a polite, inquisitive tone.",
       "targetText": "Could you clarify that point? I want to make sure I understand correctly.",
-      "stressPattern": [false, true, false, false, true, false, true, false, false, false, true, false, false, true, false, true, false, true, false, false, true],
+      "stressPattern": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
-        "Voice rises at the end of questions: ↗",
+        "Voice rises at the end of questions: \u2197",
         "Stress: clarify, point, want, sure, understand, correctly",
         "Keep 'you', 'that', 'to', 'I' unstressed"
       ]

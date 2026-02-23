@@ -8,7 +8,14 @@
       "title": "Professional Confidence",
       "instruction": "Shadow with confidence. Match the energy and pacing.",
       "targetText": "I'm confident this approach will work.",
-      "stressPattern": [false, true, false, false, false, true, true, false, false, false, true, false, false],
+      "stressPattern": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -23,7 +30,15 @@
       "title": "Same Consonant Linking",
       "instruction": "Practice linking words with the same consonant sound.",
       "targetText": "Pick the best time for the meeting.",
-      "stressPattern": [true, false, true, false, false, true, false, false, true, false, false, true, false],
+      "stressPattern": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -38,7 +53,15 @@
       "title": "Contrastive Stress",
       "instruction": "Use stress to contrast ideas or options.",
       "targetText": "We're not starting tomorrow, we're starting today.",
-      "stressPattern": [true, false, false, true, false, false, true, false, true, false, false, true, false, false, true, false],
+      "stressPattern": [
+        true,
+        false,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
@@ -53,7 +76,28 @@
       "title": "Cause and Effect",
       "instruction": "Structure cause and effect statements clearly.",
       "targetText": "Because of the delay, we need to adjust the timeline. As a result, the deadline will extend by two weeks.",
-      "stressPattern": [false, false, false, true, false, false, true, true, false, false, true, false, false, true, false, true, false, false, false, true, false, false, false, true, false, false, true, false, true, false, true, false, false, false, true, false, false, true, false, true, false, false],
+      "stressPattern": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
       "chunks": [
         "Because of the delay, we need to adjust the timeline.",
         "As a result, the deadline will extend by two weeks."
@@ -71,7 +115,14 @@
       "title": "Expressing Agreement",
       "instruction": "Shadow agreement phrases. Use a supportive tone.",
       "targetText": "I completely agree with your assessment.",
-      "stressPattern": [false, true, false, false, false, true, false, false, true, false, false, false, true, false, false],
+      "stressPattern": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
       "chunks": null,
       "audioUrl": null,
       "tips": [
