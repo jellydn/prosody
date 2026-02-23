@@ -1,6 +1,7 @@
+import json
 import sys
 from pathlib import Path
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -116,7 +117,7 @@ def test_openai_analyzer_instantiation():
 async def test_openai_analyze_signature():
     try:
         from app.analyzers.openai import OpenAIAnalyzer
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import patch
 
         analyzer = OpenAIAnalyzer(api_key="test-key")
 
@@ -153,6 +154,48 @@ async def test_openai_analyze_signature():
                 assert file_arg[2] == "audio/wav"
     except ImportError:
         pytest.skip("openai package not installed")
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 8),
+    reason="Mock requires Python 3.8+",
+)
+def test_google_analyzer_with_api_key():
+    try:
+        from app.analyzers.google import GoogleAnalyzer
+
+        analyzer = GoogleAnalyzer(api_key="test-api-key")
+        assert isinstance(analyzer, SpeechAnalyzer)
+        assert hasattr(analyzer, "analyze")
+        assert hasattr(analyzer, "client")
+    except ImportError:
+        pytest.skip("google-cloud-speech package not installed")
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 8),
+    reason="Mock requires Python 3.8+",
+)
+def test_google_analyzer_with_json_credentials():
+    try:
+        from app.analyzers.google import GoogleAnalyzer
+
+        credentials_json = json.dumps(
+            {
+                "type": "service_account",
+                "project_id": "test-project",
+                "private_key_id": "test-key-id",
+                "private_key": "test-private-key",
+                "client_email": "test@test-project.iam.gserviceaccount.com",
+            }
+        )
+
+        analyzer = GoogleAnalyzer(api_key=credentials_json)
+        assert isinstance(analyzer, SpeechAnalyzer)
+        assert hasattr(analyzer, "analyze")
+        assert hasattr(analyzer, "client")
+    except ImportError:
+        pytest.skip("google-cloud-speech package not installed")
 
 
 if __name__ == "__main__":

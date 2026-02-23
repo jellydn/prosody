@@ -1,3 +1,4 @@
+import json
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import (
     RecognitionConfig,
@@ -10,7 +11,17 @@ from typing import List
 class GoogleAnalyzer(SpeechAnalyzer):
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.client = speech_v1.SpeechClient(client_options={"api_key": api_key})
+
+        # Check if api_key is a JSON string (service account credentials)
+        try:
+            credentials_json = json.loads(api_key)
+            # If it parses as JSON, treat it as service account credentials
+            self.client = speech_v1.SpeechClient.from_service_account_info(
+                credentials_json
+            )
+        except (json.JSONDecodeError, ValueError):
+            # If it doesn't parse as JSON, treat it as a plain API key
+            self.client = speech_v1.SpeechClient(client_options={"api_key": api_key})
 
     async def analyze(self, audio_path: str, target_text: str) -> AnalysisResult:
         with open(audio_path, "rb") as audio_file:
