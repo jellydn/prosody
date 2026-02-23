@@ -1,24 +1,8 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.models import init_db, SessionLocal
 
 client = TestClient(app)
-
-
-@pytest.fixture
-def db():
-    init_db()
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def test_create_user(db):
