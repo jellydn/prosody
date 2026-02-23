@@ -45,10 +45,29 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
   useEffect(() => {
     return sound
       ? () => {
-          sound.unloadAsync();
+          void sound.unloadAsync().catch(() => {});
         }
       : undefined;
   }, [sound]);
+
+  const cleanupPlaybackSound = async () => {
+    if (!sound) return;
+
+    try {
+      await sound.stopAsync();
+    } catch {
+      // no-op: sound may already be stopped/unloaded
+    }
+
+    try {
+      await sound.unloadAsync();
+    } catch {
+      // no-op: best effort cleanup before next recording
+    }
+
+    setSound(null);
+    setIsPlaying(false);
+  };
 
   useEffect(() => {
     let pulseInterval: NodeJS.Timeout | null = null;
@@ -73,6 +92,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
     }
 
     try {
+      await cleanupPlaybackSound();
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
@@ -143,6 +163,10 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
 
     try {
       await activeRecording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+      });
       const uri = activeRecording.getURI();
       setRecordedUri(uri);
       recordingRef.current = null;
@@ -159,6 +183,11 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
     if (!recordedUri) return;
 
     try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+      });
+
       if (sound) {
         if (isPlaying) {
           await sound.pauseAsync();
@@ -187,11 +216,11 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
     }
   };
 
-  const reRecord = () => {
+  const reRecord = async () => {
+    await cleanupPlaybackSound();
     setRecordedUri(null);
-    setSound(null);
-    setIsPlaying(false);
-    startRecording();
+    silenceStartRef.current = null;
+    onRecordingComplete(null);
   };
 
   if (hasPermission === null) {
