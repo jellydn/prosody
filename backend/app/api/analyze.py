@@ -77,31 +77,44 @@ async def analyze_audio(
 
         analyzer = get_analyzer(resolved_provider, api_key)
 
-        audio_content = await audio.read()
-        audio_size_bytes = len(audio_content)
-        logger.info(
-            "Audio payload loaded provider=%s size_bytes=%d",
-            resolved_provider,
-            audio_size_bytes,
-        )
-        if audio_size_bytes > MAX_AUDIO_SIZE_BYTES:
-            logger.warning(
-                "Audio payload too large provider=%s size_bytes=%d max_size_bytes=%d",
-                resolved_provider,
-                audio_size_bytes,
-                MAX_AUDIO_SIZE_BYTES,
-            )
-            raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                detail=f"Audio file exceeds maximum size of {MAX_AUDIO_SIZE_BYTES // (1024 * 1024)}MB",
-            )
-
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         temp_path = temp_file.name
         temp_file.close()
 
-        with open(temp_path, "wb") as f:
-            f.write(audio_content)
+        audio_size_bytes = 0
+        chunk_size = 1024 * 1024
+        try:
+            with open(temp_path, "wb") as f:
+                while chunk := await audio.read(chunk_size):
+                    audio_size_bytes += len(chunk)
+                    if audio_size_bytes > MAX_AUDIO_SIZE_BYTES:
+                        f.close()
+                        os.unlink(temp_path)
+                        temp_path = None
+                        logger.warning(
+                            "Audio payload too large provider=%s size_bytes=%d max_size_bytes=%d",
+                            resolved_provider,
+                            audio_size_bytes,
+                            MAX_AUDIO_SIZE_BYTES,
+                        )
+                        raise HTTPException(
+                            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                            detail=f"Audio file exceeds maximum size of {MAX_AUDIO_SIZE_BYTES // (1024 * 1024)}MB",
+                        )
+                    f.write(chunk)
+        except HTTPException:
+            raise
+        except Exception:
+            if temp_path and os.path.exists(temp_path):
+                os.unlink(temp_path)
+                temp_path = None
+            raise
+
+        logger.info(
+            "Audio payload streamed provider=%s size_bytes=%d",
+            resolved_provider,
+            audio_size_bytes,
+        )
 
         if audio.content_type not in {"audio/wav", "audio/x-wav"}:
             from pydub import AudioSegment
