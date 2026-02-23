@@ -5,3 +5,5 @@ pydub
 python-multipart
 pydantic
 
+pytest
+pytest-asyncio
