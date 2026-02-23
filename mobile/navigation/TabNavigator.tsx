@@ -5,6 +5,7 @@ import DashboardScreen from "../screens/DashboardScreen";
 import ExerciseScreen, { type HomeStackParamList } from "../screens/ExerciseScreen";
 import HomeScreen from "../screens/HomeScreen";
 import LibraryScreen, { type LibraryStackParamList } from "../screens/LibraryScreen";
+import ProgramOverviewScreen from "../screens/ProgramOverviewScreen";
 import SessionCompletionScreen from "../screens/SessionCompletionScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
@@ -27,6 +28,11 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="SessionCompletion"
         component={SessionCompletionScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="ProgramOverview"
+        component={ProgramOverviewScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>

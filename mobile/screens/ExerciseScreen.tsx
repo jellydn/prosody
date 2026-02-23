@@ -45,6 +45,7 @@ export type HomeStackParamList = {
     streak: number;
     previousAverage?: number;
   };
+  ProgramOverview: undefined;
 };
 
 type ExerciseScreenProps = NativeStackScreenProps<HomeStackParamList, "ExerciseScreen">;

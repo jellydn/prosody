@@ -139,6 +139,23 @@ async def analyze(request: AnalyzeRequest):
 - ScrollView with `keyboardShouldPersistTaps="handled"`
 - `TouchableOpacity` with conditional styling for selections
 
+### Navigation Patterns
+
+- Export navigation param types from screen files when used by other components (e.g., `export type HomeStackParamList` from ExerciseScreen.tsx)
+- Use `NativeStackNavigationProp<ParamListType>` for type-safe navigation hooks
+- Navigation parameters: Pass data via route.params object (e.g., `navigation.navigate("ScreenName", { param: value })`)
+- Stack navigators: Each tab can have its own stack for nested navigation (e.g., HomeStack, LibraryStack)
+- Navigation flow: Use `navigation.replace()` for onboarding to prevent going back, `navigation.goBack()` for returning
+- Alert dialogs for user confirmations (e.g., skipping locked days): Use `Alert.alert(title, message, [{text, onPress}, ...])`
+
+### Progress Tracking
+
+- Fetch user progress from GET /api/v1/progress/{userId} to get completed sessions
+- Track completed days by mapping session.day values to a Set or Array
+- Lock days sequentially: Day N is unlocked if user has completed at least N-1 days
+- Display progress with visual indicators (checkmarks, lock icons, status badges)
+- Confirm day skipping with Alert.alert() for locked days
+
 ---
 
 ## Project Structure

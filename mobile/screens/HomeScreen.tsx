@@ -111,6 +111,13 @@ export default function HomeScreen() {
             <Ionicons name="list-outline" size={16} color="#8E8E93" style={styles.metaIcon} />
             <Text style={styles.metaText}>{currentDay.exercises.length} exercises</Text>
           </View>
+          <TouchableOpacity
+            style={styles.viewProgramButton}
+            onPress={() => navigation.navigate("ProgramOverview")}
+          >
+            <Ionicons name="calendar-outline" size={16} color="#007AFF" />
+            <Text style={styles.viewProgramText}>View Program</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.exercisesContainer}>
@@ -207,6 +214,22 @@ const styles = StyleSheet.create({
   },
   metaIcon: {
     marginLeft: 12,
+  },
+  viewProgramButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E3F2FF",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginTop: 16,
+  },
+  viewProgramText: {
+    marginLeft: 6,
+    color: "#007AFF",
+    fontWeight: "600",
+    fontSize: 14,
   },
   sectionTitle: {
     fontSize: 18,
