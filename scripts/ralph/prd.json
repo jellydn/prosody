@@ -32,9 +32,9 @@
 				"JSON validates against the schema from US-001",
 				"Typecheck passes"
 			],
-			"priority": 2,
-			"passes": false,
-			"notes": ""
+		"priority": 2,
+		"passes": true,
+		"notes": ""
 		},
 		{
 			"id": "US-003",
