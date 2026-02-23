@@ -42,6 +42,12 @@ mobile-lint:
 mobile-format:
     cd mobile && oxfmt .
 
+mobile-format-check:
+    cd mobile && oxfmt --check .
+
+mobile-lint-fix:
+    cd mobile && oxlint --fix .
+
 mobile-test:
     cd mobile && npx jest
 
