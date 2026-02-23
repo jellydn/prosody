@@ -783,3 +783,159 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Final review (Day 14): Comprehensive exercises covering all exercise types for consolidation
 
 ---
+
+## [2026-02-24] - US-030
+- Fixed HomeScreen to load all 14 days instead of only days 1-3
+- Added missing imports for days 4-14 in mobile/assets/curriculum/index.ts
+- CURRICULUM_BY_DAY now includes all 14 days (previously only had days 1-3)
+- HomeScreen loadProgress() function correctly calculates next day from completed sessions
+- Users can now progress through all 14 days of the curriculum
+- Files changed:
+  - mobile/assets/curriculum/index.ts (Added imports for days 4-14)
+  - Multiple files auto-formatted by oxfmt
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - Curriculum index file (mobile/assets/curriculum/index.ts) must include all day imports
+  - LAST_AVAILABLE_DAY constant uses Math.max on Object.keys(CURRICULUM_BY_DAY) to determine available days
+  - If a day JSON file exists but isn't imported in index.ts, users cannot access it
+  - Always verify CURRICULUM_BY_DAY includes all expected day numbers after adding curriculum content
+  - HomeScreen fetches progress from GET /api/v1/progress/{userId} and calculates nextDay = Math.min(highestCompletedDay + 1, 14)
+  - Falls back to Day 1 if no user progress exists or on error
+
+## [2026-02-24] - US-031
+- Fixed ProgramOverview to navigate to selected day
+- Updated loadProgress function to check selectedDay route parameter before calculating next day
+- Removed duplicate selectedDay handling logic from useEffect
+- Removed unused LAST_AVAILABLE_DAY constant
+- Files changed:
+  - mobile/screens/HomeScreen.tsx (Updated loadProgress to prioritize selectedDay)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - When navigating to a screen with route params that control what content to load, ensure the main data loading function checks route.params first
+  - The loadProgress function runs on mount and should be the single source of truth for determining what day to load
+  - Avoid loading default data first and then switching to the selected data - check route.params before loading
+  - HomeStackParamList already had selectedDay?: number from previous implementation (US-024)
+  - Remove unused variables after refactoring to avoid lint warnings
+
+## [2026-02-24] - US-032, US-033
+- Verified that BYOP provider usage is implemented across all exercise screens
+- Verified that shared types are extracted in mobile/types/analysis.ts
+- All 5 exercise screens use appendByopToFormData helper from config/byop.ts
+- Shared types (FeedbackType, FeedbackItem, AnalysisResult) are imported from types/analysis.ts
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-032 and US-033 as passing)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - BYOP helper is in mobile/config/byop.ts (not mobile/utils/analyzeAudio.ts as originally planned)
+  - BYOP helper reads provider and api_key from expo-secure-store and appends them to FormData
+  - Falls back to "free" provider if no provider or api_key is configured
+  - Shared types for analysis are in mobile/types/analysis.ts
+  - Exercise and ExerciseScores types are still in ExerciseScreen.tsx (could be extracted further if needed)
+  - Previous implementation in commit 07d2857 already centralized API config and applied BYOP flow
+  - Always check if functionality is already implemented before starting new work
+
+## [2026-02-24] - US-034
+- Fixed OpenAI analyzer to pass audio file as tuple (filename, file_handle, content_type)
+- Changed from file=audio_file to file=(audio_path, audio_file, "audio/wav")
+- Added tests for OpenAI analyzer instantiation and method signature verification
+- Tests use pytest.mark.skipif to handle missing openai package
+- Files changed:
+  - backend/app/analyzers/openai.py (Fixed file upload to use tuple format)
+  - backend/tests/test_byop_analyzers.py (Added OpenAI analyzer tests)
+- Quality checks: ruff check passed, ruff format passed, 6 passed + 2 skipped tests
+- **Learnings for future iterations:**
+  - OpenAI async client audio.transcriptions.create expects file parameter as tuple: (filename, file_object, content_type)
+  - When passing files to async APIs, always check documentation for correct format
+  - Use pytest.mark.skipif for tests that require optional dependencies
+  - Mock patch.object for testing async method calls and verifying parameters
+  - Tests verify file tuple structure: assert len(file_arg) == 3 and file_arg[2] == "audio/wav"
+
+## [2026-02-24] - US-035
+- Fixed Google analyzer to properly authenticate using API key or service account credentials
+- Added logic to detect if api_key is JSON (service account) or plain key
+- For JSON credentials: use SpeechClient.from_service_account_info(credentials_json)
+- For plain API key: use SpeechClient(client_options={"api_key": api_key})
+- Added tests for both authentication methods
+- Files changed:
+  - backend/app/analyzers/google.py (Updated __init__ to handle both auth methods)
+  - backend/tests/test_byop_analyzers.py (Added Google analyzer authentication tests)
+- Quality checks: ruff check passed, ruff format passed, 6 passed + 4 skipped tests
+- **Learnings for future iterations:**
+  - Google Cloud Speech supports two authentication methods: API key and service account credentials
+  - Use json.loads() with try/except to detect JSON strings
+  - Use SpeechClient.from_service_account_info() for JSON credentials
+  - Use SpeechClient(client_options={"api_key": ...}) for plain API keys
+  - Google Cloud Speech client_options.api_key is the correct way to pass API keys
+  - Service account credentials JSON includes: type, project_id, private_key_id, private_key, client_email
+  - Test both authentication paths to ensure flexibility for users
+
+## [2026-02-24] - US-036
+- Verified that Azure analyzer already fixed to prevent blocking event loop
+- recognize_once() call is wrapped in await asyncio.to_thread()
+- This runs synchronous Azure SDK call in a separate thread pool
+- Fix was applied in commit d39de01 on 2026-02-24
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-036 as passing)
+- Quality checks: ruff check passed, ruff format passed
+- **Learnings for future iterations:**
+  - asyncio.to_thread() is the correct way to run synchronous blocking code in async functions
+  - Azure SDK's SpeechRecognizer.recognize_once() is a blocking synchronous method
+  - Without asyncio.to_thread(), the blocking call would block the entire FastAPI event loop
+  - Previous commit d39de01 also fixed _calculate_intonation to accept parameters (was hardcoded)
+  - Always check if fixes were already applied in previous commits before implementing
+
+## [2026-02-24] - US-037
+- Verified that AudioPlayer stress pattern alignment already fixed
+- wordOffset variable tracks global word position across chunks
+- renderTextForChunk receives offset parameter and uses stressPattern[offset + index]
+- Fix was applied in commit 3cf8db6 on 2026-02-24
+- Same commit also fixed expo-audio import issue and added validation for stressPattern length
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-037 as passing)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - When rendering chunked text with stress patterns, need to track global word offset
+  - stressPattern indices correspond to word positions in the full targetText
+  - For chunks: stressPattern[offset + index] where offset is cumulative word count from previous chunks
+  - Previous commit 3cf8db6 added validation: if stressPattern.length !== words.length, fallback to plain text
+  - AudioPlayer imports from expo-av (Audio.Sound), not expo-audio
+  - Always check if fixes were already applied in previous commits before implementing
+
+## [2026-02-24] - US-038
+- Fixed stressPattern granularity mismatch in all 14 curriculum JSON files
+- Created Python script to convert syllable-level patterns to word-level patterns
+- Fixed 57 exercises across days 1-14 where stressPattern length didn't match word count
+- Algorithm: word is stressed if any syllable in the word is stressed
+- Syllable counting heuristic using vowels and word patterns
+- Copied fixed files to both backend and mobile assets directories
+- Files changed:
+  - backend/app/content/curriculum/day-01.json through day-14.json (Fixed stress patterns)
+  - mobile/assets/curriculum/day-01.json through day-14.json (Fixed stress patterns)
+- Quality checks: ruff check passed, npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- **Learnings for future iterations:**
+  - AudioPlayer splits targetText by whitespace, so stressPattern must have one boolean per word
+  - Syllable-level stress patterns (like [true, false, false, true, false]) don't work with word-level rendering
+  - Heuristic for syllable counting: count vowel groups, handle silent 'e', count 'le' exceptions
+  - Word-level stress assignment: if any syllable is stressed, the word is stressed
+  - Automated fixes are more reliable than manual fixes for large-scale curriculum updates
+  - Always validate curriculum files after making changes: check stressPattern.length === words.length
+  - Backend and mobile assets directories must be kept in sync for curriculum files
+
+## [2026-02-24] - US-039
+- Verified that BYOP analyzers already have meaningful intonation analysis
+- Azure, Google, and OpenAI analyzers all implement _calculate_intonation()
+- Algorithm uses question detection and lexical variety for scoring
+- Base score 3.0, +1.0 if question pattern matches, +lexical variety (up to 1.0)
+- All analyzers use the same implementation as FreeAnalyzer for consistency
+- Fix was applied in commit d39de01 on 2026-02-24
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-039 as passing)
+- Quality checks: ruff check passed
+- **Learnings for future iterations:**
+  - All three BYOP analyzers (Azure, Google, OpenAI) share the same intonation algorithm
+  - Intonation scoring: base 3.0, +1.0 for correct question/statement detection, +lexical variety bonus
+  - Question detection: check if "?" in target matches "?" in recognized text
+  - Lexical variety: ratio of unique words to total words (higher is better)
+  - Score is rounded to 1 decimal place, clamped between 1.0 and 5.0
+  - Previous commit d39de01 also fixed Azure event loop blocking and file upload issues
+  - Always check if fixes were already applied in previous commits before implementing
