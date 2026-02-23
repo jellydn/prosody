@@ -1,10 +1,20 @@
 from contextlib import asynccontextmanager
+import logging
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import init_db
 from app.api.progress import router as progress_router
 from app.api.analyze import router as analyze_router
+
+
+def _configure_logging() -> None:
+    raw_log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    log_level = getattr(logging, raw_log_level, logging.INFO)
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
 
 
 def _parse_cors_origins() -> list[str]:
@@ -28,6 +38,8 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+_configure_logging()
 
 cors_origins = _parse_cors_origins()
 
