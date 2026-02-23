@@ -162,6 +162,14 @@ async def analyze(request: AnalyzeRequest):
 - **Selected state**: Change text color to white when option is selected
 - **Disabled state**: Use lower opacity for disabled buttons
 
+### Exercise Navigation
+
+- **Type safety**: Use `NativeStackNavigationProp<ParamListType>` to properly type the navigation hook
+- **Export types**: Export navigation param types (e.g., `HomeStackParamList`) from screen files for reuse
+- **Router pattern**: Use a switch statement in ExerciseScreen to render the correct exercise type component
+- **Data passing**: Pass exercise data via `route.params` when navigating between screens
+- **Back navigation**: Use `navigation.goBack()` to return to previous screen
+
 ---
 
 ## Testing Guidelines
