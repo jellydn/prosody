@@ -560,8 +560,8 @@
 				"Typecheck passes"
 			],
 			"priority": 34,
-			"passes": false,
-			"notes": "BUG: Passes raw bytes to OpenAI API — will fail at runtime"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-035",
@@ -574,8 +574,8 @@
 				"Typecheck passes"
 			],
 			"priority": 35,
-			"passes": false,
-			"notes": "BUG: api_key stored but never passed to SpeechClient"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-036",
@@ -587,8 +587,8 @@
 				"Typecheck passes"
 			],
 			"priority": 36,
-			"passes": false,
-			"notes": "BUG: Synchronous Azure SDK call inside async def blocks the event loop"
+			"passes": true,
+			"notes": ""
 		},
 		{
 			"id": "US-037",
