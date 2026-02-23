@@ -386,3 +386,29 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Play button active state: Background color changes from #E3F2FF to #007AFF
   - Component props: audioUrl (string | null), targetText (string), stressPattern (boolean[] | null), chunks (string[] | null)
   - Conditional rendering: play button only shown when audioUrl is not null
+
+## [2026-02-23] - US-016
+- Implemented AudioRecorder component for recording user voice
+- Used expo-av for audio recording with mic permission handling
+- Tap-to-record button with red pulsing animation (shadow radius increases)
+- Auto-stops after 10 seconds using recording duration status update
+- Playback button with play/pause toggle to listen to own recording
+- Re-record option allows starting over before submitting
+- Mic permission requested on mount with Alert prompting to Settings if denied
+- Returns recorded audio URI to parent via onRecordingComplete callback
+- Files changed:
+  - mobile/components/AudioRecorder.tsx (AudioRecorder component)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Audio permission: Use Audio.requestPermissionsAsync() on component mount
+  - Permission handling: Alert with Settings link for denied permissions
+  - Recording options: Platform-specific config for Android (m4a/AAC), iOS (MPEG4AAC), web (webm)
+  - Audio mode: Set allowsRecordingIOS: true and playsInSilentModeIOS: true before recording
+  - Recording lifecycle: createAsync() → setOnRecordingStatusUpdate() → stopAndUnloadAsync()
+  - Duration monitoring: Check status.durationMillis in status update listener
+  - Pulsing animation: Use setInterval to toggle shadowOpacity/elevation every 500ms
+  - Button states: Record (red, large), Playback (blue, smaller), Re-record (small, refresh icon)
+  - Recording button: 72x72 when idle, 64x64 when recording for visual feedback
+  - Component callback: onRecordingComplete(uri) informs parent of recording state
+  - Cleanup: Sound playback cleanup in useEffect, recording cleanup on stop
