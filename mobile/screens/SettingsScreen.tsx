@@ -84,25 +84,16 @@ export default function SettingsScreen() {
     setIsTesting(true);
 
     try {
-      const formData = new FormData();
-      formData.append("target_text", "Hello, this is a test");
-      formData.append("provider", provider);
-      formData.append("api_key", apiKey);
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(`${API_BASE_URL}/health`);
 
       if (response.ok) {
         await saveSettings();
-        Alert.alert("Success", "API key verified successfully!");
+        Alert.alert("Saved", "Settings saved. Your API key will be validated on first use.");
       } else {
-        const error = await response.text();
-        Alert.alert("Error", `Failed to verify API key: ${error || "Unknown error"}`);
+        Alert.alert("Error", "Backend server returned an error. Please check server status.");
       }
     } catch (error) {
-      console.error("Error testing API key:", error);
+      console.error("Error connecting to server:", error);
       Alert.alert("Error", "Failed to connect to server. Make sure the backend is running.");
     } finally {
       setIsTesting(false);
@@ -181,7 +172,7 @@ export default function SettingsScreen() {
               disabled={isTesting}
             >
               <Ionicons name="checkmark-circle" size={20} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>{isTesting ? "Testing..." : "Test API Key"}</Text>
+              <Text style={styles.buttonText}>{isTesting ? "Verifying..." : "Save & Verify"}</Text>
             </TouchableOpacity>
           )}
         </View>
