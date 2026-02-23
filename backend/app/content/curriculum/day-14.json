@@ -1,0 +1,87 @@
+{
+  "day": 14,
+  "theme": "Final Review",
+  "exercises": [
+    {
+      "id": "day14-ex01",
+      "type": "stress",
+      "title": "Comprehensive Stress Practice",
+      "instruction": "Review all stress patterns: compound words, phrasal verbs, contrastive stress.",
+      "targetText": "We'll set_up a follow_up meeting, but we need to focus on the action items.",
+      "stressPattern": [true, false, true, false, true, false, true, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, true, true, false, false, true, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Compound 'set-up' and 'follow-up' stress first syllable",
+        "Phrasal verb 'focus on' stresses the particle: on",
+        "Stress: set, up, follow, up, need, focus, action, items"
+      ]
+    },
+    {
+      "id": "day14-ex02",
+      "type": "linking",
+      "title": "Comprehensive Linking Review",
+      "instruction": "Review all linking patterns: consonant+vowel, same consonant, vowel+vowel.",
+      "targetText": "Check_it_out and let_me_know what_you think about the results.",
+      "stressPattern": [true, false, false, false, false, false, true, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, false, true, false, true, false, true, false, false, false, true, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'Check it out' - consonant+vowel linking",
+        "'let me know' - smooth flow between words",
+        "'what you' - same 't' sound: what_you",
+        "Stress: Check, let, know, think, results"
+      ]
+    },
+    {
+      "id": "day14-ex03",
+      "type": "chunk",
+      "title": "Complex Thought Groups",
+      "instruction": "Break this complex statement into clear thought groups.",
+      "targetText": "Given the current market conditions, I recommend we proceed cautiously. However, if we wait too long, we might miss the opportunity. Therefore, I suggest we move forward with a balanced approach.",
+      "stressPattern": [false, false, true, true, true, false, false, false, true, false, false, false, false, true, false, true, false, false, true, true, false, false, false, false, true, false, false, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, false, true, false, false, true, false, true, false, false, true, false, true, false, true, false, false, true, false, true, false, false, false, false, false, true, true, false, false, false, true, false, true, false],
+      "chunks": [
+        "Given the current market conditions, I recommend we proceed cautiously.",
+        "However, if we wait too long, we might miss the opportunity.",
+        "Therefore, I suggest we move forward with a balanced approach."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Use logical connectors to mark thought groups",
+        "Each complete thought is a chunk",
+        "Stress: market, conditions, recommend, proceed, cautiously, wait, miss, opportunity, suggest, move, forward, balanced, approach"
+      ]
+    },
+    {
+      "id": "day14-ex04",
+      "type": "shadow",
+      "title": "Full Presentation Flow",
+      "instruction": "Shadow this complete presentation segment.",
+      "targetText": "Good morning everyone. Today I'll present our findings. Our research shows three key trends. First, customer engagement is up. Second, costs are down. Third, quality has improved. Based on these results, I recommend we expand the program. Thank you for your attention.",
+      "stressPattern": [false, true, false, true, false, false, true, false, false, true, false, true, false, false, false, true, false, false, true, false, false, false, false, false, true, false, true, false, false, true, false, true, false, true, true, false, true, true, false, true, false, true, false, true, false, true, true, false, false, true, false, true, false, true, false, false, true, true, false, false, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, true, false, true, true, true, true, false, false, true, false, true, false, false, true, true, false, false, false, true, false, true, true, true, true, true, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Maintain professional presentation tone throughout",
+        "Use pauses between sections",
+        "Stress: Good, morning, everyone, Today, present, findings, research, shows, three, key, trends, First, engagement, Second, costs, Third, quality, improved, results, recommend, expand, program, Thank, attention"
+      ]
+    },
+    {
+      "id": "day14-ex05",
+      "type": "intonation",
+      "title": "Comprehensive Intonation Review",
+      "instruction": "Review all intonation patterns: statements, questions, lists, emphasis.",
+      "targetText": "We have a clear plan. Are there any questions? We need commitment, resources, and time. This is critical!",
+      "stressPattern": [true, false, true, false, true, true, false, false, true, false, true, true, false, false, false, true, false, true, true, false, false, true, true, false, false, false, false, true, true, false, true, false, true, false, false, true, true, true, true, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Statement: 'We have a clear plan' - falls at end ↘",
+        "Question: 'Are there any questions?' - rises at end ↗",
+        "List: commitment ↗, resources ↗, time ↘",
+        "Emphasis: 'This is critical!' - strong rise and fall with extra volume"
+      ]
+    }
+  ]
+}

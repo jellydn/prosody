@@ -1,0 +1,86 @@
+{
+  "day": 8,
+  "theme": "Mixed Drills I",
+  "exercises": [
+    {
+      "id": "day08-ex01",
+      "type": "stress",
+      "title": "Compound Stress",
+      "instruction": "Practice stress in compound words and phrases.",
+      "targetText": "Let's set up a follow-up meeting.",
+      "stressPattern": [false, true, false, true, false, false, true, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Compound 'set-up' stresses first syllable",
+        "Compound 'follow-up' stresses first syllable",
+        "Keep function words unstressed: 'Let's', 'to', 'a'"
+      ]
+    },
+    {
+      "id": "day08-ex02",
+      "type": "linking",
+      "title": "Consonant Clusters",
+      "instruction": "Practice linking words with consonant clusters.",
+      "targetText": "I'll ask_about the details when we meet.",
+      "stressPattern": [false, true, false, false, false, false, true, true, false, false, true, false, false, true, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Link 'ask' + 'about' - no pause between words",
+        "The 'k' sound connects smoothly to the 'a' in about",
+        "Stress: ask, details, meet"
+      ]
+    },
+    {
+      "id": "day08-ex03",
+      "type": "chunk",
+      "title": "Numbered Lists",
+      "instruction": "Break this list into clear thought groups.",
+      "targetText": "We have three priorities. One, completing the project. Two, managing the budget. Three, communicating with stakeholders.",
+      "stressPattern": [true, false, true, true, true, false, false, true, false, false, false, true, false, true, false, false, false, true, false, false, true, false, true, false, false, false, true, false, true, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false],
+      "chunks": [
+        "We have three priorities.",
+        "One, completing the project.",
+        "Two, managing the budget.",
+        "Three, communicating with stakeholders."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Use numbers to structure your points",
+        "Each number + point is a thought group",
+        "Stress: three, priorities, completing, project, managing, budget, communicating, stakeholders"
+      ]
+    },
+    {
+      "id": "day08-ex04",
+      "type": "shadow",
+      "title": "Rhythmic Flow",
+      "instruction": "Shadow to practice natural rhythmic flow.",
+      "targetText": "We need to move forward with the decision.",
+      "stressPattern": [true, true, false, false, true, false, true, false, false, true, false, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Keep the rhythm steady and flowing",
+        "Stress: need, move, forward, decision",
+        "Speak along with the model, don't wait"
+      ]
+    },
+    {
+      "id": "day08-ex05",
+      "type": "intonation",
+      "title": "Emphasis through Pitch",
+      "instruction": "Use intonation to emphasize important words.",
+      "targetText": "This is a great opportunity for our team.",
+      "stressPattern": [false, false, true, false, true, false, true, false, false, false, true, false, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Use extra pitch and volume on key words: great, opportunity, team",
+        "Statements end with falling tone: ↘",
+        "Keep function words lower and quieter"
+      ]
+    }
+  ]
+}

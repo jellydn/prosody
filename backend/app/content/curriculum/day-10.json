@@ -1,0 +1,86 @@
+{
+  "day": 10,
+  "theme": "Mixed Drills III",
+  "exercises": [
+    {
+      "id": "day10-ex01",
+      "type": "linking",
+      "title": "Vowel to Vowel Linking",
+      "instruction": "Practice linking vowels with a slight 'j' or 'w' sound.",
+      "targetText": "I appreciate_your help with this.",
+      "stressPattern": [false, true, false, false, false, false, false, true, false, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Add a slight 'y' sound between 'appreciate' and 'your': appreciate_your",
+        "This makes the transition smoother",
+        "Stress: appreciate, help, this"
+      ]
+    },
+    {
+      "id": "day10-ex02",
+      "type": "stress",
+      "title": "Phrasal Verbs",
+      "instruction": "Practice stress in phrasal verbs. The particle usually gets stress.",
+      "targetText": "We need to follow_up on the action items.",
+      "stressPattern": [true, true, false, false, true, false, false, false, true, true, false, false, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Phrasal verb 'follow up' stresses the particle: up",
+        "Stress also on 'action' and 'items'",
+        "Keep function words unstressed: 'We', 'to', 'on', 'the'"
+      ]
+    },
+    {
+      "id": "day10-ex03",
+      "type": "chunk",
+      "title": "Step-by-Step Instructions",
+      "instruction": "Break instructions into clear steps.",
+      "targetText": "Here's the process. First, review the document. Second, add your comments. Third, send it to the team.",
+      "stressPattern": [false, true, true, true, false, false, false, true, false, false, true, false, true, false, false, false, true, false, false, true, false, true, false, false, true, false, true, false, false, true, false, false, true, false, false, true, false, false],
+      "chunks": [
+        "Here's the process.",
+        "First, review the document.",
+        "Second, add your comments.",
+        "Third, send it to the team."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Use sequential markers: First, Second, Third",
+        "Each step is a separate thought group",
+        "Stress: process, review, document, add, comments, send, team"
+      ]
+    },
+    {
+      "id": "day10-ex04",
+      "type": "shadow",
+      "title": "Summarizing Points",
+      "instruction": "Shadow this summary. Use a clear, concluding tone.",
+      "targetText": "To summarize, we've covered three key areas.",
+      "stressPattern": [false, true, false, false, true, false, false, true, false, true, true, false, false, true, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Use a concluding tone to signal the end",
+        "Stress: summarize, covered, three, key, areas",
+        "Speak clearly and deliberately"
+      ]
+    },
+    {
+      "id": "day10-ex05",
+      "type": "intonation",
+      "title": "Listing Items",
+      "instruction": "Use intonation when listing items.",
+      "targetText": "We need time, resources, and support.",
+      "stressPattern": [true, true, true, false, true, true, false, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Rise on each item: time ↗, resources ↗",
+        "Fall on the final item: support ↘",
+        "Pause briefly between items"
+      ]
+    }
+  ]
+}
