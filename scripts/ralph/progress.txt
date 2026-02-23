@@ -52,3 +52,24 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Common linking patterns: consonant+vowel, same consonant at word boundaries
   - Chunk exercises combine linking with thought group practice
   - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+
+---
+
+## [2026-02-23] - US-004
+- Created Day 3 curriculum content with theme 'Speaking in Chunks'
+- Implemented 4 exercises: 2 chunk speaking, 1 shadowing, 1 linking
+- Chunk exercises demonstrate longer thought groups and complex instructions
+- Shadowing exercise introduces timing and pause matching
+- Linking exercise focuses on connections within thought groups
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-03.json (Day 3 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Chunk exercises can have multiple thought groups separated by commas
+  - Sequential markers like 'First, then, finally' help structure thought groups
+  - Shadowing exercises need stressPattern to guide rhythm matching
+  - Longer sentences benefit from more thought groups (2-3 chunks)
+  - When combining chunk and linking practice, emphasize smooth connections within chunks
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
