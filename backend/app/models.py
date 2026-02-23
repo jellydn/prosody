@@ -1,4 +1,12 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Float,
+    DateTime,
+    ForeignKey,
+)
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from datetime import datetime, timezone
 import os
@@ -31,7 +39,7 @@ class SessionResult(Base):
     __tablename__ = "session_results"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     day = Column(Integer, nullable=False)
     exercises_completed = Column(Integer, nullable=False)
     rhythm_score = Column(Float, nullable=False)
