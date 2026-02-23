@@ -28,27 +28,36 @@ class FreeAnalyzer(SpeechAnalyzer):
 
     def _analyze_rhythm(self, y: np.ndarray, sr: int) -> float:
         tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+        tempo_value = self._to_float(tempo, default=110.0)
         ideal_tempo = 110
-        tempo_diff = abs(tempo - ideal_tempo)
+        tempo_diff = abs(tempo_value - ideal_tempo)
         max_diff = 50
-        rhythm_score = max(1.0, min(5.0, 5.0 - (tempo_diff / max_diff) * 4))
+        rhythm_score = self._clamp_score(5.0 - (tempo_diff / max_diff) * 4.0)
         return round(rhythm_score, 1)
 
     def _analyze_stress(self, y: np.ndarray, sr: int, text: str) -> float:
         rms = librosa.feature.rms(y=y)
-        rms_normalized = rms / np.max(rms)
+        peak_rms = float(np.max(rms)) if rms.size > 0 else 0.0
+        if peak_rms <= 0:
+            return 1.0
+
+        rms_normalized = rms / peak_rms
         std_dev = np.std(rms_normalized)
-        stress_score = max(1.0, min(5.0, 2.0 + std_dev * 10))
+        stress_score = self._clamp_score(
+            2.0 + self._to_float(std_dev, default=0.0) * 10.0
+        )
         return round(stress_score, 1)
 
     def _analyze_pacing(self, y: np.ndarray, sr: int, text: str) -> float:
         words = len(text.split())
         duration = librosa.get_duration(y=y, sr=sr)
+        if duration <= 0:
+            return 1.0
         words_per_minute = (words / duration) * 60
         ideal_wpm = 140
         wpm_diff = abs(words_per_minute - ideal_wpm)
         max_diff = 60
-        pacing_score = max(1.0, min(5.0, 5.0 - (wpm_diff / max_diff) * 4))
+        pacing_score = self._clamp_score(5.0 - (wpm_diff / max_diff) * 4.0)
         return round(pacing_score, 1)
 
     def _analyze_intonation(self, audio_path: str) -> float:
@@ -64,8 +73,24 @@ class FreeAnalyzer(SpeechAnalyzer):
         ideal_range = 150
         range_diff = abs(pitch_range - ideal_range)
         max_diff = 100
-        intonation_score = max(1.0, min(5.0, 5.0 - (range_diff / max_diff) * 4))
+        intonation_score = self._clamp_score(
+            5.0 - (self._to_float(range_diff, default=max_diff) / max_diff) * 4.0
+        )
         return round(intonation_score, 1)
+
+    @staticmethod
+    def _clamp_score(value: float) -> float:
+        return max(1.0, min(5.0, float(value)))
+
+    @staticmethod
+    def _to_float(value: object, default: float = 0.0) -> float:
+        try:
+            arr = np.asarray(value, dtype=float)
+            if arr.size == 0:
+                return default
+            return float(arr.reshape(-1)[0])
+        except Exception:
+            return default
 
     def _generate_feedback(
         self,
