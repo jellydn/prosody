@@ -566,3 +566,30 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Playback comparison: Two separate play buttons for model vs user audio
   - Auto-stop: Use recording status callback or timeout fallback
   - Cleanup pattern: Unload sounds and clear timeouts in useEffect return
+
+## [2026-02-24] - US-023
+- Implemented ExerciseScreen router component that renders correct exercise screen based on exercise type
+- Created ExerciseScreen.tsx with switch statement mapping exercise types to components
+- Updated TabNavigator.tsx to include ExerciseScreen in HomeStack navigator
+- Updated HomeScreen.tsx to navigate to ExerciseScreen with exercise data
+- Exported navigation types (HomeStackParamList, Exercise, ExerciseType) from ExerciseScreen for reuse
+- Used NativeStackNavigationProp<HomeStackParamList> to properly type navigation hook
+- Added exercise navigation patterns to AGENTS.md
+- Files changed:
+  - mobile/screens/ExerciseScreen.tsx (New router component)
+  - mobile/navigation/TabNavigator.tsx (Added ExerciseScreen to HomeStack)
+  - mobile/screens/HomeScreen.tsx (Added navigation to ExerciseScreen)
+  - AGENTS.md (Added exercise navigation patterns)
+  - mobile/app.json (Added expo-audio plugin)
+  - mobile/package.json (Added expo-audio dependency)
+  - mobile/screens/ShadowingModeScreen.tsx (Formatting: spaces to tabs)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Navigation typing: Use NativeStackNavigationProp<ParamListType> to properly type useNavigation hook
+  - Export navigation param types from screen files when they're used by other components
+  - Use route.params object to pass data between screens (e.g., exercise object)
+  - Switch statement pattern for routing: Map exercise types to component renders
+  - Back navigation: Use navigation.goBack() to return to previous screen
+  - Tab indentation: This codebase uses tabs for indentation, ensure consistency
+  - expo-audio is the new Audio API (replaces expo-av Audio module)
