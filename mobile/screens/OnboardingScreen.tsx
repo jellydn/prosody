@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { Logo } from "../components/Logo";
+import { API_BASE_URL } from "../config/api";
 
 const NATIVE_LANGUAGES = [
   { code: "vi", name: "Vietnamese" },
@@ -75,7 +76,7 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
 
       await AsyncStorage.setItem("userProfile", JSON.stringify(profile));
 
-      const response = await fetch("http://localhost:8000/api/v1/users", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { API_BASE_URL } from "../config/api";
 import type { HomeStackParamList } from "./ExerciseScreen";
 
 interface ExerciseScore {
@@ -60,7 +61,7 @@ export default function SessionCompletionScreen() {
         return;
       }
 
-      const response = await fetch("http://localhost:8000/api/v1/progress", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/progress`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

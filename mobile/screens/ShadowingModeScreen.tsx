@@ -1,49 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-audio";
+import { Audio } from "expo-av";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import FeedbackCard from "../components/FeedbackCard";
-
-type FeedbackType = "good" | "warning" | "tip";
-
-interface FeedbackItem {
-  type: FeedbackType;
-  message: string;
-}
-
-interface AnalysisResult {
-  rhythm_score: number;
-  stress_score: number;
-  pacing_score: number;
-  intonation_score: number;
-  feedback: FeedbackItem[];
-}
-
-interface Exercise {
-  id: string;
-  type: string;
-  title: string;
-  instruction: string;
-  targetText: string;
-  stressPattern?: boolean[] | null;
-  chunks?: string[] | null;
-  audioUrl?: string | null;
-  tips: string[];
-}
+import { API_BASE_URL } from "../config/api";
+import { appendByopToFormData } from "../config/byop";
+import type { AnalysisResult } from "../types/analysis";
+import type { Exercise, ExerciseScores } from "./ExerciseScreen";
 
 interface ShadowingModeScreenProps {
   exercise: Exercise;
   onNext: () => void;
   onBack: () => void;
-  onComplete: (
-    exerciseId: string,
-    scores: {
-      rhythm_score: number;
-      stress_score: number;
-      pacing_score: number;
-      intonation_score: number;
-    },
-  ) => void;
+  onComplete: (exerciseId: string, scores: ExerciseScores) => void;
 }
 
 export default function ShadowingModeScreen({
@@ -275,8 +244,9 @@ export default function ShadowingModeScreen({
         name: "recording.m4a",
       } as any);
       formData.append("target_text", exercise.targetText);
+      await appendByopToFormData(formData);
 
-      const response = await fetch("http://localhost:8000/api/v1/analyze", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
         method: "POST",
         body: formData,
         headers: {

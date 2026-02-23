@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+import { API_BASE_URL } from "../config/api";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -55,8 +56,8 @@ export default function DashboardScreen() {
       setUserId(parseInt(savedUserId, 10));
 
       const [summaryRes, sessionsRes] = await Promise.all([
-        fetch(`http://localhost:8000/api/v1/progress/${savedUserId}/summary`),
-        fetch(`http://localhost:8000/api/v1/progress/${savedUserId}`),
+        fetch(`${API_BASE_URL}/api/v1/progress/${savedUserId}/summary`),
+        fetch(`${API_BASE_URL}/api/v1/progress/${savedUserId}`),
       ]);
 
       if (summaryRes.ok && sessionsRes.ok) {

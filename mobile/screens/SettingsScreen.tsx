@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { API_BASE_URL } from "../config/api";
+import { BYOP_API_KEY_KEY, BYOP_PROVIDER_KEY } from "../config/byop";
 
 const PROVIDERS = [
   { id: "free", name: "Free (default)" },
@@ -22,9 +24,6 @@ const PROVIDERS = [
 
 type Provider = (typeof PROVIDERS)[number]["id"];
 
-const API_KEY_KEY = "speech_api_key";
-const PROVIDER_KEY = "speech_provider";
-
 export default function SettingsScreen() {
   const [provider, setProvider] = useState<Provider>("free");
   const [apiKey, setApiKey] = useState("");
@@ -33,8 +32,8 @@ export default function SettingsScreen() {
 
   const loadSettings = useCallback(async () => {
     try {
-      const savedProvider = await SecureStore.getItemAsync(PROVIDER_KEY);
-      const savedApiKey = await SecureStore.getItemAsync(API_KEY_KEY);
+      const savedProvider = await SecureStore.getItemAsync(BYOP_PROVIDER_KEY);
+      const savedApiKey = await SecureStore.getItemAsync(BYOP_API_KEY_KEY);
 
       if (savedProvider) {
         setProvider(savedProvider as Provider);
@@ -53,11 +52,11 @@ export default function SettingsScreen() {
 
   const saveSettings = useCallback(async () => {
     try {
-      await SecureStore.setItemAsync(PROVIDER_KEY, provider);
+      await SecureStore.setItemAsync(BYOP_PROVIDER_KEY, provider);
       if (apiKey && provider !== "free") {
-        await SecureStore.setItemAsync(API_KEY_KEY, apiKey);
+        await SecureStore.setItemAsync(BYOP_API_KEY_KEY, apiKey);
       } else {
-        await SecureStore.deleteItemAsync(API_KEY_KEY);
+        await SecureStore.deleteItemAsync(BYOP_API_KEY_KEY);
       }
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -65,9 +64,10 @@ export default function SettingsScreen() {
     }
   }, [provider, apiKey]);
 
-  const handleProviderSelect = useCallback((selectedProvider: Provider) => {
+  const handleProviderSelect = useCallback(async (selectedProvider: Provider) => {
     setProvider(selectedProvider);
     setShowPicker(false);
+    await SecureStore.setItemAsync(BYOP_PROVIDER_KEY, selectedProvider);
   }, []);
 
   const handleTest = useCallback(async () => {
@@ -89,7 +89,7 @@ export default function SettingsScreen() {
       formData.append("provider", provider);
       formData.append("api_key", apiKey);
 
-      const response = await fetch("http://localhost:8000/api/v1/analyze", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
         method: "POST",
         body: formData,
       });
