@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-audio";
+import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -70,6 +70,10 @@ export default function AudioPlayer({
     }
 
     const words = targetText.split(/\s+/);
+    if (stressPattern.length !== words.length) {
+      return <Text style={styles.text}>{targetText}</Text>;
+    }
+
     return (
       <Text style={styles.text}>
         {words.map((word, index) => {
@@ -90,18 +94,24 @@ export default function AudioPlayer({
       return renderStressedText();
     }
 
+    let wordOffset = 0;
     return (
       <View style={styles.chunkContainer}>
-        {chunks.map((chunk, index) => (
-          <View key={`chunk-${index}`} style={styles.chunk}>
-            {renderTextForChunk(chunk)}
-          </View>
-        ))}
+        {chunks.map((chunk, index) => {
+          const chunkWordCount = chunk.split(/\s+/).length;
+          const chunkView = (
+            <View key={`chunk-${index}`} style={styles.chunk}>
+              {renderTextForChunk(chunk, wordOffset)}
+            </View>
+          );
+          wordOffset += chunkWordCount;
+          return chunkView;
+        })}
       </View>
     );
   };
 
-  const renderTextForChunk = (chunkText: string) => {
+  const renderTextForChunk = (chunkText: string, offset: number) => {
     if (!stressPattern) {
       return <Text style={styles.text}>{chunkText}</Text>;
     }
@@ -110,7 +120,7 @@ export default function AudioPlayer({
     return (
       <Text style={styles.text}>
         {words.map((word, index) => {
-          const isStressed = stressPattern[index];
+          const isStressed = stressPattern[offset + index];
           return (
             <Text key={`${word}-${index}`} style={isStressed ? styles.stressed : styles.unstressed}>
               {word}

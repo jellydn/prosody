@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-audio";
-import { useEffect, useState } from "react";
+import { Audio } from "expo-av";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface AudioRecorderProps {
@@ -8,6 +8,10 @@ interface AudioRecorderProps {
 }
 
 export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
+  const SILENCE_THRESHOLD_DB = -45;
+  const SILENCE_WINDOW_MS = 10000;
+  const MAX_RECORDING_MS = 60000;
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -15,6 +19,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
   const [isPlaying, setIsPlaying] = useState(false);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [isPulsing, setIsPulsing] = useState(false);
+  const silenceStartRef = useRef<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -77,6 +82,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
           extension: ".m4a",
           outputFormat: Audio.AndroidOutputFormat.MPEG_4,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
+          isMeteringEnabled: true,
           sampleRate: 44100,
           numberOfChannels: 2,
           bitRate: 128000,
@@ -85,6 +91,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
           extension: ".m4a",
           outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
           audioQuality: Audio.IOSAudioQuality.HIGH,
+          isMeteringEnabled: true,
           sampleRate: 44100,
           numberOfChannels: 2,
           bitRate: 128000,
@@ -103,10 +110,24 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
       setIsRecording(true);
       setRecordedUri(null);
       onRecordingComplete(null);
+      silenceStartRef.current = null;
 
-      recording.setOnRecordingStatusUpdate((status) => {
-        if (status.durationMillis > 10000) {
+      recording.setOnRecordingStatusUpdate((status: Audio.RecordingStatus) => {
+        if (status.durationMillis > MAX_RECORDING_MS) {
           stopRecording();
+          return;
+        }
+
+        if (typeof status.metering === "number") {
+          if (status.metering < SILENCE_THRESHOLD_DB) {
+            if (silenceStartRef.current === null) {
+              silenceStartRef.current = Date.now();
+            } else if (Date.now() - silenceStartRef.current >= SILENCE_WINDOW_MS) {
+              stopRecording();
+            }
+          } else {
+            silenceStartRef.current = null;
+          }
         }
       });
     } catch (err) {
@@ -123,6 +144,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
       setRecordedUri(uri);
       setRecording(null);
       setIsRecording(false);
+      silenceStartRef.current = null;
       onRecordingComplete(uri);
     } catch (err) {
       console.error("Failed to stop recording", err);

@@ -22,7 +22,7 @@
       "title": "Meeting Expressions",
       "instruction": "Practice the stress pattern. Important words are stressed.",
       "targetText": "Let's discuss the proposal.",
-      "stressPattern": [false, true, false, false, true, true, false],
+      "stressPattern": [false, true, false, true],
       "chunks": null,
       "audioUrl": null,
       "tips": ["The key words are 'discuss' and 'proposal'", "'The' is unstressed - say it quickly"]
