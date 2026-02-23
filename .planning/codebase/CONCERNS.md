@@ -16,11 +16,10 @@
 - Impact: Scoring changes require editing 3 files; inconsistencies will emerge
 - Fix approach: Extract shared scoring mixin or base class with common methods; only override the speech recognition step
 
-**Hardcoded localhost API URLs scattered everywhere:**
-- Issue: `http://localhost:8000` is hardcoded in 10+ locations across mobile screens with no centralized configuration
-- Files: `mobile/screens/HomeScreen.tsx`, `mobile/screens/DashboardScreen.tsx`, `mobile/screens/StressDrillScreen.tsx`, `mobile/screens/OnboardingScreen.tsx`, `mobile/screens/SessionCompletionScreen.tsx`, `mobile/screens/SettingsScreen.tsx`, `mobile/screens/ProgramOverviewScreen.tsx`, `mobile/screens/LinkingPracticeScreen.tsx`, `mobile/screens/IntonationTrainingScreen.tsx`, `mobile/screens/ChunkSpeakingScreen.tsx`, `mobile/screens/ShadowingModeScreen.tsx`
-- Impact: Cannot deploy to production or test on physical devices; every URL change requires editing all files
-- Fix approach: Create a centralized `config.ts` or use environment variables via `expo-constants`
+**Addressed: Centralized mobile API base URL configuration:**
+- Status: Completed
+- Changes: Added `mobile/config/api.ts` with `API_BASE_URL` sourced from `EXPO_PUBLIC_API_BASE_URL` (fallback `http://localhost:8000`) and replaced hardcoded URLs across mobile screens
+- Files: `mobile/config/api.ts`, `mobile/screens/HomeScreen.tsx`, `mobile/screens/DashboardScreen.tsx`, `mobile/screens/StressDrillScreen.tsx`, `mobile/screens/OnboardingScreen.tsx`, `mobile/screens/SessionCompletionScreen.tsx`, `mobile/screens/SettingsScreen.tsx`, `mobile/screens/ProgramOverviewScreen.tsx`, `mobile/screens/LinkingPracticeScreen.tsx`, `mobile/screens/IntonationTrainingScreen.tsx`, `mobile/screens/ChunkSpeakingScreen.tsx`, `mobile/screens/ShadowingModeScreen.tsx`
 
 **Unpinned Python dependencies:**
 - Issue: `requirements.txt` has no version pins — `fastapi`, `sqlalchemy`, `librosa`, `pydub`, `parselmouth`, etc. are all unpinned
@@ -28,17 +27,15 @@
 - Impact: Builds are non-reproducible; a breaking dependency update will silently break production
 - Fix approach: Pin all dependencies with exact versions (e.g., `fastapi==0.115.0`)
 
-**Deprecated SQLAlchemy API usage:**
-- Issue: Uses `declarative_base()` from `sqlalchemy.ext.declarative` which is deprecated; should use `sqlalchemy.orm.DeclarativeBase`
+**Addressed: SQLAlchemy DeclarativeBase migration:**
+- Status: Completed
+- Changes: Replaced deprecated `declarative_base()` with `DeclarativeBase`; kept SQLite-only `check_same_thread=False` connect args
 - Files: `backend/app/models.py`
-- Impact: Will break on future SQLAlchemy versions
-- Fix approach: Migrate to `DeclarativeBase` pattern
 
-**Deprecated FastAPI lifecycle event:**
-- Issue: Uses `@app.on_event("startup")` which is deprecated in favor of `lifespan` context manager
+**Addressed: FastAPI lifespan migration:**
+- Status: Completed
+- Changes: Replaced `@app.on_event("startup")` with FastAPI `lifespan` context manager
 - Files: `backend/app/main.py`
-- Impact: Will produce warnings and eventually break on future FastAPI versions
-- Fix approach: Migrate to FastAPI `lifespan` parameter
 
 **Mobile curriculum is incomplete and HomeScreen is still hardcoded to Day 1:**
 - Issue: `HomeScreen` hardcodes `import day01Data`; mobile only has day 1-3 files while backend has day 1-14
@@ -60,37 +57,32 @@
 - Trigger: Exercise with both `chunks` and `stressPattern` set
 - Workaround: None — stress highlighting in chunked mode is incorrect
 
-**ProgramOverviewScreen disabled+locked conflict:**
-- Symptoms: Day cards have `disabled={dayCard.isLocked && !dayCard.isCompleted}` but the `onPress` handler already checks `isLocked` and shows an alert — the `disabled` prop prevents the alert from ever appearing
-- Files: `mobile/screens/ProgramOverviewScreen.tsx:155`
-- Trigger: Tap on a locked day — nothing happens instead of showing the skip alert
-- Workaround: None
+**Addressed: ProgramOverviewScreen disabled+locked conflict:**
+- Status: Completed
+- Changes: Removed the `disabled` prop so locked day taps now reach the existing alert handler
+- Files: `mobile/screens/ProgramOverviewScreen.tsx`
 
-**Duplicate Alert import in ProgramOverviewScreen:**
-- Symptoms: Imports both `Alert` and `Alert as RNAlert` from react-native — confusing and inconsistent usage
-- Files: `mobile/screens/ProgramOverviewScreen.tsx:6-7`
-- Trigger: N/A — cosmetic but indicates copy-paste issues
-- Workaround: N/A
+**Addressed: Duplicate Alert import in ProgramOverviewScreen:**
+- Status: Completed
+- Changes: Removed duplicate `Alert as RNAlert` import and standardized on `Alert`
+- Files: `mobile/screens/ProgramOverviewScreen.tsx`
 
-**Streak counter starts at 5 on HomeScreen:**
-- Symptoms: `useState<number>(5)` initializes the streak to 5 instead of 0, showing a false streak before data loads
-- Files: `mobile/screens/HomeScreen.tsx:37`
-- Trigger: Open HomeScreen before progress data loads
-- Workaround: None — user sees "5 day streak" briefly on first load
+**Addressed: HomeScreen streak default value:**
+- Status: Completed
+- Changes: Changed initial streak state from `5` to `0`
+- Files: `mobile/screens/HomeScreen.tsx`
 
-**`completedExercises` state is never updated:**
-- Symptoms: HomeScreen tracks `completedExercises` as a `Set` but the setter (`_setCompletedExercises`) is prefixed with underscore and never called — exercises never show checkmarks
-- Files: `mobile/screens/HomeScreen.tsx:27`
-- Trigger: Complete any exercise — the completion checkmark never appears
-- Workaround: None
+**Addressed: `completedExercises` state update path:**
+- Status: Completed
+- Changes: HomeScreen now updates `completedExercises` from serializable completion params when returning from ExerciseScreen
+- Files: `mobile/screens/HomeScreen.tsx`, `mobile/screens/ExerciseScreen.tsx`
 
 ## Security Considerations
 
-**CORS allows all origins:**
-- Risk: `allow_origins=["*"]` with `allow_credentials=True` permits any website to make authenticated requests to the API
-- Files: `backend/app/main.py:13-18`
-- Current mitigation: None
-- Recommendations: Restrict `allow_origins` to known mobile app origins; do not combine `*` with `allow_credentials=True`
+**Addressed: CORS wildcard configuration:**
+- Status: Completed
+- Changes: Replaced wildcard origins with env-driven `CORS_ORIGINS` parsing and local development defaults
+- Files: `backend/app/main.py`
 
 **API keys transmitted as form data over HTTP:**
 - Risk: User-provided API keys (Azure, Google, OpenAI) are sent as plain-text form fields in the `/analyze` endpoint, potentially logged in server access logs
@@ -110,11 +102,10 @@
 - Current mitigation: None
 - Recommendations: Add rate limiting middleware; implement file size limits; consider async task queue
 
-**Error responses leak internal details:**
-- Risk: Exception messages (`str(e)`) are returned directly to the client in HTTP 500 responses, potentially exposing stack traces or internal paths
-- Files: `backend/app/api/analyze.py:107`
-- Current mitigation: None
-- Recommendations: Return generic error messages; log full exceptions server-side only
+**Addressed: Internal error details in analysis endpoint:**
+- Status: Completed
+- Changes: `/analyze` now returns generic `Analysis failed` for unexpected server errors
+- Files: `backend/app/api/analyze.py`
 
 ## Performance Bottlenecks
 
@@ -136,11 +127,10 @@
 - Cause: Google Cloud Speech client is synchronous
 - Improvement path: Use `google.cloud.speech_v1.SpeechAsyncClient` or run in thread pool
 
-**No file size limit on audio uploads:**
-- Problem: Users can upload arbitrarily large audio files; the entire file is read into memory
-- Files: `backend/app/api/analyze.py:61`
-- Cause: `await audio.read()` loads the full file into memory before processing
-- Improvement path: Add `max_size` validation; stream to disk for large files
+**Addressed: Audio upload size guard:**
+- Status: Completed
+- Changes: Added `MAX_AUDIO_SIZE_BYTES` validation with HTTP 413 response for oversized uploads
+- Files: `backend/app/api/analyze.py`
 
 **SQLite with check_same_thread=False:**
 - Problem: SQLite is used with `check_same_thread=False` which allows concurrent access but SQLite itself doesn't handle concurrent writes well
@@ -156,11 +146,11 @@
 - Safe modification: Add new cases to the switch; ensure a sensible default fallback
 - Test coverage: None
 
-**Passing callbacks via navigation params:**
-- Files: `mobile/screens/HomeScreen.tsx:131-134`, `mobile/screens/ExerciseScreen.tsx:54`
-- Why fragile: `onComplete` callback is passed through React Navigation's route params. This is a React Navigation anti-pattern — functions aren't serializable and can cause issues with state persistence and deep linking
-- Safe modification: Use a shared state manager (Context/Zustand) or event emitter instead
-- Test coverage: None
+**Addressed: Passing callbacks via navigation params:**
+- Status: Completed
+- Changes: Removed function params from navigation. Exercise completion now flows through serializable params (`completedExercise`, `completedAt`)
+- Files: `mobile/screens/HomeScreen.tsx`, `mobile/screens/ExerciseScreen.tsx`, `mobile/screens/LibraryScreen.tsx`
+- Residual risk: Still uses route params for in-stack communication; consider shared store if flow grows
 
 **Streak calculation logic:**
 - Files: `backend/app/api/progress.py:135-143`
@@ -168,17 +158,17 @@
 - Safe modification: Add deduplication by day; consider using completed dates instead of day numbers
 - Test coverage: Only tests the happy path (3 consecutive days)
 
-**Audio format conversion:**
-- Files: `backend/app/api/analyze.py:65-79`
-- Why fragile: Uses `audio.content_type.split("/")[-1]` to determine pydub format — this heuristic breaks for types like `audio/x-m4a` (resolves to `x-m4a`, not a valid pydub format)
-- Safe modification: Create an explicit content-type-to-format mapping
-- Test coverage: Only tests unsupported format rejection, not the actual conversion path
+**Addressed: Audio format conversion mapping:**
+- Status: Completed
+- Changes: Replaced `content_type.split("/")[-1]` heuristic with explicit `CONTENT_TYPE_TO_FORMAT` mapping
+- Files: `backend/app/api/analyze.py`
+- Test coverage: Conversion happy-path tests still missing
 
-**Temp file cleanup in analyze endpoint:**
-- Files: `backend/app/api/analyze.py:49-84`
-- Why fragile: Manual temp file creation and cleanup with multiple cleanup paths. If any unhandled exception occurs between file creation and cleanup, the temp file leaks
-- Safe modification: Use a context manager or `try/finally` that always cleans up
-- Test coverage: No tests for the cleanup paths
+**Addressed: Temp file cleanup in analyze endpoint:**
+- Status: Completed
+- Changes: Centralized cleanup in `finally` to ensure temp file removal on all paths
+- Files: `backend/app/api/analyze.py`
+- Test coverage: Cleanup path tests still missing
 
 ## Scaling Limits
 

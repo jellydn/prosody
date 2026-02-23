@@ -489,6 +489,147 @@
 			"priority": 29,
 			"passes": true,
 			"notes": ""
+		},
+		{
+			"id": "US-030",
+			"title": "Fix HomeScreen stuck on Day 1 — load current day from progress",
+			"description": "As a user, I want to see my current day's lesson, not always Day 1.",
+			"acceptanceCriteria": [
+				"HomeScreen fetches user progress from GET /api/v1/progress/{userId}",
+				"Determines current day from completed sessions (max completed day + 1, capped at 14)",
+				"Dynamically imports the correct day-XX.json based on current day",
+				"Falls back to Day 1 if no progress exists",
+				"Typecheck passes"
+			],
+			"priority": 30,
+			"passes": false,
+			"notes": "BUG: HomeScreen hardcodes day01Data — users can never advance past Day 1"
+		},
+		{
+			"id": "US-031",
+			"title": "Fix ProgramOverview to navigate to selected day",
+			"description": "As a user, I want to tap a day in Program Overview and load that day's lesson.",
+			"acceptanceCriteria": [
+				"Tapping an unlocked day navigates to HomeMain with a selectedDay param",
+				"HomeScreen reads selectedDay from route params and loads that day's curriculum",
+				"Update HomeStackParamList to include optional selectedDay: number param",
+				"Typecheck passes"
+			],
+			"priority": 31,
+			"passes": false,
+			"notes": "BUG: Currently navigates to HomeMain without telling it which day to load"
+		},
+		{
+			"id": "US-032",
+			"title": "Fix exercise screens to use BYOP provider from Settings",
+			"description": "As a user, I want my configured API key to be used when analyzing recordings.",
+			"acceptanceCriteria": [
+				"Create a shared helper (e.g., mobile/utils/analyzeAudio.ts) that reads provider/api_key from expo-secure-store and calls /api/v1/analyze",
+				"All 5 exercise screens use the shared helper instead of inline fetch",
+				"Appends provider and api_key to FormData when non-free provider is configured",
+				"Falls back to free analyzer if no provider configured",
+				"Typecheck passes"
+			],
+			"priority": 32,
+			"passes": false,
+			"notes": "BUG: All exercise screens always use free analyzer — BYOP settings never read"
+		},
+		{
+			"id": "US-033",
+			"title": "Extract shared types to reduce duplication across exercise screens",
+			"description": "As a developer, I want shared types so exercise screens don't duplicate interfaces.",
+			"acceptanceCriteria": [
+				"Create mobile/types/exercise.ts with shared FeedbackItem, AnalysisResult, Exercise, ExerciseScores interfaces",
+				"Update all 5 exercise screens to import from shared types instead of local definitions",
+				"Update FeedbackCard component to import from shared types",
+				"Remove all duplicate interface definitions from exercise screens",
+				"Typecheck passes"
+			],
+			"priority": 33,
+			"passes": false,
+			"notes": "CODE QUALITY: FeedbackItem, AnalysisResult, Exercise duplicated in 5+ files"
+		},
+		{
+			"id": "US-034",
+			"title": "Fix OpenAI analyzer file upload",
+			"description": "As a developer, I need the OpenAI analyzer to correctly pass audio files to the API.",
+			"acceptanceCriteria": [
+				"OpenAI analyzer opens file in binary mode and passes the file object (not raw bytes) to client.audio.transcriptions.create",
+				"Use a tuple of (filename, file_handle, content_type) for the file parameter",
+				"Add test verifying analyzer can be instantiated and method signature is correct",
+				"Typecheck passes"
+			],
+			"priority": 34,
+			"passes": false,
+			"notes": "BUG: Passes raw bytes to OpenAI API — will fail at runtime"
+		},
+		{
+			"id": "US-035",
+			"title": "Fix Google analyzer to use API key",
+			"description": "As a developer, I need the Google analyzer to authenticate with the provided API key.",
+			"acceptanceCriteria": [
+				"GoogleAnalyzer creates SpeechClient using the provided api_key or credentials JSON",
+				"If api_key is a JSON string, parse as service account credentials",
+				"If api_key is a plain key, use it as API key via client options",
+				"Typecheck passes"
+			],
+			"priority": 35,
+			"passes": false,
+			"notes": "BUG: api_key stored but never passed to SpeechClient"
+		},
+		{
+			"id": "US-036",
+			"title": "Fix Azure analyzer blocking the event loop",
+			"description": "As a developer, I need the Azure analyzer to run synchronous SDK calls without blocking.",
+			"acceptanceCriteria": [
+				"Wrap recognizer.recognize_once() in asyncio.to_thread() or loop.run_in_executor()",
+				"Async method no longer blocks the FastAPI event loop",
+				"Typecheck passes"
+			],
+			"priority": 36,
+			"passes": false,
+			"notes": "BUG: Synchronous Azure SDK call inside async def blocks the event loop"
+		},
+		{
+			"id": "US-037",
+			"title": "Fix AudioPlayer stress pattern alignment for chunked text",
+			"description": "As a developer, I need stress patterns to align correctly when chunks are rendered.",
+			"acceptanceCriteria": [
+				"renderTextForChunk receives the global word offset so stressPattern indices are correct",
+				"Stress highlighting works correctly for both chunked and non-chunked exercises",
+				"Typecheck passes"
+			],
+			"priority": 37,
+			"passes": false,
+			"notes": "BUG: renderTextForChunk uses local index instead of global word offset"
+		},
+		{
+			"id": "US-038",
+			"title": "Fix stressPattern granularity mismatch in curriculum JSON",
+			"description": "As a developer, I need stressPattern arrays to match word count, not syllable count.",
+			"acceptanceCriteria": [
+				"Audit all day-01 through day-14 JSON files",
+				"Ensure stressPattern length matches the number of space-separated words in targetText",
+				"AudioPlayer splits by whitespace, so stressPattern must be per-word",
+				"All JSON files validate correctly"
+			],
+			"priority": 38,
+			"passes": false,
+			"notes": "BUG: day01-ex02 has 4 words but 7 stressPattern booleans (syllable-level vs word-level)"
+		},
+		{
+			"id": "US-039",
+			"title": "Fix BYOP analyzers hardcoded intonation score",
+			"description": "As a developer, I want BYOP analyzers to provide real intonation analysis.",
+			"acceptanceCriteria": [
+				"Azure, Google, and OpenAI analyzers use parselmouth or pitch analysis for intonation instead of returning hardcoded 3.5",
+				"Reuse the FreeAnalyzer._analyze_intonation() method or extract it as a shared utility",
+				"All BYOP analyzers return meaningful intonation scores",
+				"Typecheck passes"
+			],
+			"priority": 39,
+			"passes": false,
+			"notes": "CODE QUALITY: All BYOP analyzers hardcode intonation_score to 3.5"
 		}
 	]
 }
