@@ -15,6 +15,12 @@ dependencies = [
     "numpy",
 ]
 
+[project.optional-dependencies]
+azure = ["azure-cognitiveservices-speech"]
+google = ["google-cloud-speech"]
+openai = ["openai"]
+all = ["azure-cognitiveservices-speech", "google-cloud-speech", "openai"]
+
 [dependency-groups]
 dev = [
     "pytest",
