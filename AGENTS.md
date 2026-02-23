@@ -13,14 +13,14 @@ This file provides coding guidelines for AI agents working on English Rhythm Coa
 
 ## Quick Reference
 
-| Task                  | Command                                                               |
-| --------------------- | --------------------------------------------------------------------- |
-| Backend dev           | `cd backend && uvicorn app.main:app --reload`                         |
-| Mobile dev            | `cd mobile && npx expo start`                                         |
-| Run all backend tests | `cd backend && pytest -v`                                             |
-| Run single test       | `pytest -k "test_name"` or `pytest tests/test_file.py::test_function` |
-| Lint/format backend   | `cd backend && ruff check . && ruff format .`                         |
-| TypeScript check      | `cd mobile && npx tsc --noEmit`                                       |
+| Task                  | Command                                                              |
+| --------------------- | -------------------------------------------------------------------- |
+| Backend dev           | `just backend-dev` or `cd backend && uvicorn app.main:app --reload`  |
+| Mobile dev            | `just mobile-dev` or `cd mobile && npx expo start`                   |
+| Run all backend tests | `just backend-test` or `cd backend && pytest -v`                     |
+| Run single test       | `just backend-test-single "test_name"`                               |
+| Lint/format backend   | `just backend-lint` or `cd backend && ruff check . && ruff format .` |
+| TypeScript check      | `just mobile-typecheck` or `cd mobile && npx tsc --noEmit`           |
 
 ---
 
