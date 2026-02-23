@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { Audio } from "expo-audio";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AudioPlayer from "../components/AudioPlayer";
@@ -37,12 +37,22 @@ interface LinkingPracticeScreenProps {
   exercise: Exercise;
   onNext: () => void;
   onBack: () => void;
+  onComplete: (
+    exerciseId: string,
+    scores: {
+      rhythm_score: number;
+      stress_score: number;
+      pacing_score: number;
+      intonation_score: number;
+    },
+  ) => void;
 }
 
 export default function LinkingPracticeScreen({
   exercise,
   onNext,
   onBack,
+  onComplete,
 }: LinkingPracticeScreenProps) {
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -178,7 +188,18 @@ export default function LinkingPracticeScreen({
             <>
               <FeedbackCard result={analysisResult} />
               {renderTips()}
-              <TouchableOpacity style={styles.nextButton} onPress={onNext}>
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={() => {
+                  onComplete(exercise.id, {
+                    rhythm_score: analysisResult.rhythm_score,
+                    stress_score: analysisResult.stress_score,
+                    pacing_score: analysisResult.pacing_score,
+                    intonation_score: analysisResult.intonation_score,
+                  });
+                  onNext();
+                }}
+              >
                 <Text style={styles.nextButtonText}>Next Exercise</Text>
                 <Ionicons name="arrow-forward" size={20} color="#fff" />
               </TouchableOpacity>

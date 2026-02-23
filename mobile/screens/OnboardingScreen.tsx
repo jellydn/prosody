@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Logo } from "../components/Logo";
 
 const NATIVE_LANGUAGES = [
   { code: "vi", name: "Vietnamese" },
@@ -108,6 +109,9 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Logo size={48} />
+          </View>
           <Text style={styles.title}>Welcome!</Text>
           <Text style={styles.subtitle}>Let's personalize your English rhythm training</Text>
         </View>
@@ -206,6 +210,10 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 32,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 24,
   },
   title: {
     fontSize: 32,
