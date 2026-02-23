@@ -20,3 +20,18 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - All Python code must pass ruff check and format before committing
   - LSP errors about unresolved imports are expected before pip install
 ---
+
+## [2026-02-23] - US-002
+- Created Day 1 curriculum content with theme 'Word Stress Basics'
+- Implemented 4 exercises: 2 stress drills, 1 chunk speaking, 1 intonation
+- All exercises use professional vocabulary and clear instructions
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-01.json (Day 1 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Curriculum JSON files must be created under backend/app/content/curriculum/
+  - stressPattern uses boolean array: True=stressed, False=unstressed
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+  - Professional vocabulary examples: greetings, meeting expressions, feedback phrases
