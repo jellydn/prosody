@@ -361,3 +361,28 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Round card corners (borderRadius: 12) and shadow styling for modern look
   - Type-safe imports of JSON files in TypeScript with import from assets
 ---
+
+## [2026-02-23] - US-015
+- Implemented AudioPlayer component for playing example sentences
+- Used expo-av for audio playback with play/pause functionality
+- Visual state indicator: play button changes color and icon when playing
+- Stressed syllables displayed in bold and blue (#007AFF color)
+- Chunk boundaries shown with vertical spacing between thought groups
+- Component accepts audioUrl, targetText, stressPattern, and chunks as props
+- Files changed:
+  - mobile/components/AudioPlayer.tsx (AudioPlayer component)
+  - mobile/package.json (Added expo-av dependency)
+  - mobile/package-lock.json (Dependency updates)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - AudioPlayer component uses expo-av's Audio.Sound.createAsync() for playback
+  - Sound cleanup: Unload audio in useEffect cleanup to prevent memory leaks
+  - Playback status update listener sets isPlaying false when audio finishes
+  - Stress pattern: boolean array where true=stressed, false=unstressed
+  - Stressed text: fontWeight: "bold", color: "#007AFF", fontSize: 22
+  - Chunk display: Each chunk wrapped in View with marginVertical spacing
+  - Play button: 64x64 circular button with shadow/elevation for depth
+  - Play button active state: Background color changes from #E3F2FF to #007AFF
+  - Component props: audioUrl (string | null), targetText (string), stressPattern (boolean[] | null), chunks (string[] | null)
+  - Conditional rendering: play button only shown when audioUrl is not null
