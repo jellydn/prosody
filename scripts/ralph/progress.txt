@@ -337,3 +337,27 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - ScrollView: Use for forms to handle scrolling on smaller screens
   - TypeScript for navigation: NativeStackScreenProps with route params interface
 ---
+
+## [2026-02-23] - US-014
+- Implemented daily lesson home screen with current day display, theme, and exercise list
+- Created curriculum data structure and loaded Day 1 from bundled JSON assets
+- Added exercise type icons mapping (stress, linking, chunk, shadow, intonation)
+- Implemented streak counter display at top of screen
+- Added exercise cards with title, type, and completion status
+- Files changed:
+  - mobile/screens/HomeScreen.tsx (Home screen with curriculum display)
+  - mobile/assets/curriculum/ (Curriculum JSON files from backend)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Curriculum JSON files should be copied to mobile/assets/curriculum/ from backend
+  - Use TypeScript interfaces for curriculum data structure (Day, Exercise)
+  - Exercise type icons: Use Ionicons from @expo/vector-icons with mapping object
+  - Card-based UI with shadow/elevation for exercises in lists
+  - Streak badge with flame icon (#FF6B6B color) at top of screen
+  - Meta info (time, exercise count) displayed with small icons and text
+  - ScrollView wrapper for vertical scrolling content
+  - Completion status tracked with Set<string> of exercise IDs
+  - Round card corners (borderRadius: 12) and shadow styling for modern look
+  - Type-safe imports of JSON files in TypeScript with import from assets
+---
