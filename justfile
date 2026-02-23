@@ -36,7 +36,7 @@ backend-schema:
 
 # Mobile commands
 mobile-install:
-    cd mobile && npx expo install
+    cd mobile && npm install
 
 mobile-dev:
     cd mobile && npx expo start
