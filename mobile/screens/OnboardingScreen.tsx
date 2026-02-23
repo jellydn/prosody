@@ -49,7 +49,7 @@ interface UserProfile {
 
 type OnboardingScreenProps = NativeStackScreenProps<{
 	Onboarding: undefined;
-	Home: undefined;
+	Main: undefined;
 }>;
 
 export default function OnboardingScreen({
@@ -91,7 +91,7 @@ export default function OnboardingScreen({
 			if (response.ok) {
 				const data = await response.json();
 				await AsyncStorage.setItem("userId", data.user_id.toString());
-				navigation.replace("Home");
+				navigation.replace("Main");
 			} else {
 				throw new Error("Failed to create profile");
 			}

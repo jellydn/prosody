@@ -10,8 +10,14 @@ const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
 	Onboarding: undefined;
-	Home: undefined;
+	Main: undefined;
 };
+
+declare global {
+	namespace ReactNavigation {
+		interface RootParamList extends RootStackParamList {}
+	}
+}
 
 export default function App() {
 	const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +50,7 @@ export default function App() {
 		<NavigationContainer>
 			<Stack.Navigator screenOptions={{ headerShown: false }}>
 				{hasCompletedOnboarding ? (
-					<Stack.Screen name="Home" component={TabNavigator} />
+					<Stack.Screen name="Main" component={TabNavigator} />
 				) : (
 					<Stack.Screen name="Onboarding" component={OnboardingScreen} />
 				)}

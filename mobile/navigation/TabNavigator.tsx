@@ -17,7 +17,7 @@ function HomeStackScreen() {
 	return (
 		<HomeStack.Navigator>
 			<HomeStack.Screen
-				name="Home"
+				name="HomeMain"
 				component={HomeScreen}
 				options={{ headerShown: false }}
 			/>
@@ -29,7 +29,7 @@ function DashboardStackScreen() {
 	return (
 		<DashboardStack.Navigator>
 			<DashboardStack.Screen
-				name="Dashboard"
+				name="DashboardMain"
 				component={DashboardScreen}
 				options={{ headerShown: false }}
 			/>
@@ -41,7 +41,7 @@ function LibraryStackScreen() {
 	return (
 		<LibraryStack.Navigator>
 			<LibraryStack.Screen
-				name="Library"
+				name="LibraryMain"
 				component={LibraryScreen}
 				options={{ headerShown: false }}
 			/>
@@ -53,7 +53,7 @@ function SettingsStackScreen() {
 	return (
 		<SettingsStack.Navigator>
 			<SettingsStack.Screen
-				name="Settings"
+				name="SettingsMain"
 				component={SettingsScreen}
 				options={{ headerShown: false }}
 			/>
