@@ -82,8 +82,6 @@ npx jest --testNamePattern="name" # Single test
 | Classes             | `PascalCase`                 | `PascalCase`                   |
 | Constants           | `UPPER_SNAKE_CASE`           | `UPPER_SNAKE_CASE`             |
 | Booleans            | `isPlaying`, `hasPermission` | `is_playing`, `has_permission` |
-| Files (components)  | `AudioPlayer.tsx`            | `speech_analyzer.py`           |
-| Tests               | `AudioPlayer.test.tsx`       | `test_speech_analyzer.py`      |
 
 ---
 
@@ -115,17 +113,16 @@ async def analyze(request: AnalyzeRequest):
 
 ## Mobile Patterns
 
-### AsyncStorage
+### AsyncStorage & API Keys
 
 - Keys: descriptive (e.g., `"userProfile"`)
-- Data: JSON stringify/parse
 - API keys: Use `expo-secure-store`, not AsyncStorage
 
-### Onboarding Flow
+### Navigation
 
-- Check AsyncStorage on mount with `useEffect` + `useCallback`
-- Use `createNativeStackNavigator`
-- Use `navigation.replace()` to prevent back navigation
+- Export param types from screen files (e.g., `export type HomeStackParamList`)
+- Use `NativeStackNavigationProp<ParamListType>` for type-safe navigation
+- Use `navigation.replace()` for onboarding, `navigation.goBack()` for returns
 
 ### API Integration
 
@@ -135,37 +132,10 @@ async def analyze(request: AnalyzeRequest):
 - GET `/api/v1/progress/{user_id}` - Get history
 - GET `/api/v1/progress/{user_id}/summary` - Get summary
 
-### Form UI
-
-- Wrap in `KeyboardAvoidingView` (iOS: `behavior="padding"`)
-- ScrollView with `keyboardShouldPersistTaps="handled"`
-- `TouchableOpacity` with conditional styling for selections
-
-### Navigation Patterns
-
-- Export navigation param types from screen files when used by other components (e.g., `export type HomeStackParamList` from ExerciseScreen.tsx)
-- Use `NativeStackNavigationProp<ParamListType>` for type-safe navigation hooks
-- Navigation parameters: Pass data via route.params object (e.g., `navigation.navigate("ScreenName", { param: value })`)
-- Stack navigators: Each tab can have its own stack for nested navigation (e.g., HomeStack, LibraryStack)
-- Navigation flow: Use `navigation.replace()` for onboarding to prevent going back, `navigation.goBack()` for returning
-- Alert dialogs for user confirmations (e.g., skipping locked days): Use `Alert.alert(title, message, [{text, onPress}, ...])`
-
 ### Progress Tracking
 
-- Fetch user progress from GET /api/v1/progress/{userId} to get completed sessions
-- Track completed days by mapping session.day values to a Set or Array
-- Lock days sequentially: Day N is unlocked if user has completed at least N-1 days
-- Display progress with visual indicators (checkmarks, lock icons, status badges)
-- Confirm day skipping with Alert.alert() for locked days
-
-### API Key Management
-
-- BYOP (Bring Your Own Provider) pattern: Users can configure their own API keys for Azure/Google/OpenAI
-- Use `expo-secure-store` for encrypted storage of sensitive data (API keys)
-- SecureStore keys: Use descriptive names like "speech_api_key", "speech_provider"
-- API key validation: Test button calls POST /api/v1/analyze with provider and api_key parameters
-- Dropdown pattern: Use TouchableOpacity with state management for custom dropdowns in React Native
-- Conditional UI: Only show API key input field when provider !== "free"
+- Lock days sequentially: Day N unlocked if user completed at least N-1 days
+- Use Alert.alert() for confirming locked day selection
 
 ---
 
@@ -177,18 +147,14 @@ backend/
 │   ├── api/              # Endpoints (analyze.py, progress.py)
 │   ├── analyzers/        # Speech providers (free, azure, google, openai)
 │   ├── content/schema/  # Pydantic models for curriculum
-│   ├── models.py         # Database models
 │   └── main.py           # FastAPI entry
 ├── tests/
-├── pyproject.toml
-└── uv.lock
 
 mobile/
 ├── app/                  # Screens & navigation
 ├── components/           # Reusable UI
 ├── navigation/           # TabNavigator.tsx
-├── screens/              # Screen components
-└── package.json
+└── screens/              # Screen components
 ```
 
 ---
