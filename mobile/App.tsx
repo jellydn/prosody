@@ -9,52 +9,52 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
-	Onboarding: undefined;
-	Main: undefined;
+  Onboarding: undefined;
+  Main: undefined;
 };
 
 declare global {
-	namespace ReactNavigation {
-		interface RootParamList extends RootStackParamList {}
-	}
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
 }
 
 export default function App() {
-	const [isLoading, setIsLoading] = useState(true);
-	const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-	const checkOnboardingStatus = useCallback(async () => {
-		try {
-			const profile = await AsyncStorage.getItem("userProfile");
-			setHasCompletedOnboarding(profile !== null);
-		} catch (error) {
-			console.error("Error checking onboarding status:", error);
-		} finally {
-			setIsLoading(false);
-		}
-	}, []);
+  const checkOnboardingStatus = useCallback(async () => {
+    try {
+      const profile = await AsyncStorage.getItem("userProfile");
+      setHasCompletedOnboarding(profile !== null);
+    } catch (error) {
+      console.error("Error checking onboarding status:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-	useEffect(() => {
-		checkOnboardingStatus();
-	}, [checkOnboardingStatus]);
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, [checkOnboardingStatus]);
 
-	if (isLoading) {
-		return (
-			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-				<ActivityIndicator size="large" color="#007AFF" />
-			</View>
-		);
-	}
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
-	return (
-		<NavigationContainer>
-			<Stack.Navigator screenOptions={{ headerShown: false }}>
-				{hasCompletedOnboarding ? (
-					<Stack.Screen name="Main" component={TabNavigator} />
-				) : (
-					<Stack.Screen name="Onboarding" component={OnboardingScreen} />
-				)}
-			</Stack.Navigator>
-		</NavigationContainer>
-	);
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {hasCompletedOnboarding ? (
+          <Stack.Screen name="Main" component={TabNavigator} />
+        ) : (
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }

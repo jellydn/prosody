@@ -25,10 +25,7 @@
       "stressPattern": [false, true, false, false, true, true, false],
       "chunks": null,
       "audioUrl": null,
-      "tips": [
-        "The key words are 'discuss' and 'proposal'",
-        "'The' is unstressed - say it quickly"
-      ]
+      "tips": ["The key words are 'discuss' and 'proposal'", "'The' is unstressed - say it quickly"]
     },
     {
       "id": "day01-ex03",
@@ -37,15 +34,9 @@
       "instruction": "Break this sentence into natural thought groups. Pause at the slashes.",
       "targetText": "I'll review the document, and then I'll share my feedback.",
       "stressPattern": null,
-      "chunks": [
-        "I'll review the document,",
-        "and then I'll share my feedback."
-      ],
+      "chunks": ["I'll review the document,", "and then I'll share my feedback."],
       "audioUrl": null,
-      "tips": [
-        "Pause briefly after the comma",
-        "Each chunk should feel like a complete thought"
-      ]
+      "tips": ["Pause briefly after the comma", "Each chunk should feel like a complete thought"]
     },
     {
       "id": "day01-ex04",
@@ -56,10 +47,7 @@
       "stressPattern": null,
       "chunks": null,
       "audioUrl": null,
-      "tips": [
-        "Your voice should rise at the end: ↗",
-        "Statements end with a falling tone: ↘"
-      ]
+      "tips": ["Your voice should rise at the end: ↗", "Statements end with a falling tone: ↘"]
     }
   ]
 }

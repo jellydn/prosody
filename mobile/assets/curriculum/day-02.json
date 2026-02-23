@@ -39,10 +39,7 @@
       "instruction": "Break this into thought groups and link words within each group.",
       "targetText": "I'll send it over, and then you can check it out.",
       "stressPattern": null,
-      "chunks": [
-        "I'll send it over,",
-        "and then you can check it out."
-      ],
+      "chunks": ["I'll send it over,", "and then you can check it out."],
       "audioUrl": null,
       "tips": [
         "Link 'send-it' and 'check-it' smoothly",

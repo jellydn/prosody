@@ -42,16 +42,16 @@ mobile-typecheck:
     cd mobile && npx tsc --noEmit
 
 mobile-lint:
-    cd mobile && oxlint .
-
-mobile-format:
-    cd mobile && oxfmt .
-
-mobile-format-check:
-    cd mobile && oxfmt --check .
+    cd mobile && npx oxlint .
 
 mobile-lint-fix:
-    cd mobile && oxlint --fix .
+    cd mobile && npx oxlint --fix .
+
+mobile-format:
+    cd mobile && npx oxfmt .
+
+mobile-format-check:
+    cd mobile && npx oxfmt --check .
 
 mobile-test:
     cd mobile && npx jest
