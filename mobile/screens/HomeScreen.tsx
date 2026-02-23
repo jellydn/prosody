@@ -1,13 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CURRICULUM_BY_DAY } from "../assets/curriculum";
 import { API_BASE_URL } from "../config/api";
-import type { Exercise, ExerciseType, HomeStackParamList, ExerciseScores } from "./ExerciseScreen";
+import type { Exercise, ExerciseScores, ExerciseType, HomeStackParamList } from "./ExerciseScreen";
 
 type DayData = {
   day: number;
@@ -24,7 +26,6 @@ const EXERCISE_ICONS: Record<ExerciseType, string> = {
 };
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "HomeMain">;
-const LAST_AVAILABLE_DAY = Math.max(...Object.keys(CURRICULUM_BY_DAY).map(Number));
 
 export default function HomeScreen({ route }: HomeScreenProps) {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
@@ -65,18 +66,22 @@ export default function HomeScreen({ route }: HomeScreenProps) {
         }
       }
 
-      if (sessionsResponse.ok) {
-        const sessions = (await sessionsResponse.json()) as Array<{ day: number }>;
+      let dayToLoad = 1;
+
+      if (route.params?.selectedDay && route.params.selectedDay in CURRICULUM_BY_DAY) {
+        dayToLoad = route.params.selectedDay;
+      } else if (sessionsResponse.ok) {
+        const sessions = (await sessionsResponse.json()) as Array<{
+          day: number;
+        }>;
         const completedDays = new Set(sessions.map((session) => session.day));
         const highestCompletedDay =
           completedDays.size > 0 ? Math.max(...Array.from(completedDays)) : 0;
         const nextDay = Math.min(highestCompletedDay + 1, 14);
-        const selectedDay = route.params?.selectedDay ?? nextDay;
-        const dayToLoad = selectedDay in CURRICULUM_BY_DAY ? selectedDay : LAST_AVAILABLE_DAY;
-        setCurrentDay(CURRICULUM_BY_DAY[dayToLoad as keyof typeof CURRICULUM_BY_DAY] as DayData);
-      } else {
-        setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
+        dayToLoad = nextDay;
       }
+
+      setCurrentDay(CURRICULUM_BY_DAY[dayToLoad as keyof typeof CURRICULUM_BY_DAY] as DayData);
     } catch (err) {
       console.error("Error loading progress:", err);
       setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
@@ -94,17 +99,6 @@ export default function HomeScreen({ route }: HomeScreenProps) {
   useEffect(() => {
     const completedExercise = route.params?.completedExercise;
     const completedAt = route.params?.completedAt;
-    const selectedDay = route.params?.selectedDay;
-
-    if (selectedDay && currentDay?.day !== selectedDay) {
-      const dayToLoad =
-        selectedDay in CURRICULUM_BY_DAY
-          ? (selectedDay as keyof typeof CURRICULUM_BY_DAY)
-          : (LAST_AVAILABLE_DAY as keyof typeof CURRICULUM_BY_DAY);
-      setCurrentDay(CURRICULUM_BY_DAY[dayToLoad] as DayData);
-      navigation.setParams({ selectedDay: undefined });
-      return;
-    }
 
     if (!completedExercise || !completedAt || completedAt === lastCompletedAtHandled) {
       return;
@@ -113,8 +107,11 @@ export default function HomeScreen({ route }: HomeScreenProps) {
     setCompletedExercises((prev) => new Set(prev).add(completedExercise.exerciseId));
     handleExerciseComplete(completedExercise.exerciseId, completedExercise);
     setLastCompletedAtHandled(completedAt);
-    navigation.setParams({ completedExercise: undefined, completedAt: undefined });
-  }, [route.params, currentDay?.day, lastCompletedAtHandled, navigation, handleExerciseComplete]);
+    navigation.setParams({
+      completedExercise: undefined,
+      completedAt: undefined,
+    });
+  }, [route.params, lastCompletedAtHandled, navigation, handleExerciseComplete]);
 
   useEffect(() => {
     if (currentDay && sessionScores.length === currentDay.exercises.length) {
