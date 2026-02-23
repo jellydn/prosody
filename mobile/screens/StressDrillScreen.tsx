@@ -62,13 +62,14 @@ export default function StressDrillScreen({
         name: "recording.m4a",
       } as any);
       formData.append("target_text", exercise.targetText);
-      await appendByopToFormData(formData);
+      const byopHeaders = await appendByopToFormData(formData);
 
       const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
         method: "POST",
         body: formData,
         headers: {
           "Content-Type": "multipart/form-data",
+          ...byopHeaders,
         },
       });
 
@@ -126,12 +127,12 @@ export default function StressDrillScreen({
             />
           )}
 
-          {!recordedUri && (
-            <View style={styles.recordingSection}>
-              <Text style={styles.sectionTitle}>Record your voice</Text>
-              <AudioRecorder onRecordingComplete={handleRecordingComplete} />
-            </View>
-          )}
+          <View style={styles.recordingSection}>
+            <Text style={styles.sectionTitle}>
+              {recordedUri ? "Replay or re-record" : "Record your voice"}
+            </Text>
+            <AudioRecorder onRecordingComplete={handleRecordingComplete} />
+          </View>
 
           {isAnalyzing && <FeedbackCard result={null} isLoading={true} />}
 

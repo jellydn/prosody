@@ -244,13 +244,14 @@ export default function ShadowingModeScreen({
         name: "recording.m4a",
       } as any);
       formData.append("target_text", exercise.targetText);
-      await appendByopToFormData(formData);
+      const byopHeaders = await appendByopToFormData(formData);
 
       const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
         method: "POST",
         body: formData,
         headers: {
           "Content-Type": "multipart/form-data",
+          ...byopHeaders,
         },
       });
 

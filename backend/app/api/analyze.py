@@ -1,7 +1,7 @@
 import logging
 import os
 import tempfile
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, Form, Header, HTTPException, status
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -44,7 +44,11 @@ async def analyze_audio(
     provider: Optional[str] = Form(
         None, description="Analyzer provider (free, azure, google, openai)"
     ),
-    api_key: Optional[str] = Form(None, description="API key for paid providers"),
+    provider_api_key: Optional[str] = Header(
+        None,
+        alias="X-Provider-Api-Key",
+        description="API key for paid providers",
+    ),
 ):
     resolved_provider = (provider or "free").lower()
     audio_size_bytes: Optional[int] = None
@@ -75,7 +79,7 @@ async def analyze_audio(
         from app.analyzers.factory import get_analyzer
         from app.analyzers.base import AnalysisResult
 
-        analyzer = get_analyzer(resolved_provider, api_key)
+        analyzer = get_analyzer(resolved_provider, provider_api_key)
 
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         temp_path = temp_file.name

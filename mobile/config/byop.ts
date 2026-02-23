@@ -5,21 +5,21 @@ export const BYOP_PROVIDER_KEY = "speech_provider";
 
 type Provider = "free" | "azure" | "google" | "openai";
 
-export async function appendByopToFormData(formData: FormData) {
+export async function appendByopToFormData(formData: FormData): Promise<Record<string, string>> {
   const savedProvider = await SecureStore.getItemAsync(BYOP_PROVIDER_KEY);
   const provider = (savedProvider as Provider | null) ?? "free";
 
   if (provider === "free") {
     formData.append("provider", "free");
-    return;
+    return {};
   }
 
   const apiKey = await SecureStore.getItemAsync(BYOP_API_KEY_KEY);
   if (!apiKey) {
     formData.append("provider", "free");
-    return;
+    return {};
   }
 
   formData.append("provider", provider);
-  formData.append("api_key", apiKey);
+  return { "X-Provider-Api-Key": apiKey };
 }
