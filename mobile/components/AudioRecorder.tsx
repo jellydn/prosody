@@ -13,12 +13,13 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
   const MAX_RECORDING_MS = 60000;
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [_recording, setRecording] = useState<Audio.Recording | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [isPulsing, setIsPulsing] = useState(false);
+  const recordingRef = useRef<Audio.Recording | null>(null);
   const silenceStartRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -106,6 +107,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
       };
 
       const { recording } = await Audio.Recording.createAsync(recordingOptions);
+      recordingRef.current = recording;
       setRecording(recording);
       setIsRecording(true);
       setRecordedUri(null);
@@ -136,12 +138,14 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
   };
 
   const stopRecording = async () => {
-    if (!recording) return;
+    const activeRecording = recordingRef.current;
+    if (!activeRecording) return;
 
     try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await activeRecording.stopAndUnloadAsync();
+      const uri = activeRecording.getURI();
       setRecordedUri(uri);
+      recordingRef.current = null;
       setRecording(null);
       setIsRecording(false);
       silenceStartRef.current = null;
