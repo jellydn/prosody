@@ -53,6 +53,7 @@ Thumbs.db
 # Ralph
 progress.txt
 archive/
+scripts/ralph/.last-branch
 
 # Testing
 .coverage

@@ -5,7 +5,7 @@
 # model: opencode model ID or amp mode (smart/rush)
 # share: true/false (default: false) - share session for opencode
 
-set -e
+set -euo pipefail
 
 MAX_ITERATIONS=${1:-10}
 CLI_TOOL=${2:-amp}
@@ -13,6 +13,13 @@ MODEL=${3:-}
 SHARE=${4:-false}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROMPT_FILE="$SCRIPT_DIR/prompt-$CLI_TOOL.md"
+
+if [ ! -f "$PROMPT_FILE" ]; then
+	echo "Error: Prompt file not found: $PROMPT_FILE"
+	echo "Available prompts:"
+	ls "$SCRIPT_DIR"/prompt-*.md 2>/dev/null || echo "  (none)"
+	exit 1
+fi
 
 # Set opencode permissions via environment variable (equivalent to --dangerously-allow-all)
 if [ "$CLI_TOOL" = "opencode" ]; then
