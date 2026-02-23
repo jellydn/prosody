@@ -435,3 +435,32 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Color scheme: Matches iOS system colors for familiarity
   - TypeScript interfaces: FeedbackType, FeedbackItem, AnalysisResult for type safety
   - Key props: result (AnalysisResult | null), isLoading (boolean, defaults to false)
+
+## [2026-02-23] - US-018
+- Implemented StressDrillScreen for stress practice exercises
+- Screen header with back button, title, and spacer for layout
+- Instruction displayed in blue info box at top
+- Integrated AudioPlayer component for example audio playback
+- Integrated AudioRecorder component for user recording
+- Integrated FeedbackCard component for analysis results display
+- Flow: AudioPlayer → AudioRecorder → API call → FeedbackCard → Next button
+- API integration: POST to http://localhost:8000/api/v1/analyze with audio FormData
+- FormData includes audio file (m4a) and target_text from exercise
+- Tips section rendered after feedback using exercise.tips array
+- Audio mode cleanup on unmount using useCallback and useEffect
+- Files changed:
+  - mobile/screens/StressDrillScreen.tsx (Stress drill exercise screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen structure: Header with back button, ScrollView for content
+  - Component composition: Reuse AudioPlayer, AudioRecorder, FeedbackCard
+  - State management: recordedUri, isAnalyzing, analysisResult for exercise flow
+  - Audio mode cleanup: Use useCallback with recordedUri dependency, cleanup in useEffect
+  - FormData API: Append file as {uri, type, name} object with 'as any' type assertion
+  - API integration: Use fetch with multipart/form-data for audio upload
+  - Loading state: Pass isLoading to FeedbackCard during analysis
+  - Error handling: Alert user on analysis failure
+  - Tips rendering: Yellow background (#FFF9E6) with bulb icon for visual consistency
+  - Component props: exercise object, onNext callback, onBack callback
+  - Keyboard handling: keyboardShouldPersistTaps="handled" on ScrollView
