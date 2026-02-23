@@ -42,9 +42,10 @@ class SessionResult(Base):
 
 
 def init_db():
-    db_dir = os.path.dirname(DATABASE_URL.replace("sqlite:///", ""))
-    if db_dir and not os.path.exists(db_dir):
-        os.makedirs(db_dir)
+    if DATABASE_URL.startswith("sqlite"):
+        db_dir = os.path.dirname(DATABASE_URL.replace("sqlite:///", ""))
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
     Base.metadata.create_all(bind=engine)
 
 
