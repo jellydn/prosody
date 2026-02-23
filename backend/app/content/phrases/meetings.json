@@ -1,0 +1,184 @@
+{
+  "phrases": [
+    {
+      "id": "mp-001",
+      "category": "updates",
+      "text": "I'd like to provide an update on the project.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-002",
+      "category": "updates",
+      "text": "Here's where we stand on the current milestone.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-003",
+      "category": "updates",
+      "text": "We've made significant progress on the deliverables.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-004",
+      "category": "updates",
+      "text": "I'll give you a quick overview of our status.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-005",
+      "category": "updates",
+      "text": "We're on track to meet the deadline.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-006",
+      "category": "updates",
+      "text": "Let me walk you through the latest developments.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-007",
+      "category": "updates",
+      "text": "We've completed the first phase as planned.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-008",
+      "category": "updates",
+      "text": "I'm happy to report that we've hit our targets.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-009",
+      "category": "opinions",
+      "text": "From my perspective, this approach makes sense.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-010",
+      "category": "opinions",
+      "text": "I believe we should consider an alternative strategy.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-011",
+      "category": "opinions",
+      "text": "In my view, the current plan is solid.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-012",
+      "category": "opinions",
+      "text": "I'm concerned about the timeline for this initiative.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-013",
+      "category": "opinions",
+      "text": "I strongly recommend that we proceed with caution.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-014",
+      "category": "opinions",
+      "text": "I think this direction aligns well with our goals.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-015",
+      "category": "opinions",
+      "text": "My feeling is that we need more data before deciding.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-016",
+      "category": "opinions",
+      "text": "I'm leaning toward the second option.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-017",
+      "category": "clarifications",
+      "text": "Could you elaborate on that point?",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-018",
+      "category": "clarifications",
+      "text": "I'm not sure I follow. Could you explain again?",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-019",
+      "category": "clarifications",
+      "text": "Let me make sure I understand correctly.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-020",
+      "category": "clarifications",
+      "text": "What do you mean by that specifically?",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-021",
+      "category": "clarifications",
+      "text": "Could you give me an example?",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-022",
+      "category": "clarifications",
+      "text": "I'd like to clarify the requirements.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-023",
+      "category": "clarifications",
+      "text": "Are you saying that we should focus on X?",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-024",
+      "category": "presenting",
+      "text": "Let's start by reviewing the key objectives.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-025",
+      "category": "presenting",
+      "text": "As you can see from this chart, the trend is positive.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-026",
+      "category": "presenting",
+      "text": "I'd like to draw your attention to this figure.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-027",
+      "category": "presenting",
+      "text": "This slide demonstrates the core concept.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-028",
+      "category": "presenting",
+      "text": "Moving on to the next point, let's discuss the approach.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-029",
+      "category": "presenting",
+      "text": "Here are the main takeaways from our analysis.",
+      "audioUrl": null
+    },
+    {
+      "id": "mp-030",
+      "category": "presenting",
+      "text": "To summarize, we've achieved three key outcomes.",
+      "audioUrl": null
+    }
+  ]
+}
