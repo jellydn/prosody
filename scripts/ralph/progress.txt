@@ -541,3 +541,28 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Component props: exercise, onNext, onBack - same interface across all screens
   - API integration: Same FormData upload pattern with target_text
   - State management: recordedUri, isAnalyzing, analysisResult pattern
+
+---
+## [2026-02-24] - US-022
+- Implemented ShadowingModeScreen for shadowing practice exercises
+- Simultaneous model audio playback + user recording functionality
+- Rhythm dots comparison view showing model pattern vs user pattern
+- Side-by-side playback controls: Model and User audio buttons
+- Automatic recording stop after model audio ends (or 5-second fallback if no audioUrl)
+- Get Feedback button submits recording to /api/v1/analyze
+- Re-record option before submitting for analysis
+- Files changed:
+  - mobile/screens/ShadowingModeScreen.tsx (Shadowing mode screen)
+  - mobile/App.tsx (Navigation renames from prior session)
+  - mobile/navigation/TabNavigator.tsx (Screen name renames)
+  - mobile/screens/OnboardingScreen.tsx (Navigation target rename)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Shadowing mode requires Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true })
+  - Simultaneous playback+recording: Start recording first, then play model audio
+  - Use useRef for timeout IDs to enable cleanup in useEffect
+  - Rhythm dots visual: Use stressPattern boolean array to show stressed (tall blue) vs unstressed (short gray)
+  - Playback comparison: Two separate play buttons for model vs user audio
+  - Auto-stop: Use recording status callback or timeout fallback
+  - Cleanup pattern: Unload sounds and clear timeouts in useEffect return
