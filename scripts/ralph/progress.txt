@@ -412,3 +412,26 @@ Started: Mon Feb 23 23:13:14 +08 2026
   - Recording button: 72x72 when idle, 64x64 when recording for visual feedback
   - Component callback: onRecordingComplete(uri) informs parent of recording state
   - Cleanup: Sound playback cleanup in useEffect, recording cleanup on stop
+
+## [2026-02-23] - US-017
+- Implemented FeedbackCard component for displaying analysis results
+- Shows scores as 5 dots for rhythm, stress, pacing, intonation (1-5 range)
+- Feedback items with color-coded icons: good (green #34C759), warning (orange #FF9500), tip (blue #007AFF)
+- Loading state with sync icon and "Analyzing your recording..." text
+- Accepts AnalysisResult and isLoading as props
+- Files changed:
+  - mobile/components/FeedbackCard.tsx (FeedbackCard component)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Score display: Use Math.round() to convert decimal scores to integer for dot rendering
+  - Dot rendering: Loop 1-5 to create dots, check if index <= rounded score
+  - Active dot: #007AFF, inactive dot: #E5E5EA, 12x12 rounded
+  - Feedback icons: checkmark-circle (good), warning (warning), bulb (tip)
+  - Loading state: Conditional render with Ionicons sync icon + text
+  - Component structure: Scores section at top, feedback section below with separator
+  - Score label width: Fixed 80px to align dots vertically
+  - Feedback item: Flex row with icon left, text right (flex: 1)
+  - Color scheme: Matches iOS system colors for familiarity
+  - TypeScript interfaces: FeedbackType, FeedbackItem, AnalysisResult for type safety
+  - Key props: result (AnalysisResult | null), isLoading (boolean, defaults to false)
