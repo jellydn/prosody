@@ -1,3 +1,4 @@
+import asyncio
 import json
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import (
@@ -39,7 +40,9 @@ class GoogleAnalyzer(BYOPScoringMixin, SpeechAnalyzer):
             language_code="en-US",
         )
 
-        response = self.client.recognize(config=config, audio=audio)
+        response = await asyncio.to_thread(
+            self.client.recognize, config=config, audio=audio
+        )
 
         if not response.results:
             return AnalysisResult(
