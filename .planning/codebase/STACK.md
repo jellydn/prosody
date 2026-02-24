@@ -5,96 +5,63 @@
 ## Languages
 
 **Primary:**
-- TypeScript ~5.9.2 - Mobile app (React Native/Expo)
-- Python 3.12 (CI) / 3.11 (Docker) - Backend API
+- TypeScript 5.9 (Expo-managed React Native app) described in `mobile/package.json` and governed by the strict `expo/tsconfig.base` extension in `mobile/tsconfig.json`.
 
 **Secondary:**
-- JSON - Curriculum content, schemas, app config
+- Python 3.10+ for FastAPI + SQLAlchemy backend (stated via `requires-python` in `backend/pyproject.toml` and the `ghcr.io/astral-sh/uv:python3.11-bookworm-slim` base used in `backend/Dockerfile`).
 
 ## Runtime
 
 **Environment:**
-- Node.js 20 (CI target)
-- Python 3.12 (CI) / 3.11 (Dockerfile)
-- Expo SDK 54 (managed workflow)
+- Expo SDK 54 (React Native 0.81.5) running on Node through `npx expo start` with platform-specific audio permissions and plugin configuration defined in `mobile/app.json`.
+- FastAPI 0.131.0 served by `uvicorn` (`uv run uvicorn app.main:app`) in both local (`README.md`) and containerized (`backend/Dockerfile`) contexts.
 
 **Package Manager:**
-- npm (mobile)
-- Lockfile: present (`package-lock.json`)
-- pip (backend)
-- Lockfile: missing (uses `requirements.txt` without pinned versions)
+- `npm` for the mobile app, locked by `mobile/package-lock.json` and invoked via `mobile/package.json` scripts (`start`, `lint`, `fmt`).
+- `uv` as the Python dependency manager (see the `tool.uv` section of `backend/pyproject.toml`, the `backend/uv.lock`, and `backend/Dockerfile` that runs `uv sync --frozen`).
 
 ## Frameworks
 
 **Core:**
-- FastAPI 0.x - Backend REST API
-- React Native 0.81.5 - Mobile UI framework
-- Expo ~54.0.33 - React Native managed workflow (build, dev, plugins)
-- React 19.1.0 - UI component library
-- React Navigation 7.x - Mobile navigation (native stack + bottom tabs)
-- SQLAlchemy - Python ORM for database access
-- Pydantic - Request/response validation (FastAPI models)
+- React Navigation stacks/tabs in `mobile/navigation/TabNavigator.tsx` and root `mobile/App.tsx`, combining `@react-navigation/*`, `@expo/vector-icons`, and Expo-managed audio/secure-store/async-storage helpers for the UI and onboarding flows.
+- FastAPI routers (`backend/app/api/analyze.py`, `backend/app/api/progress.py`) plus SQLAlchemy models in `backend/app/models.py` for HTTP surface and persistence.
+- Audio analysis logic spanning `backend/app/analyzers/free.py` (librosa/parselmouth), `azure.py`, `google.py`, and `openai.py` for on-device and BYOP scoring options.
 
 **Testing:**
-- pytest + pytest-asyncio - Backend tests
-- Jest - Mobile tests (referenced in justfile, no config file present)
+- `pytest` and `pytest-asyncio` listed under `dev` dependencies in `backend/pyproject.toml` drive backend test tooling; the mobile app currently relies on manual QA (no JS test deps).
 
 **Build/Dev:**
-- uvicorn[standard] - ASGI server for FastAPI
-- Expo CLI - Mobile dev server, build tooling
-- just - Task runner (justfile with all dev/test/lint commands)
-- ruff - Python linting + formatting
-- oxlint - TypeScript/React linting
-- oxfmt - TypeScript/React formatting
-- Docker - Backend containerization
+- Mobile development uses Expo CLI (`npx expo start`/`expo publish`) plus `oxlint` and `oxfmt` for linting/formatting defined in `mobile/package.json` scripts.
+- Backend development runs `uv run uvicorn app.main:app` and dependency/lockfile commands (`uv sync`, `uv lock`) documented in `README.md` and encapsulated in `backend/Dockerfile` for production deployments.
 
 ## Key Dependencies
 
 **Critical:**
-- librosa - Audio signal processing (rhythm, stress, pacing analysis)
-- parselmouth (Praat) - Pitch/intonation analysis from audio
-- numpy - Numerical computation for audio analysis
-- pydub - Audio format conversion (M4A/MP4 → WAV)
-- expo-audio ~1.1.1 - Audio recording and playback on mobile
-- openai (AsyncOpenAI) - OpenAI Whisper API client for speech recognition
-- azure-cognitiveservices-speech - Azure Speech SDK for recognition
-- google-cloud-speech v1 - Google Cloud Speech-to-Text SDK
+- `expo`, `react`, `react-native`, `@expo/vector-icons`, `react-native-chart-kit`, `@react-navigation/native`, `expo-av`, `expo-secure-store`, `@react-native-async-storage/async-storage` from `mobile/package.json` powering UI, audio recording/playback (`mobile/components/*`), navigation, and persistent storage.
+- `fastapi`, `uvicorn[standard]`, `sqlalchemy`, `pydantic`, `python-multipart`, `librosa`, `praat-parselmouth`, `numpy`, `pydub`, `PyJWT` from `backend/pyproject.toml` covering API layer, multipart uploads, SQLite/Postgres ORM, and the rhythm/stress/pacing analysis math in `backend/app/analyzers/free.py`.
 
 **Infrastructure:**
-- @react-native-async-storage/async-storage 2.2.0 - Local data persistence (onboarding state, user profile)
-- expo-secure-store ~15.0.8 - Secure storage for API keys
-- react-native-chart-kit ^6.12.0 - Dashboard charts/visualizations
-- react-native-svg 15.12.1 - SVG rendering (logo, icons)
-- @expo/vector-icons ^15.0.3 - Icon library
-- python-multipart - Multipart form data for file uploads
+- Optional BYOP clients `azure-cognitiveservices-speech`, `google-cloud-speech`, `openai` declared in `backend/pyproject.toml` and wired via `backend/app/analyzers/azure.py`, `google.py`, and `openai.py`.
+- `uv` CLI from `backend/pyproject.toml`/`backend/Dockerfile` for reproducible Python installs; `expo` CLI in `mobile/package.json` for mobile bundling.
 
 ## Configuration
 
 **Environment:**
-- `DATABASE_URL` env var (defaults to `sqlite:///./data/app.db`)
-- No `.env` files in repo (env vars set externally)
-- API keys passed per-request from mobile client (BYOP model)
+- Backend honors `DATABASE_URL`, `LOG_LEVEL`, and `CORS_ORIGINS` in `backend/app/models.py` and `backend/app/main.py` (SQLite default in `./data/app.db`, log level override, and CORS allow-list). Reading `EXPO_PUBLIC_API_BASE_URL` and runtime host detection inside `mobile/config/api.ts` determine where the mobile app points; BYOP provider/API-key persistence lives in `mobile/config/byop.ts` and the Settings/recording screens that call `appendByopToFormData`.
 
 **Build:**
-- `app.json` - Expo app config (name, plugins, EAS project ID, permissions)
-- `tsconfig.json` - TypeScript config (extends `expo/tsconfig.base`, strict mode)
-- `Dockerfile` - Backend container build (python:3.11-slim base)
-- `justfile` - Task runner recipes for all dev/test/lint/CI commands
+- Expo config (`mobile/app.json`) declares orientation, plugin list (`expo-audio`, `expo-font`, `expo-asset`, `expo-secure-store`), permissions (record audio), and the EAS project ID used during builds.
+- Backend container build uses `backend/Dockerfile` to install dependencies via `uv sync --frozen` and run `uvicorn` for production.
 
 ## Platform Requirements
 
 **Development:**
-- Python 3.11+ with pip
-- Node.js 20+ with npm
-- Expo CLI (`npx expo`)
-- just (task runner)
-- Android: RECORD_AUDIO + MODIFY_AUDIO_SETTINGS permissions
-- iOS: supportsTablet enabled
+- Backend: `uv sync --dev --frozen` and `uv run uvicorn app.main:app` per `README.md`, ensuring Python 3.11 in the `uv` container image.
+- Mobile: `npx expo start`, `oxlint`, `oxfmt`, and the strict TypeScript compiler settings from `mobile/tsconfig.json` under Expo SDK 54 as documented in `README.md`.
 
 **Production:**
-- Docker (backend deployment)
-- EAS Build (mobile, project ID configured)
-- SQLite file storage (MVP) → PostgreSQL (planned)
+- Backend deploys as a Docker container built from `backend/Dockerfile` (python3.11 base) and connects to SQLite or a database referenced by `DATABASE_URL`.
+- Mobile ships as an Expo-managed React Native app configured in `mobile/app.json` (audio permissions, assets, EAS project) and runs on iOS/Android via Expo Go or custom builds.
 
 ---
 

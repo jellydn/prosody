@@ -5,144 +5,82 @@
 ## Naming Patterns
 
 **Files:**
-- TypeScript components: `PascalCase.tsx` (e.g., `AudioPlayer.tsx`, `HomeScreen.tsx`, `TabNavigator.tsx`)
-- TypeScript entry: `camelCase.ts` (e.g., `index.ts`)
-- Python modules: `snake_case.py` (e.g., `analyze.py`, `speech_analyzer.py`)
-- Python tests: `test_<module>.py` (e.g., `test_analyzers.py`, `test_progress.py`)
-- JSON data: `kebab-case.json` (e.g., `day-01.json`, `meetings.json`)
+- `PascalCase` for React Native screens/components such as `mobile/screens/HomeScreen.tsx`, `mobile/components/AudioPlayer.tsx`, `mobile/navigation/TabNavigator.tsx`, and `mobile/components/TabBarIcon.tsx`.
+- `snake_case` for backend modules like `backend/app/api/analyze.py`, `backend/app/api/progress.py`, and `backend/app/models.py`.
 
 **Functions:**
-- TypeScript: `camelCase` (e.g., `handleExerciseComplete`, `loadProgress`, `playSound`)
-- Python: `snake_case` (e.g., `analyze_audio`, `get_progress`, `init_db`)
-- Python private: `_snake_case` (e.g., `_analyze_rhythm`, `_calculate_stress`, `_generate_feedback`)
+- CamelCase for UI helpers/hooks (`loadProgress`, `handleExerciseComplete`, `renderChunkedText`, `playSound`) in `mobile/screens/HomeScreen.tsx` and `mobile/components/AudioPlayer.tsx`.
+- `snake_case` for FastAPI endpoints/helpers (`create_user`, `create_progress`, `get_progress_summary`, `_configure_logging`, `_parse_cors_origins`) in `backend/app/api/progress.py` and `backend/app/main.py`.
 
 **Variables:**
-- TypeScript: `camelCase` (e.g., `isPlaying`, `hasPermission`, `recordedUri`)
-- TypeScript constants: `UPPER_SNAKE_CASE` (e.g., `EXERCISE_ICONS`, `NATIVE_LANGUAGES`, `ENGLISH_LEVELS`)
-- Python: `snake_case` (e.g., `rhythm_score`, `feedback_items`, `temp_path`)
-- Python constants: `UPPER_SNAKE_CASE` (e.g., `SUPPORTED_FORMATS`, `DATABASE_URL`, `FREE_ANALYZER_AVAILABLE`)
+- UPPER_SNAKE_CASE constants for configuration data such as `EXERCISE_ICONS` (`mobile/screens/HomeScreen.tsx`), `API_BASE_URL` (`mobile/config/api.ts`), `SUPPORTED_FORMATS`, and `MAX_AUDIO_SIZE_BYTES` (`backend/app/api/analyze.py`).
+- Descriptive camelCase on the mobile side (`currentDay`, `completedExercises`, `sessionScores`) and snake_case in Python (`session_result`, `user_id`, `audio_size_bytes`).
 
 **Types:**
-- TypeScript: `interface` preferred for component props and data shapes (e.g., `AudioPlayerProps`, `FeedbackCardProps`)
-- TypeScript: `type` used for unions, aliases, and param lists (e.g., `ExerciseType`, `HomeStackParamList`, `DayData`)
-- Python: Pydantic `BaseModel` for request/response schemas (e.g., `AnalysisResponse`, `UserCreateRequest`)
-- Python: `@dataclass` for internal data structures (e.g., `AnalysisResult`, `FeedbackItem`)
-- Python: `str, Enum` for string enums (e.g., `FeedbackType`, `ExerciseType`)
+- TypeScript interfaces/aliases (`DayData`, `AudioPlayerProps`, `Exercise`, `ExerciseScores`, `HomeStackParamList`) defined in `mobile/screens/HomeScreen.tsx` and `mobile/screens/ExerciseScreen.tsx` capture props, navigation params, and curriculum structure.
+- Backend dataclasses/Pydantic models such as `FeedbackType`, `AnalysisResult`, `ProgressCreateRequest`, and `ProgressSummary` appear in `backend/app/analyzers/base.py` and `backend/app/api/progress.py`.
 
 ## Code Style
 
 **Formatting:**
-- TypeScript: `oxfmt` (Oxc formatter)
-- TypeScript indentation: Tabs
-- TypeScript trailing commas: Yes (in function params, arrays, objects)
-- Python: `ruff format` (Black-compatible)
-- Python indentation: 4 spaces
-- Python quotes: Double quotes
+- Mobile formatting relies on `oxfmt` (`mobile/package.json` scripts `fmt`/`fmt:check`) and Expo’s `tsconfig` (`mobile/tsconfig.json`) that extends `expo/tsconfig.base` with `strict` mode.
+- Backend formatting runs through `uv run ruff format .` inside `just backend-lint`, followed by `uv run ruff check .` as described in `justfile`.
 
 **Linting:**
-- TypeScript: `oxlint` (Oxc linter) — no config file, uses defaults
-- Python: `ruff check` — no config file, uses defaults
-- TypeScript: `tsc --noEmit` with `strict: true` (extends `expo/tsconfig.base`)
-- CI enforces: lint + format check + typecheck (no tests in mobile CI)
+- `oxlint` vets the mobile code (`mobile/package.json` `lint` script, `just mobile-lint`).
+- `ruff` underpins backend linting via `just backend-lint`; `backend/pyproject.toml` contains no `[tool.ruff]` overrides, so defaults apply.
 
 ## Import Organization
 
-**TypeScript Order:**
-1. Expo/React Native packages (`@expo/vector-icons`, `expo-audio`, `react`, `react-native`)
-2. Third-party navigation (`@react-navigation/*`, `@react-native-async-storage/*`)
-3. Relative internal imports (`../components/`, `../screens/`, `../navigation/`)
-4. Asset imports (`../assets/curriculum/`)
-
-**Python Order:**
-1. Standard library (`os`, `tempfile`, `datetime`, `enum`, `abc`)
-2. Third-party (`fastapi`, `sqlalchemy`, `pydantic`, `librosa`, `numpy`, `parselmouth`)
-3. Internal app imports (`app.models`, `app.analyzers.base`)
-4. Relative imports within packages (`.base`, `.free`)
+**Order:**
+1. Framework/library imports (`@expo/*`, `react`, `react-native`, `@react-navigation/*`) as shown in `mobile/screens/HomeScreen.tsx` and `mobile/components/AudioPlayer.tsx`.
+2. Expo utilities, navigation hooks, and `useX` hooks before local assets/config files (`../assets/curriculum`, `../config/api`).
+3. Backend files follow stdlib → third-party (`datetime`, `typing`, `fastapi`, `sqlalchemy`) → app package order (`from app.models import ...` in `backend/app/api/progress.py`).
 
 **Path Aliases:**
-- None configured — all imports use relative paths
+- No custom path aliases; the codebase uses module specifiers (`@expo/*`, `react`) and relative/local packages (`../screens`, `from app.*`).
 
 ## Error Handling
 
-**FastAPI Patterns:**
-- `HTTPException` with `status` module constants (e.g., `status.HTTP_400_BAD_REQUEST`, `status.HTTP_404_NOT_FOUND`)
-- Try/except wrapping entire endpoint logic with specific exception re-raise and generic fallback to 500
-- Re-raise `HTTPException` explicitly before catching generic `Exception`
-- Resource cleanup in except blocks (e.g., `os.unlink(temp_path)`)
-- `ValueError` for invalid arguments in factory/utility functions (e.g., `get_analyzer()`)
-
-**React Native Patterns:**
-- `try/catch` for all async operations (API calls, AsyncStorage, audio recording)
-- `console.error()` for developer-facing error logging
-- `Alert.alert()` for user-facing error messages with action buttons
-- Graceful degradation: return early or show fallback UI on missing data (e.g., `if (!currentDay) return <Loading />`)
-- `finally` blocks to reset loading states
+**Patterns:**
+- Mobile async helpers wrap fetches or audio playback in `try/catch`, log with `console.error`, and fall back to safe defaults (`loadProgress` in `mobile/screens/HomeScreen.tsx`, `playSound` in `mobile/components/AudioPlayer.tsx`).
+- Backend routers raise `fastapi.HTTPException` for invalid formats, missing users, provider errors, and oversized payloads while logging `warning`/`exception` entries and cleaning temp files in `backend/app/api/analyze.py`.
 
 ## Logging
 
-**Framework:** `console` (both frontend and backend)
+**Framework:** `logging` on the backend and `console` on the mobile side.
 
 **Patterns:**
-- TypeScript: `console.error("Error <context>:", err)` — only for caught errors
-- Python: No structured logging — errors propagated via HTTPException
-- No logging library configured in either codebase
+- `_configure_logging()` in `backend/app/main.py` seeds `logging.basicConfig`, and module-scoped loggers (`logging.getLogger(__name__)`) emit `info`/`warning`/`exception` messages inside `backend/app/api/analyze.py`.
+- Mobile catch blocks log errors via `console.error("Error loading progress:", err)` in `mobile/screens/HomeScreen.tsx` and `console.error("Error playing sound:", error)` in `mobile/components/AudioPlayer.tsx`.
 
 ## Comments
 
 **When to Comment:**
-- Sparingly — code is largely self-documenting
-- Only inline comment found: `mobile/index.ts` explaining `registerRootComponent`
-- Pydantic `Field(description=...)` serves as documentation for API schemas
-- `Config.json_schema_extra` with examples in Pydantic models
+- Inline comments are sparse (`mobile/screens/HomeScreen.tsx`, `mobile/components/AudioPlayer.tsx`, `backend/app/api/analyze.py` rely on descriptive identifiers instead of annotations).
 
 **JSDoc/TSDoc:**
-- Not used in TypeScript files
-- Python docstrings: Minimal — only `generate_json_schema()` has a docstring
-- Pydantic `Field(description=...)` preferred over docstrings for model documentation
+- No consistent JSDoc/TSDoc; TypeScript interfaces like `AudioPlayerProps` (`mobile/components/AudioPlayer.tsx`) document prop shapes.
 
 ## Function Design
 
-**Size:** Functions are small-to-medium (5–30 lines typical). Screen components are larger (50–100 lines of JSX).
+**Size:**
+- React hooks/helpers stay compact (a few dozen lines), while FastAPI route handlers (e.g., `create_progress`, `get_progress_summary` in `backend/app/api/progress.py`) concentrate on a single HTTP action.
 
 **Parameters:**
-- TypeScript: Destructured props objects for components (e.g., `{ exercise, onNext, onBack, onComplete }`)
-- TypeScript: Callback functions passed as props (e.g., `onRecordingComplete`, `onComplete`)
-- Python: FastAPI dependency injection via `Depends()` (e.g., `db: Session = Depends(get_db)`)
-- Python: `Optional[str]` with defaults for optional params
+- UI helpers accept strongly typed props (`handleExerciseComplete(exerciseId: string, scores: ExerciseScores)` in `mobile/screens/HomeScreen.tsx`); backend routes take Pydantic bodies or typed params (`ProgressCreateRequest`, `user_id: int`).
 
 **Return Values:**
-- TypeScript: JSX elements from components, void from handlers
-- Python: Pydantic models as response types (`response_model=AnalysisResponse`)
-- Python: `@dataclass` for internal return types (`AnalysisResult`)
+- Mobile functions update state or trigger navigation; backend endpoints return Pydantic responses or plain dicts (such as `return {"message": "Progress saved successfully", "id": session_result.id}` in `backend/app/api/progress.py`).
 
 ## Module Design
 
 **Exports:**
-- TypeScript: `export default function` for all components and screens (one per file)
-- TypeScript: Named exports for shared types (e.g., `export type HomeStackParamList`, `export interface Exercise`)
-- Python: No `__all__` definitions; empty `__init__.py` files
-- Python: Factory function pattern for analyzer instantiation (`get_analyzer()`)
+- Each React file exports a default component plus local styles (`StyleSheet.create` at the bottom of `mobile/screens/HomeScreen.tsx` and `mobile/components/AudioPlayer.tsx`).
+- Backend API files expose an `APIRouter` named `router` that is registered in `backend/app/main.py` (`app.include_router(...)`).
 
 **Barrel Files:**
-- Not used — direct file imports throughout
-- Python `__init__.py` files are empty (marker files only)
-
-## Architecture Patterns
-
-**Backend:**
-- ABC base class with concrete implementations (Strategy pattern for analyzers)
-- Factory function for provider selection (`get_analyzer()`)
-- FastAPI router separation by domain (`analyze.py`, `progress.py`)
-- SQLAlchemy models with `get_db()` generator for session management
-
-**Mobile:**
-- Functional components with hooks (no class components)
-- `useState` for local state, `AsyncStorage` for persistence
-- `useCallback` for memoized handlers, `useEffect` for side effects
-- Screen-as-router pattern (ExerciseScreen delegates to type-specific screens)
-- Stack navigators nested inside tab navigator
-- `StyleSheet.create()` at module level for all styling
-- `as const` assertions for constant arrays/objects
+- There are no barrel exports; `backend/app/api/__init__.py` is empty, and routers are imported explicitly in `backend/app/main.py`.
 
 ---
 

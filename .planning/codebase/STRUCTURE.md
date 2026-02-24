@@ -5,189 +5,116 @@
 ## Directory Layout
 
 ```
-english-rhythm-coach/
-├── backend/                    # Python FastAPI backend
-│   ├── app/
-│   │   ├── api/                # Route handlers
-│   │   ├── analyzers/          # Speech analysis providers
-│   │   ├── content/
-│   │   │   ├── curriculum/     # Day JSON files
-│   │   │   ├── phrases/        # Meeting phrase data
-│   │   │   └── schema/         # Pydantic models + JSON schemas
-│   │   ├── __init__.py
-│   │   ├── main.py             # FastAPI app entry
-│   │   └── models.py           # SQLAlchemy models
-│   ├── tests/                  # pytest test files
-│   ├── data/                   # SQLite database (generated)
-│   ├── Dockerfile
-│   └── requirements.txt
-├── mobile/                     # React Native (Expo) frontend
-│   ├── assets/
-│   │   ├── curriculum/         # Day JSON files (duplicated from backend)
-│   │   └── phrases/            # Meeting phrase data
-│   ├── components/             # Reusable UI components
-│   ├── navigation/             # Tab and stack navigators
-│   ├── screens/                # Screen components
-│   ├── App.tsx                 # Root component
-│   ├── index.ts                # Expo entry point
-│   ├── app.json                # Expo config
-│   ├── package.json
-│   └── tsconfig.json
-├── scripts/
-│   ├── generate_schema.py      # JSON schema generator
-│   └── ralph/                  # Autonomous agent tooling
-├── .github/workflows/ci.yml   # CI pipeline
-├── .planning/                  # Planning documents
-├── justfile                    # Task runner (just)
-├── AGENTS.md                   # Agent coding guidelines
-├── CLAUDE.md                   # AI assistant config
-└── README.md
+[project-root]/
+├── backend/           # FastAPI service, analyzers, content, tests
+├── mobile/            # Expo/React Native client (navigation, screens, assets)
+├── docs/              # Written workflows (curriculum/audio guidance)
+├── scripts/           # Helper scripts (schema generator)
+├── .planning/         # Generated architecture/structure notes
+├── justfile           # Task shortcuts (`just backend-dev`, `just mobile-test`, etc.)
+├── README.md          # Project overview & setup steps
+├── logo.svg           # Brand asset used by the mobile app
+└── config/??? (none)  # No standalone config directory
 ```
 
 ## Directory Purposes
 
-**`backend/app/api/`:**
-- Purpose: FastAPI route handlers
-- Contains: `analyze.py` (audio analysis endpoint), `progress.py` (user + session CRUD)
-- Key files: `analyze.py` (POST /api/v1/analyze), `progress.py` (POST /api/v1/users, /progress, GET /progress/{id})
+**`.planning/`:**
+- Purpose: Store generated knowledge about this repo.
+- Contains: `codebase/ARCHITECTURE.md`, `codebase/STRUCTURE.md` plus other analysis artifacts (removed before this task and now regenerated).
+- Key files: ``.planning/codebase/ARCHITECTURE.md``, ``.planning/codebase/STRUCTURE.md``.
 
-**`backend/app/analyzers/`:**
-- Purpose: Pluggable speech analysis engine
-- Contains: Abstract base class, factory function, 4 provider implementations
-- Key files: `base.py` (SpeechAnalyzer ABC, AnalysisResult), `factory.py` (get_analyzer), `free.py` (librosa/parselmouth), `azure.py`, `google.py`, `openai.py`
+**`backend/`:**
+- Purpose: Host the FastAPI backend, speech analyzers, curriculum content, and Python tests.
+- Contains: `app/` (FastAPI entrypoints, analyzers, content schema), `data/` (SQLite DB file), `tests/test_byop_analyzers.py`, `pyproject.toml`, `uv.lock`.
+- Key files: ``backend/app/main.py``, ``backend/app/api/analyze.py``, ``backend/app/api/progress.py``, ``backend/app/analyzers/free.py``, ``backend/app/content/curriculum/day-01.json``.
 
-**`backend/app/content/`:**
-- Purpose: Curriculum content and data schemas
-- Contains: JSON curriculum files, Pydantic content models, JSON Schema definitions
-- Key files: `schema/models.py` (Exercise, Day, MeetingPhrase), `curriculum/day-*.json`, `phrases/meetings.json`
+**`mobile/`:**
+- Purpose: Provide the Expo/React Native experience remotely hitting the backend.
+- Contains: `App.tsx`, `index.ts`, navigation (`navigation/TabNavigator.tsx`), reusable UI (`components/`), screens (`screens/*.tsx`), config helpers (`config/api.ts`, `config/byop.ts`), assets (`assets/curriculum/`, `assets/phrases/`, logos), and type definitions (`types/analysis.ts`).
+- Key files: ``mobile/App.tsx``, ``mobile/navigation/TabNavigator.tsx``, ``mobile/screens/HomeScreen.tsx``, ``mobile/screens/ChunkSpeakingScreen.tsx``.
 
-**`backend/tests/`:**
-- Purpose: Backend test suite
-- Contains: pytest test files
-- Key files: `test_analyze_api.py`, `test_progress.py`, `test_analyzers.py`, `test_byop_analyzers.py`
-
-**`mobile/screens/`:**
-- Purpose: Full-page screen components
-- Contains: 11 screen files covering onboarding, home, exercises (5 types), dashboard, library, settings, session completion, program overview
-- Key files: `HomeScreen.tsx`, `ExerciseScreen.tsx` (router), `StressDrillScreen.tsx`, `DashboardScreen.tsx`, `OnboardingScreen.tsx`
-
-**`mobile/components/`:**
-- Purpose: Reusable UI components
-- Contains: Audio recording/playback, feedback display, branding
-- Key files: `AudioRecorder.tsx`, `AudioPlayer.tsx`, `FeedbackCard.tsx`, `Logo.tsx`, `TabBarIcon.tsx`
-
-**`mobile/navigation/`:**
-- Purpose: App navigation structure
-- Contains: Tab navigator with nested stack navigators
-- Key files: `TabNavigator.tsx` (4 tabs: Home, Dashboard, Library, Settings)
-
-**`mobile/assets/`:**
-- Purpose: Static assets and bundled content data
-- Contains: App icons, splash images, curriculum JSON, phrase JSON
-- Key files: `curriculum/day-01.json` through `day-03.json`, `phrases/meetings.json`
+**`docs/`:**
+- Purpose: Capture workflows and developer guidance beyond code.
+- Contains: `content-and-audio-workflow.md` describing content syncing and audio fallback rules referenced from both sides.
 
 **`scripts/`:**
-- Purpose: Development and automation scripts
-- Contains: Schema generation, autonomous agent tooling
-- Key files: `generate_schema.py`, `ralph/prd.json`
+- Purpose: Support ancillary tooling for schema generation.
+- Contains: `generate_schema.py` which imports `backend/app/content/schema/models.py` to dump JSON schemas.
+- Key file: ``scripts/generate_schema.py``.
+
+**`justfile`:**
+- Purpose: Centralize CLI commands (`backend-dev`, `backend-test`, `mobile-lint`, `mobile-format`, etc.) and link to `uv`, `npx`, or `expo` tooling.
+
+**`README.md`:**
+- Purpose: Entry-level instructions for installing dependencies and understanding the project layout.
+
+**`logo.svg`:**
+- Purpose: Brand asset used via `mobile/assets/logo.svg` and referenced by the Expo app’s splash screens.
 
 ## Key File Locations
 
 **Entry Points:**
-- `backend/app/main.py`: FastAPI application creation, middleware, router registration, DB init
-- `mobile/index.ts`: Expo `registerRootComponent` entry
-- `mobile/App.tsx`: Root React component with onboarding check and navigation container
+- ``backend/app/main.py``: FastAPI app setup, logging, CORS, and lifespan hook that initializes `init_db()`.
+- ``mobile/App.tsx``: Chooses between onboarding flow or main `TabNavigator`, then renders `NavigationContainer`.
 
 **Configuration:**
-- `justfile`: Task runner commands for dev, test, lint, format
-- `mobile/app.json`: Expo project configuration
-- `mobile/tsconfig.json`: TypeScript compiler settings
-- `mobile/package.json`: Node dependencies and scripts
-- `backend/requirements.txt`: Python dependencies
-- `.github/workflows/ci.yml`: CI pipeline definition
+- ``backend/pyproject.toml`` + ``uv.lock``: Defines Python dependencies (FastAPI, SQLAlchemy, analyzers) and lockfile for `uv`.
+- ``mobile/package.json`` + ``tsconfig.json``: Pin Expo, React Navigation, and TypeScript settings for the mobile client.
+- ``mobile/config/api.ts``: Resolves `API_BASE_URL` based on emulator/dev server and `process.env` overrides.
+- ``mobile/config/byop.ts``: Reads provider/API keys from `expo-secure-store` and appends `X-Provider-Api-Key`.
+- ``justfile``: Maps `just backend-dev`, `just mobile-test`, `just check`, etc.
 
 **Core Logic:**
-- `backend/app/analyzers/free.py`: Primary speech analysis using librosa + parselmouth
-- `backend/app/analyzers/factory.py`: Provider selection logic
-- `backend/app/api/analyze.py`: Audio upload, conversion, analysis orchestration
-- `backend/app/api/progress.py`: User creation, session recording, summary calculation
-- `mobile/screens/ExerciseScreen.tsx`: Exercise type → screen component router
+- ``backend/app/api/analyze.py`` + ``backend/app/analyzers/*``: Handle audio uploads, format conversions, provider selection, scoring, and response shaping.
+- ``backend/app/api/progress.py`` + ``backend/app/models.py``: Validate requests, maintain SQLAlchemy models, and compute progress summaries.
+- ``mobile/screens/*.tsx`` + ``mobile/components/*.tsx``: UI layout, recording/analysis flows, `HomeScreen`, `ExerciseScreen`, `SessionCompletionScreen`, `ChunkSpeakingScreen`, `FeedbackCard`, `AudioRecorder`, `AudioPlayer`.
+- ``mobile/assets/curriculum/`` and ``mobile/assets/phrases/``: Static lesson content imported through `CURRICULUM_BY_DAY` (`mobile/assets/curriculum/index.ts`).
 
 **Testing:**
-- `backend/tests/test_analyze_api.py`: Analysis endpoint tests
-- `backend/tests/test_progress.py`: Progress/user endpoint tests
-- `backend/tests/test_analyzers.py`: Analyzer unit tests
-- `backend/tests/test_byop_analyzers.py`: Bring-your-own-provider analyzer tests
+- ``backend/tests/test_byop_analyzers.py``: Unit tests around analyzer base classes and provider wiring.
+- Mobile client currently lacks automated tests; unit/integration coverage is expected to follow `just mobile-test` once added.
 
 ## Naming Conventions
 
 **Files:**
-- Components/screens: `PascalCase.tsx` (e.g., `AudioRecorder.tsx`, `HomeScreen.tsx`)
-- Python modules: `snake_case.py` (e.g., `speech_analyzer.py`, `progress.py`)
-- Tests (Python): `test_*.py` (e.g., `test_analyzers.py`)
-- Tests (TS): `*.test.tsx` (convention, none exist yet)
-- JSON data: `kebab-case.json` (e.g., `day-01.json`, `meetings.json`)
+- React Native screens/components: PascalCase with `.tsx` (e.g., ``mobile/screens/HomeScreen.tsx``, ``mobile/components/AudioPlayer.tsx``).
+- TypeScript modules (helpers/config): camelCase file names (e.g., ``mobile/config/api.ts``, ``mobile/config/byop.ts``) while type definitions include `PascalCase` when they export interfaces/types.
+- Python modules: snake_case for files in `backend/app/api/` and `backend/app/analyzers/` (e.g., ``analyze.py``, ``progress.py``, ``free.py``), PascalCase for classes/ORM models (e.g., `User`, `SessionResult`).
 
 **Directories:**
-- Feature-grouped: `screens/`, `components/`, `analyzers/`, `api/`
-- Lowercase with no separators: `navigation/`, `content/`, `assets/`
-
-**Code:**
-- TypeScript: `camelCase` functions/variables, `PascalCase` components/types, `UPPER_SNAKE_CASE` constants
-- Python: `snake_case` functions/variables, `PascalCase` classes, `UPPER_SNAKE_CASE` constants
-- Navigation params: Exported `*ParamList` types from screen files (e.g., `HomeStackParamList`)
+- Group by concern: `screens/` for full views, `components/` for shared widgets, `navigation/` for stack/tab definitions, `assets/` for static data.
+- Backend splits: `api/`, `analyzers/`, `content/`, `models.py`, `tests/`.
 
 ## Where to Add New Code
 
-**New Exercise Type:**
-- Screen: `mobile/screens/{Type}Screen.tsx`
-- Route: Add case in `mobile/screens/ExerciseScreen.tsx` switch
-- Icon mapping: Add to `EXERCISE_ICONS` in `mobile/screens/HomeScreen.tsx`
-- Schema: Add enum value to `ExerciseType` in `backend/app/content/schema/models.py`
+**New Feature (backend):**
+- Primary code: `backend/app/api/` for endpoints, `backend/app/models.py` for new tables, `backend/app/analyzers/` for any scoring behavior, `backend/tests/` for regression coverage.
+- Tests: `backend/tests/` following the style in `test_byop_analyzers.py`.
 
-**New API Endpoint:**
-- Route handler: `backend/app/api/{module}.py`
-- Register: `app.include_router()` in `backend/app/main.py`
-- Tests: `backend/tests/test_{module}.py`
-
-**New Analyzer Provider:**
-- Implementation: `backend/app/analyzers/{provider}.py` (extend `SpeechAnalyzer`)
-- Registration: Add branch in `backend/app/analyzers/factory.py`
-- Tests: `backend/tests/test_analyzers.py` or `test_byop_analyzers.py`
-
-**New Mobile Screen:**
-- Screen: `mobile/screens/{Name}Screen.tsx`
-- Navigation: Add to appropriate stack in `mobile/navigation/TabNavigator.tsx`
-- Param types: Export `*ParamList` from screen or navigator file
-
-**New Reusable Component:**
-- Component: `mobile/components/{Name}.tsx`
+**New Component (mobile):**
+- Implementation: Add screen under `mobile/screens/` and reusable view under `mobile/components/`, wire navigation inside `mobile/navigation/TabNavigator.tsx` or stacks, update `mobile/assets/` if new static content is needed.
 
 **Utilities:**
-- Backend shared helpers: `backend/app/` (create module as needed)
-- Mobile shared helpers: `mobile/` (no utils directory yet)
+- Shared helpers go under `mobile/config/` (see `api.ts`, `byop.ts`) or `mobile/types/` when describing shapes.
+- Server utilities (schema generation) live in `scripts/generate_schema.py` and rely on `backend/app/content/schema/models.py`.
 
 ## Special Directories
 
+**`.planning/codebase/`:**
+- Purpose: Capture structured architecture/structure analysis.
+- Generated: yes (documents rebuilt when this task runs).
+- Committed: yes, so future agents reference the latest analysis file names.
+
 **`backend/data/`:**
-- Purpose: SQLite database storage
-- Generated: Yes (`app.db` created on first run via `init_db()`)
-- Committed: Yes (contains initial `app.db`)
+- Purpose: Stores SQLite database files when `DATABASE_URL` points to `sqlite:///./data/app.db`.
+- Generated: yes (created during `backend/app/main.py` startup or `init_db`).
+- Committed: no (the folder is ignored, but the folder tree exists for runtime storage).
 
-**`.planning/`:**
-- Purpose: Architecture and planning documentation
-- Generated: No (manually authored)
-- Committed: Yes
-
-**`scripts/ralph/`:**
-- Purpose: Autonomous agent (Ralph) configuration and progress tracking
-- Generated: Partially (`progress.txt`, `.last-branch`)
-- Committed: Yes
-
-**`mobile/assets/`:**
-- Purpose: Static assets bundled into the mobile app
-- Generated: No
-- Committed: Yes
+**`mobile/assets/curriculum/` & `mobile/assets/phrases/`:**
+- Purpose: Static JSON lessons referenced by `CURRICULUM_BY_DAY` and mirrored on the backend in `backend/app/content/curriculum/`.
+- Generated: authored manually and kept in sync with backend folders described in `docs/content-and-audio-workflow.md`.
+- Committed: yes (these files ship with the client).
 
 ---
 

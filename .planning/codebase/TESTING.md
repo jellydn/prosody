@@ -5,155 +5,116 @@
 ## Test Framework
 
 **Runner:**
-- Backend: pytest + pytest-asyncio
-- Mobile: Jest (via Expo, configured in package.json — no standalone jest.config)
-- Config: No explicit pytest.ini, pyproject.toml, or conftest.py — uses pytest defaults
+- `pytest` 8.4.2 (from `backend/pyproject.toml` dev dependencies).
+- Config: defaults (no `pytest.ini`/`pyproject` `tool.pytest`, so CLI flags come from the `just backend-test` workflow in `justfile`).
 
 **Assertion Library:**
-- Backend: pytest built-in `assert` statements
-- Mobile: No test files found — Jest available but unused
+- Plain `assert` statements via `pytest` (e.g., `test_progress.py`, `test_analyzers.py`).
 
 **Run Commands:**
 ```bash
-just backend-test              # Run all backend tests (pytest -v)
-just backend-test-single "name" # Single test by pattern (pytest -k)
-just backend-test-file path    # Specific test file (pytest path -v)
-just mobile-test               # Run all mobile tests (npx jest)
-just mobile-test-single "name" # Single mobile test (npx jest --testNamePattern)
+cd backend && uv run pytest -v             # Run all tests (`just backend-test`)
+cd backend && uv run pytest -k "<pattern>"  # Target a subset (`just backend-test-single "pattern"`)
+# Coverage: Not configured (no coverage command in `justfile`).
 ```
 
 ## Test File Organization
 
 **Location:**
-- Backend: Separate `backend/tests/` directory (not co-located)
-- Mobile: Co-located pattern prescribed (`ComponentName.test.tsx`) but no test files exist yet
+- All tests live under `backend/tests/` alongside `conftest.py`, covering API layers (`test_progress.py`, `test_analyze_api.py`) and analyzers (`test_analyzers.py`, `test_byop_analyzers.py`).
+- Mobile side currently has no `*.test.*` files, so Jest is unused in this repo snapshot.
 
 **Naming:**
-- Backend: `test_<module_name>.py` (e.g., `test_analyzers.py`, `test_progress.py`, `test_analyze_api.py`)
-- Mobile: `ComponentName.test.tsx` (prescribed convention, not yet implemented)
+- Files follow `test_*.py` (e.g., `test_progress.py`, `test_analyzers.py`, `test_byop_analyzers.py`, `test_analyze_api.py`).
 
 **Structure:**
 ```
-backend/
-└── tests/
-    ├── __init__.py              # Empty marker file
-    ├── test_analyzers.py        # Unit tests for analyzer base classes
-    ├── test_byop_analyzers.py   # BYOP analyzer interface tests with mock
-    ├── test_analyze_api.py      # API integration tests for /analyze endpoint
-    └── test_progress.py         # API integration tests for /progress endpoints
+backend/tests/
+├── conftest.py       # fixtures (db/session)
+├── test_progress.py  # API integration
+├── test_analyze_api.py
+├── test_analyzers.py
+└── test_byop_analyzers.py
 ```
 
 ## Test Structure
 
 **Suite Organization:**
 ```python
-# Flat function-based tests (no class grouping)
-# Each test is a standalone function prefixed with test_
-
-def test_base_analyzer_is_abstract():
-    import inspect
-    assert inspect.isabstract(SpeechAnalyzer)
-
-def test_analysis_result_dataclass():
-    result = AnalysisResult(
-        rhythm_score=4.0,
-        stress_score=4.5,
-        ...
-    )
-    assert result.rhythm_score == 4.0
+def test_create_user(db):
+    response = client.post("/api/v1/users", json={...})
+    assert response.status_code == 201
 ```
+(from `backend/tests/test_progress.py` – each test posts JSON, asserts status/response, and relies on shared `client`).
 
 **Patterns:**
-- Setup: `sys.path.insert(0, ...)` at top of each test file for import resolution
-- Setup: `@pytest.fixture` for database session management (yield-based cleanup)
-- Teardown: Fixture-based with `try/finally` for DB session cleanup
-- Assertion: Direct `assert` comparisons, `assert ... in ...` for string checking
-- Conditional execution: `@pytest.mark.skipif` for optional dependency tests
+- Setup: `db` fixture from `backend/tests/conftest.py` calls `init_db()` and yields `SessionLocal`, ensuring a fresh SQLite schema per test.
+- Teardown: Fixture finalizer closes the session (`db.close()` in `conftest.py`).
+- Assertion: HTTP responses (status codes, payload shape) are asserted directly via `response.status_code` and `response.json()`.
 
 ## Mocking
 
-**Framework:** No dedicated mock library — hand-written mock classes
+**Framework:** `unittest.mock` (`AsyncMock`, `MagicMock`, `patch`) as in `backend/tests/test_byop_analyzers.py`.
 
 **Patterns:**
 ```python
-# Hand-written mock implementing the abstract base class
-class MockAnalyzer(SpeechAnalyzer):
-    def __init__(self, name: str = "mock"):
-        self.name = name
-
-    async def analyze(self, audio_path: str, target_text: str) -> AnalysisResult:
-        return AnalysisResult(
-            rhythm_score=3.0,
-            stress_score=3.0,
-            pacing_score=3.0,
-            intonation_score=3.0,
-            feedback_items=[
-                FeedbackItem(type=FeedbackType.good, message=f"Mock analyzer {self.name}")
-            ],
-        )
+with patch.object(
+    analyzer.client.audio.transcriptions, "create", new_callable=AsyncMock
+) as mock_create:
+    mock_create.return_value = mock_transcription
+    ...
+    mock_create.assert_called_once()
 ```
+(see `backend/tests/test_byop_analyzers.py`).
 
 **What to Mock:**
-- Abstract base classes (SpeechAnalyzer) — implement with hardcoded return values
-- External dependencies conditionally imported with try/except + skipif
+- Networked analyzer clients (OpenAI transcription calls, file I/O) are mocked to avoid hitting external APIs: `patch.object(..., "create")` and patching `builtins.open` appear in `backend/tests/test_byop_analyzers.py`.
 
 **What NOT to Mock:**
-- Database — uses real SQLite in-memory/file via `init_db()`
-- FastAPI app — uses `TestClient(app)` for real HTTP-layer testing
-- Pydantic models and dataclasses — tested directly
+- FastAPI `TestClient` is used without mocking to exercise routers/endpoints directly (`backend/tests/test_progress.py`, `backend/tests/test_analyze_api.py`).
+- The SQLite-backed `SessionLocal` is created once per fixture rather than mocked, so database behavior is verified end-to-end.
 
 ## Fixtures and Factories
 
 **Test Data:**
 ```python
-# Inline test data — no shared fixture files
-@pytest.fixture
-def db():
-    init_db()
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# API test data created inline
-response = client.post("/api/v1/users", json={
-    "native_language": "Vietnamese",
-    "english_level": "Intermediate",
-    "goal": "Meetings",
-})
+client.post(
+    "/api/v1/progress",
+    json={
+        "user_id": user_id,
+        "day": 1,
+        "exercises_completed": 4,
+        "rhythm_score": 4.5,
+        "stress_score": 4.0,
+        "pacing_score": 4.2,
+        "intonation_score": 4.3,
+    },
+)
 ```
+(from `backend/tests/test_progress.py` – repeated posts seed progress history).
 
 **Location:**
-- All test data is inline within test functions
-- No separate fixtures directory or factory files
-- No conftest.py for shared fixtures (db fixture duplicated per file)
+- Fixtures live in `backend/tests/conftest.py` (the `db` fixture initializes the schema and closes sessions).
 
 ## Coverage
 
-**Requirements:** None enforced
+**Requirements:** Not enforced; `justfile` lacks a coverage command or target.
 
 **View Coverage:**
 ```bash
-cd backend && pytest --cov=app --cov-report=html  # Not configured, but available
+# Coverage reporting is not configured currently.
 ```
 
 ## Test Types
 
 **Unit Tests:**
-- Analyzer base classes, dataclasses, enums (`test_analyzers.py`, `test_byop_analyzers.py`)
-- Direct instantiation and attribute assertion
-- Score range validation
-- Interface compliance checks (`issubclass`, `hasattr`, `isabstract`)
+- Analyzer unit tests validate dataclasses/enums (`backend/tests/test_analyzers.py`) and the `MockAnalyzer` interface (`backend/tests/test_byop_analyzers.py`).
 
 **Integration Tests:**
-- API endpoint tests via `fastapi.testclient.TestClient` (`test_progress.py`, `test_analyze_api.py`)
-- Full request/response cycle including database operations
-- HTTP status code and JSON response body assertions
-- Multi-step workflows (create user → create progress → get summary)
+- API tests (`backend/tests/test_progress.py`, `backend/tests/test_analyze_api.py`) exercise routers via `TestClient` and the real database layer.
 
 **E2E Tests:**
-- Not used
+- Not present in this snapshot (no Cypress/Appium suites or Expo Jest files).
 
 ## Common Patterns
 
@@ -164,45 +125,12 @@ async def test_analyzer_analyze_method():
     analyzer = MockAnalyzer("async-test")
     result = await analyzer.analyze("test.wav", "Hello world")
     assert isinstance(result, AnalysisResult)
-    assert result.rhythm_score == 3.0
 ```
+(from `backend/tests/test_byop_analyzers.py`).
 
 **Error Testing:**
-```python
-def test_analyze_endpoint_unsupported_format():
-    files = {"audio": ("test.txt", BytesIO(b"fake audio"), "text/plain")}
-    data = {"target_text": "Hello world"}
-    response = client.post("/api/v1/analyze", files=files, data=data)
-    assert response.status_code == 400
-    assert "Unsupported audio format" in response.json()["detail"]
-
-def test_get_progress_summary_no_data(db):
-    response = client.get("/api/v1/progress/999/summary")
-    assert response.status_code == 404
-```
-
-**Conditional Skip Pattern:**
-```python
-try:
-    from app.analyzers.free import FreeAnalyzer
-    FREE_ANALYZER_AVAILABLE = True
-except ImportError:
-    FREE_ANALYZER_AVAILABLE = False
-
-@pytest.mark.skipif(
-    not FREE_ANALYZER_AVAILABLE, reason="librosa/parselmouth not installed"
-)
-def test_free_analyzer_implements_interface():
-    ...
-```
-
-**Standalone Execution:**
-```python
-# Every test file supports direct execution
-if __name__ == "__main__":
-    import sys
-    pytest.main([__file__, "-v"] + sys.argv[1:])
-```
+- `backend/tests/test_progress.py` asserts 404 responses for missing users (`test_get_progress_summary_no_data`).
+- `backend/tests/test_analyze_api.py` checks that unsupported formats return 400 and that missing audio returns 422 when `librosa`/`parselmouth` are installed.
 
 ---
 
