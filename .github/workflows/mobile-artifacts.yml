@@ -1,6 +1,10 @@
 name: Mobile Build Artifacts
 
 on:
+  push:
+    branches:
+      - main
+      - feat/sideload
   workflow_dispatch:
     inputs:
       platform:
@@ -44,10 +48,13 @@ jobs:
       - name: Format check
         run: npx oxfmt --check .
 
+      - name: Run tests
+        run: npx jest --passWithNoTests
+
   build-android:
     name: Build Android APK
     needs: quality-checks
-    if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'android' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.platform == 'both' || github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,7 +76,7 @@ jobs:
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          eas-version: 18
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK
@@ -92,7 +99,7 @@ jobs:
   build-ios:
     name: Build iOS IPA
     needs: quality-checks
-    if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'ios' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.platform == 'both' || github.event.inputs.platform == 'ios' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -114,7 +121,7 @@ jobs:
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          eas-version: 18
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS IPA
@@ -137,7 +144,7 @@ jobs:
   build-ios-simulator:
     name: Build iOS Simulator App
     needs: quality-checks
-    if: ${{ github.event.inputs.platform == 'ios-simulator' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.platform == 'ios-simulator' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -159,7 +166,7 @@ jobs:
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          eas-version: 18
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS simulator artifact
