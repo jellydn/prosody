@@ -1,0 +1,148 @@
+name: Mobile Build Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform to build"
+        required: true
+        default: "both"
+        type: choice
+        options:
+          - both
+          - android
+          - ios
+          - ios-simulator
+
+jobs:
+  build-android:
+    name: Build Android APK
+    if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'android' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK
+        run: |
+          eas build --platform android --profile android-apk --non-interactive --wait --json > ../android-build.json
+
+      - name: Download Android APK
+        working-directory: .
+        run: |
+          node -e "const fs=require('fs'); const build=JSON.parse(fs.readFileSync('android-build.json','utf8'))[0]; if(!build?.artifacts?.buildUrl){throw new Error('Missing Android build artifact URL');} fs.writeFileSync('android-url.txt', build.artifacts.buildUrl);"
+          curl -fsSL "$(cat android-url.txt)" -o english-rhythm-coach.apk
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-rhythm-coach-android-apk
+          path: english-rhythm-coach.apk
+          if-no-files-found: error
+
+  build-ios:
+    name: Build iOS IPA
+    if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'ios' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS IPA
+        run: |
+          eas build --platform ios --profile ios-ipa --non-interactive --wait --json > ../ios-build.json
+
+      - name: Download iOS IPA
+        working-directory: .
+        run: |
+          node -e "const fs=require('fs'); const build=JSON.parse(fs.readFileSync('ios-build.json','utf8'))[0]; if(!build?.artifacts?.buildUrl){throw new Error('Missing iOS build artifact URL');} fs.writeFileSync('ios-url.txt', build.artifacts.buildUrl);"
+          curl -fsSL "$(cat ios-url.txt)" -o english-rhythm-coach.ipa
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-rhythm-coach-ios-ipa
+          path: english-rhythm-coach.ipa
+          if-no-files-found: error
+
+  build-ios-simulator:
+    name: Build iOS Simulator App
+    if: ${{ github.event.inputs.platform == 'ios-simulator' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS simulator artifact
+        run: |
+          eas build --platform ios --profile ios-simulator --non-interactive --wait --json > ../ios-simulator-build.json
+
+      - name: Download iOS simulator artifact
+        working-directory: .
+        run: |
+          node -e "const fs=require('fs'); const build=JSON.parse(fs.readFileSync('ios-simulator-build.json','utf8'))[0]; if(!build?.artifacts?.buildUrl){throw new Error('Missing iOS simulator artifact URL');} fs.writeFileSync('ios-simulator-url.txt', build.artifacts.buildUrl);"
+          curl -fsSL "$(cat ios-simulator-url.txt)" -o english-rhythm-coach-ios-simulator.tar.gz
+
+      - name: Upload iOS simulator artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: english-rhythm-coach-ios-simulator-app
+          path: english-rhythm-coach-ios-simulator.tar.gz
+          if-no-files-found: error
