@@ -161,15 +161,13 @@ async def test_openai_analyze_signature():
     reason="Mock requires Python 3.8+",
 )
 def test_google_analyzer_with_api_key():
-    try:
-        from app.analyzers.google import GoogleAnalyzer
+    pytest.importorskip("google.cloud.speech_v1")
+    from app.analyzers.google import GoogleAnalyzer
 
-        analyzer = GoogleAnalyzer(api_key="test-api-key")
-        assert isinstance(analyzer, SpeechAnalyzer)
-        assert hasattr(analyzer, "analyze")
-        assert hasattr(analyzer, "client")
-    except ImportError:
-        pytest.skip("google-cloud-speech package not installed")
+    analyzer = GoogleAnalyzer(api_key="test-api-key")
+    assert isinstance(analyzer, SpeechAnalyzer)
+    assert hasattr(analyzer, "analyze")
+    assert hasattr(analyzer, "client")
 
 
 @pytest.mark.skipif(
@@ -177,25 +175,23 @@ def test_google_analyzer_with_api_key():
     reason="Mock requires Python 3.8+",
 )
 def test_google_analyzer_with_json_credentials():
-    try:
-        from app.analyzers.google import GoogleAnalyzer
+    pytest.importorskip("google.cloud.speech_v1")
+    from app.analyzers.google import GoogleAnalyzer
 
-        credentials_json = json.dumps(
-            {
-                "type": "service_account",
-                "project_id": "test-project",
-                "private_key_id": "test-key-id",
-                "private_key": "test-private-key",
-                "client_email": "test@test-project.iam.gserviceaccount.com",
-            }
-        )
+    credentials_json = json.dumps(
+        {
+            "type": "service_account",
+            "project_id": "test-project",
+            "private_key_id": "test-key-id",
+            "private_key": "test-private-key",
+            "client_email": "test@test-project.iam.gserviceaccount.com",
+        }
+    )
 
-        analyzer = GoogleAnalyzer(api_key=credentials_json)
-        assert isinstance(analyzer, SpeechAnalyzer)
-        assert hasattr(analyzer, "analyze")
-        assert hasattr(analyzer, "client")
-    except ImportError:
-        pytest.skip("google-cloud-speech package not installed")
+    analyzer = GoogleAnalyzer(api_key=credentials_json)
+    assert isinstance(analyzer, SpeechAnalyzer)
+    assert hasattr(analyzer, "analyze")
+    assert hasattr(analyzer, "client")
 
 
 if __name__ == "__main__":
