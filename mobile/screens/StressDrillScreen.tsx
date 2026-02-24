@@ -118,14 +118,12 @@ export default function StressDrillScreen({
             <Text style={styles.instruction}>{exercise.instruction}</Text>
           </View>
 
-          {exercise.audioUrl && (
-            <AudioPlayer
-              audioUrl={exercise.audioUrl}
-              targetText={exercise.targetText}
-              stressPattern={exercise.stressPattern}
-              chunks={exercise.chunks}
-            />
-          )}
+          <AudioPlayer
+            audioUrl={exercise.audioUrl ?? null}
+            targetText={exercise.targetText}
+            stressPattern={exercise.stressPattern}
+            chunks={exercise.chunks}
+          />
 
           <View style={styles.recordingSection}>
             <Text style={styles.sectionTitle}>

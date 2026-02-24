@@ -92,12 +92,14 @@ export default function ChunkSpeakingScreen({
       return null;
     }
 
+    const chunks = exercise.chunks;
+
     return (
       <View style={styles.chunksContainer}>
-        {exercise.chunks.map((chunk) => (
+        {chunks.map((chunk) => (
           <View key={chunk} style={styles.chunkCard}>
             <View style={styles.chunkNumber}>
-              <Text style={styles.chunkNumberText}>{exercise.chunks.indexOf(chunk) + 1}</Text>
+              <Text style={styles.chunkNumberText}>{chunks.indexOf(chunk) + 1}</Text>
             </View>
             <Text style={styles.chunkText}>{chunk}</Text>
           </View>
@@ -142,14 +144,12 @@ export default function ChunkSpeakingScreen({
             {renderChunks()}
           </View>
 
-          {exercise.audioUrl && (
-            <AudioPlayer
-              audioUrl={exercise.audioUrl}
-              targetText={exercise.targetText}
-              stressPattern={exercise.stressPattern}
-              chunks={exercise.chunks}
-            />
-          )}
+          <AudioPlayer
+            audioUrl={exercise.audioUrl ?? null}
+            targetText={exercise.targetText}
+            stressPattern={exercise.stressPattern}
+            chunks={exercise.chunks}
+          />
 
           <View style={styles.recordingSection}>
             <Text style={styles.sectionTitle}>

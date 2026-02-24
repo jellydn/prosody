@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { Audio, type AVPlaybackStatus } from "expo-av";
+import * as Speech from "expo-speech";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -18,24 +19,35 @@ export default function AudioPlayer({
 }: AudioPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasAudio, setHasAudio] = useState(audioUrl !== null);
 
   useEffect(() => {
-    setHasAudio(audioUrl !== null);
-  }, [audioUrl]);
-
-  useEffect(() => {
-    return sound
-      ? () => {
-          void sound.unloadAsync().catch(() => {});
-        }
-      : undefined;
+    return () => {
+      void Speech.stop().catch(() => {});
+      if (sound) {
+        void sound.unloadAsync().catch(() => {});
+      }
+    };
   }, [sound]);
 
   const playSound = async () => {
-    if (!audioUrl) return;
-
     try {
+      if (!audioUrl) {
+        if (isPlaying) {
+          await Speech.stop();
+          setIsPlaying(false);
+          return;
+        }
+
+        setIsPlaying(true);
+        await Speech.speak(targetText, {
+          language: "en-US",
+          onDone: () => setIsPlaying(false),
+          onStopped: () => setIsPlaying(false),
+          onError: () => setIsPlaying(false),
+        });
+        return;
+      }
+
       if (sound) {
         if (isPlaying) {
           await sound.pauseAsync();
@@ -55,11 +67,12 @@ export default function AudioPlayer({
       }
     } catch (error) {
       console.error("Error playing sound:", error);
+      setIsPlaying(false);
     }
   };
 
-  const onPlaybackStatusUpdate = (status: any) => {
-    if (status.didJustFinish) {
+  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+    if (status.isLoaded && status.didJustFinish) {
       setIsPlaying(false);
     }
   };
@@ -135,18 +148,17 @@ export default function AudioPlayer({
   return (
     <View style={styles.container}>
       <View style={styles.textContent}>{chunks ? renderChunkedText() : renderStressedText()}</View>
-      {hasAudio && (
-        <Pressable
-          onPress={playSound}
-          style={[styles.playButton, isPlaying && styles.playButtonActive]}
-        >
-          <Ionicons
-            name={isPlaying ? "pause" : "play"}
-            size={32}
-            color={isPlaying ? "#fff" : "#007AFF"}
-          />
-        </Pressable>
-      )}
+      <Pressable
+        onPress={playSound}
+        style={[styles.playButton, isPlaying && styles.playButtonActive]}
+      >
+        <Ionicons
+          name={isPlaying ? "pause" : "play"}
+          size={32}
+          color={isPlaying ? "#fff" : "#007AFF"}
+        />
+      </Pressable>
+      {!audioUrl && <Text style={styles.fallbackLabel}>TTS model voice</Text>}
     </View>
   );
 }
@@ -204,5 +216,10 @@ const styles = StyleSheet.create({
   },
   playButtonActive: {
     backgroundColor: "#007AFF",
+  },
+  fallbackLabel: {
+    marginTop: 8,
+    fontSize: 12,
+    color: "#8E8E93",
   },
 });
