@@ -2,15 +2,14 @@
 """Generate JSON schema from Pydantic models."""
 
 import json
+import sys
 from pathlib import Path
 
 # Add the backend app to the path
 backend_path = Path(__file__).parent.parent / "backend" / "app"
-import sys
-
 sys.path.insert(0, str(backend_path))
 
-from content.schema.models import Exercise, Day, MeetingPhrase
+from content.schema.models import Exercise, Day, MeetingPhrase  # noqa: E402
 
 
 def main():
