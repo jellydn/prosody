@@ -162,6 +162,29 @@ npx expo install
 npx expo start
 ```
 
+### Build APK/IPA Artifacts (Sideload)
+
+This repo now includes a GitHub Actions CD workflow at `.github/workflows/mobile-artifacts.yml` that builds downloadable mobile artifacts without App Store / Play Store submission.
+
+1. Add repository secret `EXPO_TOKEN`:
+   - Create token: https://expo.dev/accounts/[account]/settings/access-tokens
+   - GitHub: `Settings -> Secrets and variables -> Actions -> New repository secret`
+2. In GitHub Actions, run **Mobile Build Artifacts** with:
+   - `platform=android` for `.apk`
+   - `platform=ios` for `.ipa`
+   - `platform=ios-simulator` for iOS simulator app artifact (`.app` packaged as `.tar.gz`)
+   - `platform=both` for both artifacts
+3. Download build files from workflow run artifacts:
+   - `english-rhythm-coach-android-apk`
+   - `english-rhythm-coach-ios-ipa`
+   - `english-rhythm-coach-ios-simulator-app`
+
+Notes:
+- Android artifact is generated with EAS profile `android-apk`.
+- iOS artifact is generated with EAS profile `ios-ipa` (`distribution: internal`), which still requires valid Apple signing credentials in Expo/EAS for device sideloading.
+- iOS simulator artifact is generated with EAS profile `ios-simulator` and does not require Apple signing for simulator usage.
+- No store submission is performed by this workflow.
+
 ### Content And Audio
 
 See content/audio authoring guide:
