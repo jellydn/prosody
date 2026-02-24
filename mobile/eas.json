@@ -11,6 +11,9 @@
     "production": {
       "environment": "production",
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+      },
       "android": {
         "buildType": "apk"
       },
@@ -20,12 +23,18 @@
     },
     "android-apk": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "ios-ipa": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+      },
       "ios": {
         "simulator": false
       }
