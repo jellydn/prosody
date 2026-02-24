@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -40,6 +41,7 @@ interface SessionResult {
 }
 
 export default function DashboardScreen() {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<ProgressSummary | null>(null);
   const [sessions, setSessions] = useState<SessionResult[]>([]);
@@ -50,6 +52,14 @@ export default function DashboardScreen() {
     try {
       const savedUserId = await AsyncStorage.getItem("userId");
       if (!savedUserId) {
+        await AsyncStorage.multiRemove(["userProfile", "userId"]);
+        const rootNavigation = navigation.getParent()?.getParent()?.getParent();
+        rootNavigation?.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Onboarding" }],
+          }),
+        );
         setLoading(false);
         return;
       }
@@ -71,7 +81,7 @@ export default function DashboardScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     loadData();

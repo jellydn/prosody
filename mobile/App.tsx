@@ -25,8 +25,17 @@ export default function App() {
 
   const checkOnboardingStatus = useCallback(async () => {
     try {
-      const profile = await AsyncStorage.getItem("userProfile");
-      setHasCompletedOnboarding(profile !== null);
+      const [profile, userId] = await Promise.all([
+        AsyncStorage.getItem("userProfile"),
+        AsyncStorage.getItem("userId"),
+      ]);
+
+      const isSetupComplete = profile !== null && userId !== null;
+      setHasCompletedOnboarding(isSetupComplete);
+
+      if (profile !== null && userId === null) {
+        await AsyncStorage.removeItem("userProfile");
+      }
     } catch (error) {
       console.error("Error checking onboarding status:", error);
     } finally {

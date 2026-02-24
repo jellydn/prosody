@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
@@ -48,7 +48,14 @@ export default function HomeScreen({ route }: HomeScreenProps) {
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) {
-        setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
+        await AsyncStorage.multiRemove(["userProfile", "userId"]);
+        const rootNavigation = navigation.getParent()?.getParent();
+        rootNavigation?.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Onboarding" }],
+          }),
+        );
         return;
       }
 
@@ -86,7 +93,7 @@ export default function HomeScreen({ route }: HomeScreenProps) {
       console.error("Error loading progress:", err);
       setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
     }
-  }, [route.params?.selectedDay]);
+  }, [navigation, route.params?.selectedDay]);
 
   useEffect(() => {
     loadProgress();

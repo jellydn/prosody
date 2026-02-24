@@ -74,8 +74,6 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
         goal: goal!,
       };
 
-      await AsyncStorage.setItem("userProfile", JSON.stringify(profile));
-
       const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
         method: "POST",
         headers: {
@@ -90,12 +88,16 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
 
       if (response.ok) {
         const data = await response.json();
-        await AsyncStorage.setItem("userId", data.user_id.toString());
+        await AsyncStorage.multiSet([
+          ["userProfile", JSON.stringify(profile)],
+          ["userId", data.user_id.toString()],
+        ]);
         navigation.replace("Main");
       } else {
         throw new Error("Failed to create profile");
       }
     } catch (error) {
+      await AsyncStorage.multiRemove(["userProfile", "userId"]);
       Alert.alert("Error", "Failed to complete setup. Please try again.", [{ text: "OK" }]);
       console.error("Onboarding error:", error);
     } finally {

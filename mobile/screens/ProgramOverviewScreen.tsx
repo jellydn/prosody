@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -43,6 +44,14 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
     try {
       const userId = await AsyncStorage.getItem("userId");
       if (!userId) {
+        await AsyncStorage.multiRemove(["userProfile", "userId"]);
+        const rootNavigation = navigation.getParent()?.getParent();
+        rootNavigation?.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Onboarding" }],
+          }),
+        );
         return;
       }
 
@@ -71,7 +80,7 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
     } catch (err) {
       console.error("Error loading progress:", err);
     }
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     loadProgress();
