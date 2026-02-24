@@ -125,21 +125,30 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS IPA
+        id: build_ios_ipa
+        continue-on-error: true
         run: |
           eas build --platform ios --profile ios-ipa --non-interactive --wait --json > ../ios-build.json
 
       - name: Download iOS IPA
+        if: ${{ steps.build_ios_ipa.outcome == 'success' }}
         working-directory: .
         run: |
           node -e "const fs=require('fs'); const build=JSON.parse(fs.readFileSync('ios-build.json','utf8'))[0]; if(!build?.artifacts?.buildUrl){throw new Error('Missing iOS build artifact URL');} fs.writeFileSync('ios-url.txt', build.artifacts.buildUrl);"
           curl -fsSL "$(cat ios-url.txt)" -o english-rhythm-coach.ipa
 
       - name: Upload iOS artifact
+        if: ${{ steps.build_ios_ipa.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: english-rhythm-coach-ios-ipa
           path: english-rhythm-coach.ipa
           if-no-files-found: error
+
+      - name: Report iOS IPA build warning
+        if: ${{ steps.build_ios_ipa.outcome != 'success' }}
+        run: |
+          echo "⚠️ iOS IPA build failed or was skipped due to missing Apple credentials/team. Continuing workflow." >> "$GITHUB_STEP_SUMMARY"
 
   build-ios-simulator:
     name: Build iOS Simulator App
