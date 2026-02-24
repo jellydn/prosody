@@ -22,6 +22,19 @@ export default function ShadowingModeScreen({
   onBack,
   onComplete,
 }: ShadowingModeScreenProps) {
+  const RECORDING_AUDIO_MODE = {
+    allowsRecordingIOS: true,
+    playsInSilentModeIOS: true,
+    shouldDuckAndroid: false,
+    playThroughEarpieceAndroid: false,
+  } as const;
+  const PLAYBACK_AUDIO_MODE = {
+    allowsRecordingIOS: false,
+    playsInSilentModeIOS: true,
+    shouldDuckAndroid: false,
+    playThroughEarpieceAndroid: false,
+  } as const;
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isShadowing, setIsShadowing] = useState(false);
   const [modelSound, setModelSound] = useState<Audio.Sound | null>(null);
@@ -71,10 +84,7 @@ export default function ShadowingModeScreen({
     }
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
+      await Audio.setAudioModeAsync(RECORDING_AUDIO_MODE);
 
       const recordingOptions = {
         android: {
@@ -111,7 +121,7 @@ export default function ShadowingModeScreen({
       if (exercise.audioUrl) {
         const { sound } = await Audio.Sound.createAsync(
           { uri: exercise.audioUrl },
-          { shouldPlay: true },
+          { shouldPlay: true, volume: 1.0 },
           (status: any) => {
             if (status.didJustFinish) {
               setIsPlayingModel(false);
@@ -125,6 +135,7 @@ export default function ShadowingModeScreen({
         setIsPlayingModel(true);
         await Speech.speak(exercise.targetText, {
           language: "en-US",
+          volume: 1.0,
           onDone: () => {
             setIsPlayingModel(false);
             void stopRecordingAfterDelay(newRecording, 500);
@@ -185,10 +196,7 @@ export default function ShadowingModeScreen({
 
   const playModelAudio = async () => {
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
+      await Audio.setAudioModeAsync(PLAYBACK_AUDIO_MODE);
 
       if (!exercise.audioUrl) {
         if (isPlayingModel) {
@@ -200,6 +208,7 @@ export default function ShadowingModeScreen({
         setIsPlayingModel(true);
         await Speech.speak(exercise.targetText, {
           language: "en-US",
+          volume: 1.0,
           onDone: () => setIsPlayingModel(false),
           onStopped: () => setIsPlayingModel(false),
           onError: () => setIsPlayingModel(false),
@@ -218,7 +227,7 @@ export default function ShadowingModeScreen({
       } else {
         const { sound } = await Audio.Sound.createAsync(
           { uri: exercise.audioUrl },
-          { shouldPlay: true },
+          { shouldPlay: true, volume: 1.0 },
           (status: any) => {
             if (status.didJustFinish) {
               setIsPlayingModel(false);
@@ -237,10 +246,7 @@ export default function ShadowingModeScreen({
     if (!recordedUri) return;
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-      });
+      await Audio.setAudioModeAsync(PLAYBACK_AUDIO_MODE);
 
       if (userSound) {
         await userSound.replayAsync();
@@ -248,7 +254,7 @@ export default function ShadowingModeScreen({
       } else {
         const { sound } = await Audio.Sound.createAsync(
           { uri: recordedUri },
-          { shouldPlay: true },
+          { shouldPlay: true, volume: 1.0 },
           (status: any) => {
             if (status.didJustFinish) {
               setIsPlayingUser(false);
