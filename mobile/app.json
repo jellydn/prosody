@@ -13,9 +13,11 @@
       "backgroundColor": "#007AFF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dunghd.englishrhythmcoach"
     },
     "android": {
+      "package": "com.dunghd.englishrhythmcoach",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
