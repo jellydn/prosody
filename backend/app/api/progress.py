@@ -121,13 +121,10 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
         "pacing": sum(s.pacing_score for s in sessions) / total_sessions,
         "intonation": sum(s.intonation_score for s in sessions) / total_sessions,
     }
-    average_score = (
-        sum(
-            s.rhythm_score + s.stress_score + s.pacing_score + s.intonation_score
-            for s in sessions
-        )
-        / (total_sessions * 4)
-    )
+    average_score = sum(
+        s.rhythm_score + s.stress_score + s.pacing_score + s.intonation_score
+        for s in sessions
+    ) / (total_sessions * 4)
 
     streak = 0
     if sessions:
