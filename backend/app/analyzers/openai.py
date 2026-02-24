@@ -1,3 +1,5 @@
+import os
+
 from openai import AsyncOpenAI
 from .base import (
     SpeechAnalyzer,
@@ -16,7 +18,7 @@ class OpenAIAnalyzer(BYOPScoringMixin, SpeechAnalyzer):
         with open(audio_path, "rb") as audio_file:
             transcription_response = await self.client.audio.transcriptions.create(
                 model="whisper-1",
-                file=("audio.wav", audio_file, "audio/wav"),
+                file=(os.path.basename(audio_path), audio_file, "audio/wav"),
             )
 
         recognized_text = transcription_response.text
