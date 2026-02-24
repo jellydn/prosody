@@ -42,6 +42,11 @@ backend-migrate-create MESSAGE:
 
 backend-migrate-rollback:
     cd backend && uv run alembic downgrade -1
+backend-fly-deploy:
+    cd backend && fly deploy
+
+backend-fly-logs:
+    cd backend && fly logs
 
 # Mobile commands
 mobile-install:

@@ -1,0 +1,20 @@
+name: Create Production Builds
+
+on:
+  push:
+    branches:
+      - main
+      - feat/sideload
+
+jobs:
+  build_android:
+    type: build
+    params:
+      platform: android
+      profile: android-apk
+
+  build_ios_simulator:
+    type: build
+    params:
+      platform: ios
+      profile: ios-simulator

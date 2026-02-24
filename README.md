@@ -43,15 +43,15 @@ Open app → See daily lesson → Listen to example → Record yourself → Get 
 
 ## Tech Stack
 
-| Layer                      | Technology                                                |
-| -------------------------- | --------------------------------------------------------- |
-| **Mobile App**             | React Native (Expo managed workflow)                      |
-| **Backend**                | Python / FastAPI                                          |
-| **Speech Analysis (Free)** | Whisper + librosa + parselmouth (on-device)               |
-| **Speech Analysis (BYOP)** | Azure Speech / Google Cloud / OpenAI (user's own API key) |
+| Layer                      | Technology                                                       |
+| -------------------------- | ---------------------------------------------------------------- |
+| **Mobile App**             | React Native (Expo managed workflow)                             |
+| **Backend**                | Python / FastAPI                                                 |
+| **Speech Analysis (Free)** | Whisper + librosa + parselmouth (on-device)                      |
+| **Speech Analysis (BYOP)** | Azure Speech / Google Cloud / OpenAI (user's own API key)        |
 | **Example Audio**          | Hosted model audio URL or in-app TTS fallback (`audioUrl: null`) |
-| **Database**               | SQLite (MVP) → PostgreSQL (later)                         |
-| **Curriculum**             | JSON files in repo                                        |
+| **Database**               | SQLite (MVP) → PostgreSQL (later)                                |
+| **Curriculum**             | JSON files in repo                                               |
 
 ---
 
@@ -145,6 +145,46 @@ uv sync --dev --frozen
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+### Deploy API To Fly.io
+
+Fly config is at `backend/fly.toml`.
+
+1. Install/auth Fly CLI:
+
+```bash
+brew install flyctl
+fly auth login
+```
+
+2. Create app and volume (one-time):
+
+```bash
+cd backend
+fly apps create english-rhythm-coach-api
+fly volumes create api_data --region sin --size 1
+```
+
+3. Set runtime env/secrets:
+
+```bash
+fly secrets set CORS_ORIGINS="https://your-mobile-web-origin.example"
+```
+
+4. Deploy:
+
+```bash
+cd backend
+fly deploy
+```
+
+5. Verify:
+
+```bash
+fly status
+fly logs
+curl https://english-rhythm-coach-api.fly.dev/health
+```
+
 When you change dependencies:
 
 ```bash
@@ -160,6 +200,50 @@ uv sync --dev --frozen
 cd mobile
 npx expo install
 npx expo start
+```
+
+For local development, mobile defaults to `http://localhost:8000` (or `http://10.0.2.2:8000` on Android emulator). You can override explicitly:
+
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 npx expo start
+```
+
+### Build APK/IPA Artifacts (Sideload)
+
+This repo now includes a GitHub Actions CD workflow at `.github/workflows/mobile-artifacts.yml` that builds downloadable mobile artifacts without App Store / Play Store submission.
+
+1. Add repository secret `EXPO_TOKEN`:
+   - Create token: https://expo.dev/accounts/[account]/settings/access-tokens
+   - GitHub: `Settings -> Secrets and variables -> Actions -> New repository secret`
+2. In GitHub Actions, run **Mobile Build Artifacts** with:
+   - `platform=android` for `.apk`
+   - `platform=ios` for `.ipa`
+   - `platform=ios-simulator` for iOS simulator app artifact (`.app` packaged as `.tar.gz`)
+   - `platform=both` for both artifacts
+3. Download build files from workflow run artifacts:
+   - `english-rhythm-coach-android-apk`
+   - `english-rhythm-coach-ios-ipa`
+   - `english-rhythm-coach-ios-simulator-app`
+
+Notes:
+
+- Android artifact is generated with EAS profile `android-apk`.
+- iOS artifact is generated with EAS profile `ios-ipa` (`distribution: internal`), which still requires valid Apple signing credentials in Expo/EAS for device sideloading.
+- iOS simulator artifact is generated with EAS profile `ios-simulator` and does not require Apple signing for simulator usage.
+- Production artifact profiles (`production`, `android-apk`, `ios-ipa`) are configured to use `https://english-rhythm-coach-api.fly.dev` via `EXPO_PUBLIC_API_BASE_URL`.
+- Bundle/package IDs are profile-based via `mobile/app.config.ts`:
+  - `development`, `ios-simulator`: `com.englishrhythmcoach.app`
+  - `production`, `android-apk`, `ios-ipa`: `com.dunghd.englishrhythmcoach`
+- No store submission is performed by this workflow.
+
+Local EAS build commands:
+
+```bash
+cd mobile
+npx eas build --profile development --platform ios
+npx eas build --profile development --platform android
+npx eas build --profile production --platform ios
+npx eas build --profile production --platform android
 ```
 
 ### Content And Audio
