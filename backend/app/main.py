@@ -28,7 +28,18 @@ def _parse_cors_origins() -> list[str]:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    run_migrations()
+    raw_flag = os.getenv("RUN_MIGRATIONS_ON_STARTUP", "true").strip().lower()
+    should_run_migrations = raw_flag in {"1", "true", "yes", "on"}
+    logger = logging.getLogger(__name__)
+
+    if should_run_migrations:
+        logger.info("Running database migrations on startup.")
+        run_migrations()
+    else:
+        logger.info(
+            "Skipping database migrations on startup (RUN_MIGRATIONS_ON_STARTUP=%r).",
+            raw_flag,
+        )
     yield
 
 

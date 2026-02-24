@@ -14,7 +14,7 @@ If it is not set, Alembic falls back to `sqlite:///./data/app.db` (the local dev
 Set it in your `.env` file (see `.env.example`):
 
 ```env
-DATABASE_URL=sqlite:///./backend/data/app.db
+DATABASE_URL=sqlite:///./data/app.db
 ```
 
 For staging/production, use a full connection string, e.g.:
@@ -35,7 +35,7 @@ just backend-migrate
 cd backend && uv run alembic upgrade head
 ```
 
-The backend also runs `alembic upgrade head` automatically at startup via the FastAPI lifespan hook, so the schema is always up-to-date when the server starts.
+The backend can run `alembic upgrade head` automatically at startup via the FastAPI lifespan hook. This is controlled by `RUN_MIGRATIONS_ON_STARTUP` (default: `true`).
 
 ---
 
