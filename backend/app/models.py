@@ -49,12 +49,22 @@ class SessionResult(Base):
     completed_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
-def init_db():
+def _ensure_sqlite_dir() -> None:
+    """Create the SQLite database directory if it does not exist."""
     if DATABASE_URL.startswith("sqlite"):
         db_dir = os.path.dirname(DATABASE_URL.replace("sqlite:///", ""))
         if db_dir and not os.path.exists(db_dir):
             os.makedirs(db_dir)
-    Base.metadata.create_all(bind=engine)
+
+
+def run_migrations() -> None:
+    """Apply all pending Alembic migrations (upgrade to head)."""
+    from alembic.config import Config
+    from alembic import command
+
+    _ensure_sqlite_dir()
+    alembic_cfg = Config(os.path.join(os.path.dirname(__file__), "..", "alembic.ini"))
+    command.upgrade(alembic_cfg, "head")
 
 
 def get_db():
