@@ -34,6 +34,15 @@ backend-lint:
 backend-schema:
     cd backend && uv run python ../scripts/generate_schema.py
 
+backend-migrate:
+    cd backend && uv run alembic upgrade head
+
+backend-migrate-create MESSAGE:
+    cd backend && uv run alembic revision --autogenerate -m "{{MESSAGE}}"
+
+backend-migrate-rollback:
+    cd backend && uv run alembic downgrade -1
+
 # Mobile commands
 mobile-install:
     cd mobile && npm install

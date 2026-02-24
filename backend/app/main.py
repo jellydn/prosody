@@ -3,7 +3,7 @@ import logging
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.models import init_db
+from app.models import run_migrations
 from app.api.progress import router as progress_router
 from app.api.analyze import router as analyze_router
 
@@ -28,7 +28,7 @@ def _parse_cors_origins() -> list[str]:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    init_db()
+    run_migrations()
     yield
 
 

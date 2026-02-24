@@ -4,12 +4,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from app.models import init_db, SessionLocal
+from app.models import run_migrations, SessionLocal
 
 
 @pytest.fixture
 def db():
-    init_db()
+    run_migrations()
     db = SessionLocal()
     try:
         yield db
