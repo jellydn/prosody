@@ -1,0 +1,120 @@
+{
+  "day": 11,
+  "theme": "Advanced Linking",
+  "exercises": [
+    {
+      "id": "day11-ex01",
+      "type": "linking",
+      "title": "Complex Linking Patterns",
+      "instruction": "Practice complex linking with multiple connections.",
+      "targetText": "Check_it_out_and_send_me_the_report.",
+      "stressPattern": [
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Link 'check' + 'it' + 'out' - one smooth flow",
+        "Link 'out' + 'and' - connect the sounds",
+        "Link 'send' + 'me' + 'the' - continuous stream",
+        "Stress: Check, send, report"
+      ]
+    },
+    {
+      "id": "day11-ex02",
+      "type": "linking",
+      "title": "Reductions in Common Phrases",
+      "instruction": "Practice how common phrases are reduced in natural speech.",
+      "targetText": "I wanna go over the details with you.",
+      "stressPattern": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'want to' reduces to 'wanna' in natural speech",
+        "'go over' links smoothly: go_over",
+        "Stress: wanna, over, details"
+      ]
+    },
+    {
+      "id": "day11-ex03",
+      "type": "shadow",
+      "title": "Natural Flow",
+      "instruction": "Shadow to achieve natural, connected speech.",
+      "targetText": "I don't know about that, but I'll check.",
+      "stressPattern": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'don't know' links together: don't_know",
+        "Keep everything connected and flowing",
+        "Stress: know, that, check"
+      ]
+    },
+    {
+      "id": "day11-ex04",
+      "type": "linking",
+      "title": "T-Sound Flapping",
+      "instruction": "Practice the flapped 't' sound between vowels.",
+      "targetText": "Better to wait than to rush.",
+      "stressPattern": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "The 't' in 'better' sounds like a quick 'd' between vowels",
+        "Same for 'to' between vowels: better to = bedder duh",
+        "Stress: Better, wait, rush"
+      ]
+    },
+    {
+      "id": "day11-ex05",
+      "type": "shadow",
+      "title": "Connected Narrative",
+      "instruction": "Shadow this short narrative. Keep the flow continuous.",
+      "targetText": "We started small, worked hard, and now we're seeing results.",
+      "stressPattern": [
+        true,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Connect everything smoothly",
+        "Stress: started, small, worked, hard, now, seeing, results",
+        "Keep the narrative flowing without breaks"
+      ]
+    }
+  ]
+}

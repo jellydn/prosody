@@ -1,0 +1,141 @@
+{
+  "day": 7,
+  "theme": "Professional Scenarios",
+  "exercises": [
+    {
+      "id": "day07-ex01",
+      "type": "shadow",
+      "title": "Negotiation - Opening",
+      "instruction": "Shadow this negotiation opening. Be clear and professional.",
+      "targetText": "We're interested in exploring a partnership with your company.",
+      "stressPattern": [
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Start strong with 'We're'",
+        "Emphasize key business terms: interested, exploring, partnership, company",
+        "Keep the tone professional but friendly"
+      ]
+    },
+    {
+      "id": "day07-ex02",
+      "type": "stress",
+      "title": "Making Suggestions",
+      "instruction": "Practice stress patterns when making suggestions.",
+      "targetText": "I suggest we consider a different approach.",
+      "stressPattern": [
+        false,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Stress the main ideas: suggest, consider, different, approach",
+        "Keep 'we' and 'a' unstressed",
+        "Use a confident, not aggressive, tone"
+      ]
+    },
+    {
+      "id": "day07-ex03",
+      "type": "linking",
+      "title": "Professional Transitions",
+      "instruction": "Link words smoothly in professional transitions.",
+      "targetText": "In_addition_to that, I'd like_to mention the budget.",
+      "stressPattern": [
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Link 'In' + 'addition' + 'to' - one smooth flow",
+        "Link 'like' + 'to' - no pause between them",
+        "Stress: addition, mention, budget"
+      ]
+    },
+    {
+      "id": "day07-ex04",
+      "type": "chunk",
+      "title": "Complex Proposals",
+      "instruction": "Break this proposal into clear thought groups.",
+      "targetText": "Our proposal consists of three parts. First, the timeline. Second, the budget. Third, the deliverables.",
+      "stressPattern": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true
+      ],
+      "chunks": [
+        "Our proposal consists of three parts.",
+        "First, the timeline.",
+        "Second, the budget.",
+        "Third, the deliverables."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Each part is its own short thought group",
+        "Use numbering for clear structure",
+        "Stress: proposal, consists, three, timeline, budget, deliverables"
+      ]
+    },
+    {
+      "id": "day07-ex05",
+      "type": "shadow",
+      "title": "Closing a Discussion",
+      "instruction": "Shadow this closing. End discussions professionally.",
+      "targetText": "Thank you for your time. I look forward to our next meeting.",
+      "stressPattern": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Be warm and professional",
+        "Stress: Thank, time, look, forward, next, meeting",
+        "End with a falling tone for the statement: \u2198"
+      ]
+    }
+  ]
+}

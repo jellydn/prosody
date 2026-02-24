@@ -1,0 +1,82 @@
+{
+  "day": 12,
+  "theme": "Word Reductions",
+  "exercises": [
+    {
+      "id": "day12-ex01",
+      "type": "linking",
+      "title": "Common Contractions",
+      "instruction": "Practice common contractions in natural speech.",
+      "targetText": "I'm gonna do it, so don't worry.",
+      "stressPattern": [false, true, false, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'going to' reduces to 'gonna'",
+        "'don't' is a contraction, say it quickly",
+        "Stress: gonna, do, don't, worry"
+      ]
+    },
+    {
+      "id": "day12-ex02",
+      "type": "linking",
+      "title": "Auxiliary Verbs",
+      "instruction": "Practice reducing auxiliary verbs.",
+      "targetText": "They're working on it right now.",
+      "stressPattern": [false, true, false, false, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'They're' contracts 'they' + 'are'",
+        "Keep 'on' unstressed and quick",
+        "Stress: working, right, now"
+      ]
+    },
+    {
+      "id": "day12-ex03",
+      "type": "shadow",
+      "title": "Informal Speech",
+      "instruction": "Shadow this informal conversation style.",
+      "targetText": "Wanna grab some lunch together?",
+      "stressPattern": [true, true, false, true, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'want to' reduces to 'wanna'",
+        "'some' reduces to 'sum'",
+        "Stress: Wanna, grab, lunch, together"
+      ]
+    },
+    {
+      "id": "day12-ex04",
+      "type": "linking",
+      "title": "Reduced Forms of 'to' and 'for'",
+      "instruction": "Practice how 'to' and 'for' reduce in natural speech.",
+      "targetText": "I'm going to the store for some groceries.",
+      "stressPattern": [false, false, true, false, false, false, true, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'going to' reduces to 'gonna' or 'ganna'",
+        "'to' often sounds like 'tuh' or 'dah'",
+        "'for' reduces to 'fer' or 'fur'",
+        "Stress: going, store, groceries"
+      ]
+    },
+    {
+      "id": "day12-ex05",
+      "type": "shadow",
+      "title": "Casual Office Talk",
+      "instruction": "Shadow casual office conversation.",
+      "targetText": "Let me know if you need anything.",
+      "stressPattern": [false, true, false, true, false, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'Let me know' - connect smoothly",
+        "Keep 'if' unstressed",
+        "Stress: know, need, anything"
+      ]
+    }
+  ]
+}

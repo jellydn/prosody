@@ -1,0 +1,45 @@
+{
+  "example": {
+    "audioUrl": "/audio/mp-001.mp3",
+    "category": "updates",
+    "id": "mp-001",
+    "text": "I'd like to provide an update on the project."
+  },
+  "properties": {
+    "id": {
+      "description": "Unique identifier for the phrase",
+      "title": "Id",
+      "type": "string"
+    },
+    "category": {
+      "description": "Category of the meeting phrase",
+      "title": "Category",
+      "type": "string"
+    },
+    "text": {
+      "description": "The phrase text",
+      "title": "Text",
+      "type": "string"
+    },
+    "audioUrl": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "URL or path to example audio file",
+      "title": "Audiourl"
+    }
+  },
+  "required": [
+    "id",
+    "category",
+    "text"
+  ],
+  "title": "MeetingPhrase",
+  "type": "object"
+}

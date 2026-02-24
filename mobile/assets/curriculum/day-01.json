@@ -1,0 +1,56 @@
+{
+  "day": 1,
+  "theme": "Word Stress Basics",
+  "exercises": [
+    {
+      "id": "day01-ex01",
+      "type": "stress",
+      "title": "Professional Greetings",
+      "instruction": "Listen and repeat. Emphasize the bold syllables clearly and keep unstressed syllables short.",
+      "targetText": "Nice to meet you.",
+      "stressPattern": [true, false, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Keep 'to' and 'you' unstressed - say them quickly",
+        "Make 'nice' and 'meet' longer and louder"
+      ]
+    },
+    {
+      "id": "day01-ex02",
+      "type": "stress",
+      "title": "Meeting Expressions",
+      "instruction": "Practice of stress pattern. Important words are stressed.",
+      "targetText": "Let's discuss the proposal.",
+      "stressPattern": [false, true, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": ["The key words are 'discuss' and 'proposal'", "'The' is unstressed - say it quickly"]
+    },
+    {
+      "id": "day01-ex03",
+      "type": "chunk",
+      "title": "Thought Groups",
+      "instruction": "Break this sentence into natural thought groups. Pause at the slashes.",
+      "targetText": "I'll review the document, and then I'll share my feedback.",
+      "stressPattern": null,
+      "chunks": ["I'll review the document,", "and then I'll share my feedback."],
+      "audioUrl": null,
+      "tips": ["Pause briefly after the comma", "Each chunk should feel like a complete thought"]
+    },
+    {
+      "id": "day01-ex04",
+      "type": "intonation",
+      "title": "Questions vs Statements",
+      "instruction": "Listen to how your voice goes up at the end for questions.",
+      "targetText": "Can we start now?",
+      "stressPattern": null,
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Your voice should rise at the end: \u2197",
+        "Statements end with a falling tone: \u2198"
+      ]
+    }
+  ]
+}

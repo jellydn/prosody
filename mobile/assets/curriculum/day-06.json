@@ -1,0 +1,116 @@
+{
+  "day": 6,
+  "theme": "Meeting Phrases",
+  "exercises": [
+    {
+      "id": "day06-ex01",
+      "type": "shadow",
+      "title": "Giving Updates",
+      "instruction": "Shadow these update phrases. Use a clear, confident tone.",
+      "targetText": "I'd like to provide an update on the project status.",
+      "stressPattern": [false, false, true, false, false, true, false, false, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Start with 'I'd like to' - keep it quick and unstressed",
+        "Emphasize: provide, update, project, status",
+        "Keep the pace steady and confident"
+      ]
+    },
+    {
+      "id": "day06-ex02",
+      "type": "linking",
+      "title": "Connecting Ideas",
+      "instruction": "Practice linking words when connecting ideas in meetings.",
+      "targetText": "Based_on that, I think_we_should proceed with the plan.",
+      "stressPattern": [true, false, false, true, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Link 'based' + 'on' - no pause between them",
+        "Link 'think' + 'we' + 'should' - connect smoothly",
+        "Stress key ideas: based, think, proceed, plan"
+      ]
+    },
+    {
+      "id": "day06-ex03",
+      "type": "stress",
+      "title": "Emphasizing Key Points",
+      "instruction": "Practice stressing the most important words to highlight key points.",
+      "targetText": "The critical issue is timing.",
+      "stressPattern": [false, true, false, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Stress 'critical' and 'issue' to emphasize importance",
+        "'The' is unstressed - say it quickly",
+        "Stress 'timing' as the key concern"
+      ]
+    },
+    {
+      "id": "day06-ex04",
+      "type": "chunk",
+      "title": "Organizing Updates",
+      "instruction": "Break this update into clear thought groups.",
+      "targetText": "First, let me summarize the current situation. Next, I'll outline the challenges. Finally, I'll propose solutions.",
+      "stressPattern": [
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true
+      ],
+      "chunks": [
+        "First, let me summarize the current situation.",
+        "Next, I'll outline the challenges.",
+        "Finally, I'll propose solutions."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Use sequential markers to structure your updates",
+        "Each marker is its own thought group",
+        "Stress the main ideas: summarize, situation, outline, challenges, propose, solutions"
+      ]
+    },
+    {
+      "id": "day06-ex05",
+      "type": "shadow",
+      "title": "Requesting Clarification",
+      "instruction": "Shadow these clarification phrases. Use a polite, inquisitive tone.",
+      "targetText": "Could you clarify that point? I want to make sure I understand correctly.",
+      "stressPattern": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Voice rises at the end of questions: \u2197",
+        "Stress: clarify, point, want, sure, understand, correctly",
+        "Keep 'you', 'that', 'to', 'I' unstressed"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 # 🎵 English Rhythm Coach
 
+<div align="center">
+  <img src="logo.svg" width="200" alt="English Rhythm Coach Logo" />
+</div>
+
 > _"Fitness app for English speaking rhythm"_
 
 A mobile app that helps non-native English speakers sound more natural and confident through short daily exercises, AI feedback, and real-world speaking scenarios. Starting with Vietnamese professionals.
@@ -45,7 +49,7 @@ Open app → See daily lesson → Listen to example → Record yourself → Get 
 | **Backend**                | Python / FastAPI                                          |
 | **Speech Analysis (Free)** | Whisper + librosa + parselmouth (on-device)               |
 | **Speech Analysis (BYOP)** | Azure Speech / Google Cloud / OpenAI (user's own API key) |
-| **Example Audio**          | ElevenLabs TTS (pre-generated, bundled)                   |
+| **Example Audio**          | Hosted model audio URL or in-app TTS fallback (`audioUrl: null`) |
 | **Database**               | SQLite (MVP) → PostgreSQL (later)                         |
 | **Curriculum**             | JSON files in repo                                        |
 
@@ -61,7 +65,7 @@ english-rhythm-coach/
 │   │   ├── AudioPlayer.tsx
 │   │   ├── AudioRecorder.tsx
 │   │   └── FeedbackCard.tsx
-│   └── assets/              # Bundled audio files
+│   └── assets/              # Curriculum + phrase JSON content
 ├── backend/                 # Python FastAPI server
 │   ├── app/
 │   │   ├── main.py          # FastAPI app entry
@@ -137,8 +141,17 @@ english-rhythm-coach/
 
 ```bash
 cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+uv sync --dev --frozen
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+When you change dependencies:
+
+```bash
+cd backend
+uv add <package>              # or: uv remove <package>
+uv lock
+uv sync --dev --frozen
 ```
 
 ### Mobile App
@@ -148,6 +161,12 @@ cd mobile
 npx expo install
 npx expo start
 ```
+
+### Content And Audio
+
+See content/audio authoring guide:
+
+- `docs/content-and-audio-workflow.md`
 
 ---
 
@@ -173,3 +192,32 @@ Vietnamese professionals working in English environments — engineers, knowledg
 - Rhythm score improvement after 14 days
 - ≥ 40% users record 5+ sessions/week
 - Audio analysis response < 5 seconds (p95)
+
+---
+
+## Connect
+
+<div id="badges">
+  <a href="https://www.linkedin.com/in/dunghd">
+    <img src="https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/>
+  </a>
+  <a href="https://www.youtube.com/c/ITManVietnam">
+    <img src="https://img.shields.io/badge/YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Youtube Badge"/>
+  </a>
+  <a href="https://www.twitter.com/jellydn">
+    <img src="https://img.shields.io/badge/Twitter-blue?style=for-the-badge&logo=twitter&logoColor=white" alt="Twitter Badge"/>
+  </a>
+  <a href="https://blog.productsway.com">
+    <img src="https://img.shields.io/badge/Blog-FF5722?style=for-the-badge&logo=blogger&logoColor=white" alt="Blog Badge"/>
+  </a>
+</div>
+
+---
+
+## Show Your Support
+
+If you find this project helpful, consider supporting the development:
+
+[![kofi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/dunghd)
+[![paypal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/dunghd)
+[![buymeacoffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/dunghd)

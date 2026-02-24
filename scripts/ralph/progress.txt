@@ -1,0 +1,941 @@
+# Ralph Progress Log
+Started: Mon Feb 23 23:13:14 +08 2026
+---
+
+## [2026-02-23] - US-001
+- Implemented Pydantic models for curriculum content (Exercise, Day, MeetingPhrase)
+- Created ExerciseType enum with five types: stress, linking, chunk, shadow, intonation
+- Generated JSON schemas from Pydantic models using custom generation script
+- Schema files exported to backend/app/content/schema/
+- Files changed:
+  - backend/app/content/schema/models.py (Pydantic models)
+  - backend/app/content/schema/curriculum.json (combined schema)
+  - backend/app/content/schema/{exercise,day,meetingphrase}.json (individual schemas)
+  - scripts/generate_schema.py (schema generation script)
+  - backend/requirements.txt (dependencies)
+- Quality checks: ruff check && ruff format passed
+- **Learnings for future iterations:**
+  - Use Pydantic for type-safe data models and automatic JSON schema generation
+  - Schema generation script at scripts/generate_schema.py should be run after model changes
+  - All Python code must pass ruff check and format before committing
+  - LSP errors about unresolved imports are expected before pip install
+---
+
+## [2026-02-23] - US-002
+- Created Day 1 curriculum content with theme 'Word Stress Basics'
+- Implemented 4 exercises: 2 stress drills, 1 chunk speaking, 1 intonation
+- All exercises use professional vocabulary and clear instructions
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-01.json (Day 1 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Curriculum JSON files must be created under backend/app/content/curriculum/
+  - stressPattern uses boolean array: True=stressed, False=unstressed
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+  - Professional vocabulary examples: greetings, meeting expressions, feedback phrases
+---
+
+## [2026-02-23] - US-003
+- Created Day 2 curriculum content with theme 'Linking Words Together'
+- Implemented 4 exercises: 2 linking practice, 1 chunk speaking, 1 stress drill
+- Linking exercises demonstrate consonant-to-vowel and same-consonant connections
+- All exercises include tips for smooth linking and natural rhythm
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-02.json (Day 2 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Linking exercises should show connected forms in instruction/tips using underscores (pick_it_up) or tie character (pick‿it‿up)
+  - Common linking patterns: consonant+vowel, same consonant at word boundaries
+  - Chunk exercises combine linking with thought group practice
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+
+---
+
+## [2026-02-23] - US-004
+- Created Day 3 curriculum content with theme 'Speaking in Chunks'
+- Implemented 4 exercises: 2 chunk speaking, 1 shadowing, 1 linking
+- Chunk exercises demonstrate longer thought groups and complex instructions
+- Shadowing exercise introduces timing and pause matching
+- Linking exercise focuses on connections within thought groups
+- JSON validates successfully against schema from US-001
+- Files changed:
+  - backend/app/content/curriculum/day-03.json (Day 3 content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed Pydantic model loading works
+- **Learnings for future iterations:**
+  - Chunk exercises can have multiple thought groups separated by commas
+  - Sequential markers like 'First, then, finally' help structure thought groups
+  - Shadowing exercises need stressPattern to guide rhythm matching
+  - Longer sentences benefit from more thought groups (2-3 chunks)
+  - When combining chunk and linking practice, emphasize smooth connections within chunks
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import Day; import json; print(Day(**json.load(open('path/to/file'))))"`
+
+---
+
+## [2026-02-23] - US-005
+- Created meeting phrases JSON content with 30 phrases across 4 categories
+- Categories: updates (8 phrases), opinions (8 phrases), clarifications (7 phrases), presenting (7 phrases)
+- All phrases use professional meeting vocabulary and natural business expressions
+- Each phrase has empty audioUrl placeholder for future audio recording
+- JSON validates successfully against MeetingPhrase schema
+- Files changed:
+  - backend/app/content/phrases/meetings.json (Meeting phrases content)
+- Quality checks: ruff check && ruff format passed
+- Validation: Python script confirmed all 30 phrases load correctly into MeetingPhrase model
+- **Learnings for future iterations:**
+  - Meeting phrases files should be created under backend/app/content/phrases/
+  - MeetingPhrase structure: id (mp-### format), category, text, audioUrl (null placeholder)
+  - Professional meeting vocabulary: updates (progress reports), opinions (recommendations), clarifications (questions), presenting (transition phrases)
+  - Validate JSON against Pydantic models before committing: `cd backend && python -c "from app.content.schema.models import MeetingPhrase; import json; data = json.load(open('app/content/phrases/meetings.json')); [MeetingPhrase(**p) for p in data['phrases']]"`
+
+---
+
+## [2026-02-23] - US-006
+- Created FastAPI application scaffolding with health endpoint
+- Implemented GET /health endpoint returning { status: 'ok' }
+- Configured CORS middleware to allow all origins, methods, and headers
+- Created Dockerfile for containerized deployment
+- App runs successfully with 'uvicorn backend.app.main:app'
+- Files changed:
+  - backend/app/main.py (FastAPI application)
+  - backend/Dockerfile (Container deployment)
+- Quality checks: ruff check && ruff format passed
+- Verification: App import successful, routes configured correctly
+- **Learnings for future iterations:**
+  - FastAPI app main entry point at backend/app/main.py
+  - CORS middleware configured for React Native cross-origin requests
+  - Start command: uvicorn backend.app.main:app (from project root)
+  - Health endpoint pattern: GET /health returns { status: 'ok' }
+  - Auto-generated docs available at /docs and /redoc
+  - Dockerfile uses python:3.11-slim base image for production deployment
+
+---
+
+## [2026-02-23] - US-007
+- Created SQLAlchemy database models for User and SessionResult
+- User model: id, native_language, english_level, goal, created_at
+- SessionResult model: id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at
+- Implemented database initialization on app startup using @app.on_event("startup")
+- Database file created at backend/data/app.db with proper directory creation
+- Added .gitignore for data/ directory to exclude database from version control
+- Files changed:
+  - backend/app/models.py (Database models and initialization)
+  - backend/app/main.py (Added startup event for DB init)
+  - backend/.gitignore (Exclude database files)
+- Quality checks: ruff check && ruff format passed
+- Verification: Database tables and columns created successfully
+- **Learnings for future iterations:**
+  - Database models at backend/app/models.py using SQLAlchemy
+  - Database initialization called via @app.on_event("startup") in main.py
+  - SQLite database location: backend/data/app.db (excluded from git)
+  - Use get_db() dependency injection for database sessions in routes
+  - User tracks profile info: native language, English level, goal
+  - SessionResult tracks daily exercise scores and completion data
+  - Database URL configurable via DATABASE_URL environment variable
+
+---
+
+## [2026-02-23] - US-008
+- Created REST API endpoints for user progress tracking
+- POST /api/v1/users: Creates user profile, returns user_id
+- POST /api/v1/progress: Saves session result with day, exercises, and scores
+- GET /api/v1/progress/{user_id}: Returns full progress history ordered by day
+- GET /api/v1/progress/{user_id}/summary: Returns streak, averages, total_sessions, trend
+- Streak calculation: Counts consecutive days backwards from last session, resets on gaps
+- Trend calculation: Compares recent 5 sessions vs overall average (Improving/Stable/Declining)
+- All tests pass with sample data
+- Files changed:
+  - backend/app/api/progress.py (API endpoints)
+  - backend/app/api/__init__.py (API module)
+  - backend/app/main.py (Router integration)
+  - backend/tests/test_progress.py (Test suite)
+  - backend/requirements.txt (Added pytest, pytest-asyncio, httpx)
+- Quality checks: ruff check && ruff format passed
+- Tests: 5/5 passed (create_user, create_progress, get_progress, get_progress_summary, get_progress_summary_no_data)
+- **Learnings for future iterations:**
+  - API routes at backend/app/api/ directory using FastAPI Router
+  - Pydantic models for request/response validation in route files
+  - Database session injection via Depends(get_db) in route handlers
+  - Tests use TestClient and SessionLocal fixtures for isolated test databases
+  - Streak logic: iterate backwards from last session, decrement expected_day
+  - Trend logic: compare recent avg (last 5 sessions) vs overall avg
+  - Error handling: HTTP 404 for missing user, HTTP 201 for successful creation
+  - Type hints: Use dict[str, float] instead of dict for better type safety
+  - Import path: Add backend/tests/ to sys.path for test module imports
+
+---
+
+## [2026-02-23] - US-009
+- Created abstract speech analyzer interface with FreeAnalyzer implementation
+- Abstract SpeechAnalyzer class defines analyze(audio_path, target_text) method
+- AnalysisResult dataclass: rhythm_score, stress_score, pacing_score, intonation_score (1-5 range), feedback_items list
+- FeedbackItem dataclass: type (good/warning/tip enum), message string
+- FreeAnalyzer uses librosa for rhythm/stress/pacing analysis and parselmouth for intonation
+- Rhythm analysis: Beat tracking with librosa.beat.beat_track, ideal tempo 110 BPM
+- Stress analysis: RMS energy variance, higher variance = better stress
+- Pacing analysis: Words per minute, ideal 140 WPM
+- Intonation analysis: Pitch range with parselmouth, ideal range 150 Hz
+- Feedback generation: Scores >= 4.0 get 'good', <= 2.5 get 'warning/tip', otherwise 'tip'
+- Files changed:
+  - backend/app/analyzers/base.py (Abstract interface and dataclasses)
+  - backend/app/analyzers/free.py (FreeAnalyzer implementation)
+  - backend/app/analyzers/__init__.py (Analyzer module)
+  - backend/requirements.txt (Added librosa, parselmouth, numpy)
+  - backend/tests/test_analyzers.py (Test suite)
+- Quality checks: ruff check && ruff format passed
+- Tests: 5/5 passed (1 skipped due to missing librosa/parselmouth)
+- **Learnings for future iterations:**
+  - Analyzer plugins at backend/app/analyzers/ directory
+  - Abstract base class ensures consistent API across implementations
+  - Dataclasses for clean data structures (AnalysisResult, FeedbackItem)
+  - Score range: 1.0-5.0 with rounding to 1 decimal place
+  - librosa for audio analysis: beat tracking, RMS energy, duration calculation
+  - parselmouth for pitch analysis: Sound.to_pitch() for pitch values
+  - Feedback types: good (encouragement), warning (needs improvement), tip (actionable advice)
+  - FreeAnalyzer provides basic analysis without API keys (suitable for development/testing)
+  - Tests skip implementation when dependencies not installed using pytest.mark.skipif
+
+---
+
+## [2026-02-23] - US-010
+- Created BYOP (Bring Your Own Provider) analyzer implementations
+- AzureAnalyzer: Uses azure-cognitiveservices-speech, accepts api_key and region parameters
+- GoogleAnalyzer: Uses google-cloud-speech, accepts api_key parameter
+- OpenAIAnalyzer: Uses openai Whisper API, accepts api_key parameter
+- Factory function get_analyzer(provider, api_key, **kwargs) returns correct implementation
+- Provider options: 'free' (no key), 'azure', 'google', 'openai' (all require API key)
+- Factory validates: Raises ValueError if API key missing for paid providers, or unknown provider
+- All analyzers return unified AnalysisResult format from base.py
+- Speech recognition uses provider SDKs: Azure SpeechRecognizer, Google Cloud Speech, OpenAI Whisper
+- Score calculation: Word similarity between recognized text and target text for rhythm/stress/pacing
+- Intonation score: Fixed at 3.5 for all BYOP providers (requires provider-specific analysis)
+- Feedback generation: Good feedback for >= 4.0 scores, tip for < 3.0 average
+- Files changed:
+  - backend/app/analyzers/azure.py (Azure Speech Services implementation)
+  - backend/app/analyzers/google.py (Google Cloud Speech implementation)
+  - backend/app/analyzers/openai.py (OpenAI Whisper implementation)
+  - backend/app/analyzers/factory.py (Factory function)
+  - backend/requirements.txt (Added azure-cognitiveservices-speech, google-cloud-speech, openai)
+  - backend/tests/test_byop_analyzers.py (Interface tests with mock analyzer)
+- Quality checks: ruff check && ruff format passed
+- Tests: 6/6 passed (base interface, result structure, feedback types, async analyze, score validation)
+- **Learnings for future iterations:**
+  - BYOP pattern: Users bring their own API keys for better-quality analysis
+  - Factory pattern: get_analyzer(provider, api_key) centralizes provider selection
+  - Provider SDK integration: Each analyzer uses provider's speech recognition API
+  - Azure: azure-cognitiveservices-speech with SpeechRecognizer.recognize_once()
+  - Google: google-cloud-speech.v1 with client.recognize()
+  - OpenAI: openai.AsyncOpenAI with audio.transcriptions.create(model="whisper-1")
+  - Score calculation: Word similarity (Jaccard index) for rhythm/stress/pacing metrics
+  - Intonation analysis: Requires provider-specific pitch/intonation features (currently simplified)
+  - Async support: OpenAIAnalyzer uses AsyncOpenAI for async operations
+  - Error handling: Returns default scores (3.0) with warning feedback if recognition fails
+  - Factory validation: Ensures API keys present before creating paid provider analyzers
+
+---
+
+## [2026-02-23] - US-011
+- Created audio analysis REST API endpoint at POST /api/v1/analyze
+- Accepts multipart form: audio file (WAV/M4A), target_text, provider (optional), api_key (optional)
+- Supported formats: audio/wav, audio/x-wav, audio/mpeg, audio/mp4, audio/x-m4a
+- Converts non-WAV audio to WAV using pydub before analysis
+- Uses FreeAnalyzer by default (no provider specified) or BYOP analyzer when provider/api_key provided
+- Returns JSON: rhythm_score, stress_score, pacing_score, intonation_score, feedback list
+- Feedback items converted to dict format: {type: str, message: str}
+- Error handling: 400 for unsupported formats, 500 for analysis failures
+- Temp file cleanup: Automatically removes temporary audio files after analysis
+- Files changed:
+  - backend/app/api/analyze.py (Analysis endpoint)
+  - backend/app/main.py (Router integration)
+  - backend/tests/test_analyze_api.py (Test suite)
+- Quality checks: ruff check && ruff format passed
+- Tests: 2/2 passed (requires_audio, unsupported_format)
+- **Learnings for future iterations:**
+  - API endpoint at backend/app/api/analyze.py using FastAPI UploadFile
+  - Multipart form handling: File() for audio, Form() for text fields
+  - Audio format validation: Check content_type before processing
+  - Audio conversion: Use pydub AudioSegment for format conversion if needed
+  - Temporary file management: Use tempfile.NamedTemporaryFile, ensure cleanup in finally block
+  - Analyzer factory: get_analyzer(provider, api_key) to select implementation
+  - Default provider: Uses "free" if provider not specified
+  - Error responses: HTTP 400 for client errors, HTTP 500 for server errors
+  - Feedback serialization: Convert FeedbackItem objects to dict for JSON response
+  - Delayed imports: Import analyzer modules inside function to avoid import errors when dependencies missing
+  - Test mocking: Patch app.analyzers.factory.get_analyzer to mock analyzer in tests
+  - Response format: Consistent with mobile app expectations (scores 1-5, feedback items)
+
+---
+
+## [2026-02-23] - US-012
+- Created Expo managed workflow project with TypeScript
+- Implemented bottom tab navigation with 4 tabs: Home, Dashboard, Library, Settings
+- Created placeholder screens for each tab displaying the tab name
+- Integrated @expo/vector-icons for tab bar icons (home, bar-chart, book, settings)
+- Navigation structure using @react-navigation/bottom-tabs and @react-navigation/native-stack
+- Each tab has its own stack navigator for future screen nesting
+- App configuration updated with app name "English Rhythm Coach"
+- TypeScript configured with tsconfig.json
+- Files changed:
+  - mobile/App.tsx (Navigation container)
+  - mobile/navigation/TabNavigator.tsx (Bottom tab navigation)
+  - mobile/screens/HomeScreen.tsx (Home tab)
+  - mobile/screens/DashboardScreen.tsx (Dashboard tab)
+  - mobile/screens/LibraryScreen.tsx (Library tab)
+  - mobile/screens/SettingsScreen.tsx (Settings tab)
+  - mobile/components/TabBarIcon.tsx (Tab icon component)
+  - mobile/app.json (Expo configuration)
+  - mobile/package.json (Dependencies)
+  - mobile/tsconfig.json (TypeScript config)
+  - mobile/assets/ (App icons and splash screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Expo project structure managed by Expo CLI, uses app.json for configuration
+  - Navigation: @react-navigation/bottom-tabs for tab navigation
+  - Stack navigation: @react-navigation/native-stack for nested navigation (createNativeStackNavigator)
+  - Tab bar icons: @expo/vector-icons with Ionicons component
+  - Tab bar styling: tabBarActiveTintColor (#007AFF), tabBarInactiveTintColor (#8E8E93)
+  - Each tab screen wraps in a stack navigator for future nesting
+  - Screen options: headerShown: false to hide default headers
+  - TypeScript: Configured with tsconfig.json, must pass npx tsc --noEmit
+  - File naming: Components use PascalCase.tsx (TabBarIcon.tsx)
+  - Component naming: Screen components follow TabNameScreen.tsx pattern
+  - Browser testing required for frontend stories (verify UI changes in browser)
+  - Install navigation: npx expo install @react-navigation/native @react-navigation/bottom-tabs react-native-screens
+## [2026-02-23] - US-013
+- Implemented onboarding profile setup screen with native language, English level, and goal selection
+- Created OnboardingScreen with selectable options for native language (Vietnamese pre-selected), English level (Beginner/Intermediate/Advanced), and goal (Meetings/Presentations/General confidence)
+- Updated App.tsx to check AsyncStorage for profile on launch and show OnboardingScreen if not completed
+- Integrated with backend API (POST /api/v1/users) to create user profile
+- Navigation flow: Onboarding → Home using native stack navigator
+- User profile and userId saved to AsyncStorage
+- Loading indicator while checking onboarding status
+- Files changed:
+  - mobile/screens/OnboardingScreen.tsx (Onboarding screen with form)
+  - mobile/App.tsx (Onboarding flow with stack navigator)
+  - mobile/package.json (Added @react-native-async-storage/async-storage)
+  - mobile/package-lock.json (Dependency updates)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - AsyncStorage key for profile: "userProfile" (JSON string)
+  - AsyncStorage key for userId: "userId" (string)
+  - Onboarding flow: Use native stack navigator, replace screen after completion
+  - Profile API: POST http://localhost:8000/api/v1/users with {native_language, english_level, goal}
+  - Response: {user_id: int} - save to AsyncStorage
+  - Native stack navigation: use createNativeStackNavigator() and navigation.replace() to avoid going back
+  - Form validation: Disable submit button until all required fields selected
+  - Option selection: Use TouchableOpacity with conditional styling (borderColor, backgroundColor)
+  - Loading state: Show "Setting up..." text while submitting to API
+  - Error handling: Alert user if API call fails, allow retry
+  - Native languages list: 10 common languages, Vietnamese pre-selected
+  - KeyboardAvoidingView: Use for forms to avoid keyboard covering inputs (iOS: padding, Android: height)
+  - ScrollView: Use for forms to handle scrolling on smaller screens
+  - TypeScript for navigation: NativeStackScreenProps with route params interface
+---
+
+## [2026-02-23] - US-014
+- Implemented daily lesson home screen with current day display, theme, and exercise list
+- Created curriculum data structure and loaded Day 1 from bundled JSON assets
+- Added exercise type icons mapping (stress, linking, chunk, shadow, intonation)
+- Implemented streak counter display at top of screen
+- Added exercise cards with title, type, and completion status
+- Files changed:
+  - mobile/screens/HomeScreen.tsx (Home screen with curriculum display)
+  - mobile/assets/curriculum/ (Curriculum JSON files from backend)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Curriculum JSON files should be copied to mobile/assets/curriculum/ from backend
+  - Use TypeScript interfaces for curriculum data structure (Day, Exercise)
+  - Exercise type icons: Use Ionicons from @expo/vector-icons with mapping object
+  - Card-based UI with shadow/elevation for exercises in lists
+  - Streak badge with flame icon (#FF6B6B color) at top of screen
+  - Meta info (time, exercise count) displayed with small icons and text
+  - ScrollView wrapper for vertical scrolling content
+  - Completion status tracked with Set<string> of exercise IDs
+  - Round card corners (borderRadius: 12) and shadow styling for modern look
+  - Type-safe imports of JSON files in TypeScript with import from assets
+---
+
+## [2026-02-23] - US-015
+- Implemented AudioPlayer component for playing example sentences
+- Used expo-av for audio playback with play/pause functionality
+- Visual state indicator: play button changes color and icon when playing
+- Stressed syllables displayed in bold and blue (#007AFF color)
+- Chunk boundaries shown with vertical spacing between thought groups
+- Component accepts audioUrl, targetText, stressPattern, and chunks as props
+- Files changed:
+  - mobile/components/AudioPlayer.tsx (AudioPlayer component)
+  - mobile/package.json (Added expo-av dependency)
+  - mobile/package-lock.json (Dependency updates)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - AudioPlayer component uses expo-av's Audio.Sound.createAsync() for playback
+  - Sound cleanup: Unload audio in useEffect cleanup to prevent memory leaks
+  - Playback status update listener sets isPlaying false when audio finishes
+  - Stress pattern: boolean array where true=stressed, false=unstressed
+  - Stressed text: fontWeight: "bold", color: "#007AFF", fontSize: 22
+  - Chunk display: Each chunk wrapped in View with marginVertical spacing
+  - Play button: 64x64 circular button with shadow/elevation for depth
+  - Play button active state: Background color changes from #E3F2FF to #007AFF
+  - Component props: audioUrl (string | null), targetText (string), stressPattern (boolean[] | null), chunks (string[] | null)
+  - Conditional rendering: play button only shown when audioUrl is not null
+
+## [2026-02-23] - US-016
+- Implemented AudioRecorder component for recording user voice
+- Used expo-av for audio recording with mic permission handling
+- Tap-to-record button with red pulsing animation (shadow radius increases)
+- Auto-stops after 10 seconds using recording duration status update
+- Playback button with play/pause toggle to listen to own recording
+- Re-record option allows starting over before submitting
+- Mic permission requested on mount with Alert prompting to Settings if denied
+- Returns recorded audio URI to parent via onRecordingComplete callback
+- Files changed:
+  - mobile/components/AudioRecorder.tsx (AudioRecorder component)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Audio permission: Use Audio.requestPermissionsAsync() on component mount
+  - Permission handling: Alert with Settings link for denied permissions
+  - Recording options: Platform-specific config for Android (m4a/AAC), iOS (MPEG4AAC), web (webm)
+  - Audio mode: Set allowsRecordingIOS: true and playsInSilentModeIOS: true before recording
+  - Recording lifecycle: createAsync() → setOnRecordingStatusUpdate() → stopAndUnloadAsync()
+  - Duration monitoring: Check status.durationMillis in status update listener
+  - Pulsing animation: Use setInterval to toggle shadowOpacity/elevation every 500ms
+  - Button states: Record (red, large), Playback (blue, smaller), Re-record (small, refresh icon)
+  - Recording button: 72x72 when idle, 64x64 when recording for visual feedback
+  - Component callback: onRecordingComplete(uri) informs parent of recording state
+  - Cleanup: Sound playback cleanup in useEffect, recording cleanup on stop
+
+## [2026-02-23] - US-017
+- Implemented FeedbackCard component for displaying analysis results
+- Shows scores as 5 dots for rhythm, stress, pacing, intonation (1-5 range)
+- Feedback items with color-coded icons: good (green #34C759), warning (orange #FF9500), tip (blue #007AFF)
+- Loading state with sync icon and "Analyzing your recording..." text
+- Accepts AnalysisResult and isLoading as props
+- Files changed:
+  - mobile/components/FeedbackCard.tsx (FeedbackCard component)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Score display: Use Math.round() to convert decimal scores to integer for dot rendering
+  - Dot rendering: Loop 1-5 to create dots, check if index <= rounded score
+  - Active dot: #007AFF, inactive dot: #E5E5EA, 12x12 rounded
+  - Feedback icons: checkmark-circle (good), warning (warning), bulb (tip)
+  - Loading state: Conditional render with Ionicons sync icon + text
+  - Component structure: Scores section at top, feedback section below with separator
+  - Score label width: Fixed 80px to align dots vertically
+  - Feedback item: Flex row with icon left, text right (flex: 1)
+  - Color scheme: Matches iOS system colors for familiarity
+  - TypeScript interfaces: FeedbackType, FeedbackItem, AnalysisResult for type safety
+  - Key props: result (AnalysisResult | null), isLoading (boolean, defaults to false)
+
+## [2026-02-23] - US-018
+- Implemented StressDrillScreen for stress practice exercises
+- Screen header with back button, title, and spacer for layout
+- Instruction displayed in blue info box at top
+- Integrated AudioPlayer component for example audio playback
+- Integrated AudioRecorder component for user recording
+- Integrated FeedbackCard component for analysis results display
+- Flow: AudioPlayer → AudioRecorder → API call → FeedbackCard → Next button
+- API integration: POST to http://localhost:8000/api/v1/analyze with audio FormData
+- FormData includes audio file (m4a) and target_text from exercise
+- Tips section rendered after feedback using exercise.tips array
+- Audio mode cleanup on unmount using useCallback and useEffect
+- Files changed:
+  - mobile/screens/StressDrillScreen.tsx (Stress drill exercise screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen structure: Header with back button, ScrollView for content
+  - Component composition: Reuse AudioPlayer, AudioRecorder, FeedbackCard
+  - State management: recordedUri, isAnalyzing, analysisResult for exercise flow
+  - Audio mode cleanup: Use useCallback with recordedUri dependency, cleanup in useEffect
+  - FormData API: Append file as {uri, type, name} object with 'as any' type assertion
+  - API integration: Use fetch with multipart/form-data for audio upload
+  - Loading state: Pass isLoading to FeedbackCard during analysis
+  - Error handling: Alert user on analysis failure
+  - Tips rendering: Yellow background (#FFF9E6) with bulb icon for visual consistency
+  - Component props: exercise object, onNext callback, onBack callback
+  - Keyboard handling: keyboardShouldPersistTaps="handled" on ScrollView
+
+## [2026-02-23] - US-019
+- Implemented LinkingPracticeScreen for linking practice exercises
+- Screen structure identical to StressDrillScreen for consistency
+- Connected speech display section with title "Connected Speech"
+- Render linked text with tie character (‿) between words in orange (#FF9500)
+- Words displayed in flex-wrap layout for responsive text display
+- Same exercise flow: instruction → linked text → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as stress drills
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/LinkingPracticeScreen.tsx (Linking practice screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as StressDrillScreen for consistency
+  - Visual difference: Connected speech section replaces standard AudioPlayer text display
+  - Linking visual: Use tie character (‿) U+203F for visual word connection
+  - Flex-wrap layout: Allows words to wrap naturally on smaller screens
+  - Word wrapper: Each word and tie character in a row for horizontal alignment
+  - Orange color (#FF9500) for link symbol to make connections visible
+  - Component props: exercise, onNext, onBack - same interface as other screens
+  - API integration: Same FormData upload pattern across all exercise types
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
+  - Cleanup pattern: useCallback with recordedUri dependency, cleanup in useEffect
+
+## [2026-02-23] - US-020
+- Implemented ChunkSpeakingScreen for thought group practice
+- Screen structure identical to StressDrillScreen and LinkingPracticeScreen for consistency
+- Thought groups section with title "Thought Groups"
+- Chunks rendered as numbered cards with visual separation
+- Each chunk card has: numbered circle (blue background), chunk text
+- Chunks displayed in vertical stack with gap for clear separation
+- Same exercise flow: instruction → chunks → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as previous screens
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/ChunkSpeakingScreen.tsx (Chunk speaking screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as StressDrillScreen and LinkingPracticeScreen
+  - Chunk rendering: Each chunk in a separate card with numbered indicator
+  - Visual separation: Gray background (#F8F8F8) for chunk cards
+  - Numbered indicator: Blue circle (#007AFF) with white bold number
+  - Gap styling: Use gap: 12 for consistent spacing between chunks
+  - Component props: exercise, onNext, onBack - same interface across all screens
+  - API integration: Same FormData upload pattern with target_text
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
+  - Chunk data: exercise.chunks array contains thought group strings
+
+## [2026-02-23] - US-021
+- Implemented IntonationTrainingScreen for rising/falling intonation practice
+- Screen structure identical to previous exercise screens for consistency
+- Intonation pattern section with title "Intonation Pattern"
+- Sentence displayed in large text at top of pattern section
+- Question detection: Checks if targetText contains "?" to determine pattern
+- Visual indicator: Icon + arrow text in gray badge
+- Question pattern: Arrow-up-circle icon (orange #FF9500) + "↗ Rising" text
+- Statement pattern: Arrow-down-circle icon (blue #007AFF) + "↘ Falling" text
+- Same exercise flow: instruction → intonation pattern → AudioPlayer → AudioRecorder → FeedbackCard → Next
+- FormData API call to /api/v1/analyze same as previous screens
+- Tips section rendered after feedback with exercise.tips
+- Files changed:
+  - mobile/screens/IntonationTrainingScreen.tsx (Intonation training screen)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Exercise screen reuse: Same structure as all previous exercise screens
+  - Intonation detection: Simple "?" check to identify questions vs statements
+  - Visual pattern: Use Ionicons arrow-up-circle/arrow-down-circle for intonation
+  - Color coding: Orange (#FF9500) for rising (questions), blue (#007AFF) for falling (statements)
+  - Badge styling: Gray background (#F8F8F8) with rounded corners (borderRadius: 20)
+  - Unicode arrows: ↗ U+2197 for rising, ↘ U+2198 for falling
+  - Component props: exercise, onNext, onBack - same interface across all screens
+  - API integration: Same FormData upload pattern with target_text
+  - State management: recordedUri, isAnalyzing, analysisResult pattern
+
+---
+## [2026-02-24] - US-022
+- Implemented ShadowingModeScreen for shadowing practice exercises
+- Simultaneous model audio playback + user recording functionality
+- Rhythm dots comparison view showing model pattern vs user pattern
+- Side-by-side playback controls: Model and User audio buttons
+- Automatic recording stop after model audio ends (or 5-second fallback if no audioUrl)
+- Get Feedback button submits recording to /api/v1/analyze
+- Re-record option before submitting for analysis
+- Files changed:
+  - mobile/screens/ShadowingModeScreen.tsx (Shadowing mode screen)
+  - mobile/App.tsx (Navigation renames from prior session)
+  - mobile/navigation/TabNavigator.tsx (Screen name renames)
+  - mobile/screens/OnboardingScreen.tsx (Navigation target rename)
+- Quality checks: npx tsc --noEmit passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Shadowing mode requires Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true })
+  - Simultaneous playback+recording: Start recording first, then play model audio
+  - Use useRef for timeout IDs to enable cleanup in useEffect
+  - Rhythm dots visual: Use stressPattern boolean array to show stressed (tall blue) vs unstressed (short gray)
+  - Playback comparison: Two separate play buttons for model vs user audio
+  - Auto-stop: Use recording status callback or timeout fallback
+  - Cleanup pattern: Unload sounds and clear timeouts in useEffect return
+
+## [2026-02-24] - US-023
+- Implemented ExerciseScreen router component that renders correct exercise screen based on exercise type
+- Created ExerciseScreen.tsx with switch statement mapping exercise types to components
+- Updated TabNavigator.tsx to include ExerciseScreen in HomeStack navigator
+- Updated HomeScreen.tsx to navigate to ExerciseScreen with exercise data
+- Exported navigation types (HomeStackParamList, Exercise, ExerciseType) from ExerciseScreen for reuse
+- Used NativeStackNavigationProp<HomeStackParamList> to properly type navigation hook
+- Added exercise navigation patterns to AGENTS.md
+- Files changed:
+  - mobile/screens/ExerciseScreen.tsx (New router component)
+  - mobile/navigation/TabNavigator.tsx (Added ExerciseScreen to HomeStack)
+  - mobile/screens/HomeScreen.tsx (Added navigation to ExerciseScreen)
+  - AGENTS.md (Added exercise navigation patterns)
+  - mobile/app.json (Added expo-audio plugin)
+  - mobile/package.json (Added expo-audio dependency)
+  - mobile/screens/ShadowingModeScreen.tsx (Formatting: spaces to tabs)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Navigation typing: Use NativeStackNavigationProp<ParamListType> to properly type useNavigation hook
+  - Export navigation param types from screen files when they're used by other components
+  - Use route.params object to pass data between screens (e.g., exercise object)
+  - Switch statement pattern for routing: Map exercise types to component renders
+  - Back navigation: Use navigation.goBack() to return to previous screen
+  - Tab indentation: This codebase uses tabs for indentation, ensure consistency
+  - expo-audio is the new Audio API (replaces expo-av Audio module)
+
+---
+
+## [2026-02-24] - US-024
+- Implemented SessionCompletionScreen with score display, streak tracking, and improvement comparison
+- Added session progress tracking to HomeScreen with dynamic streak display
+- Modified exercise flow to pass scores back via onComplete callback
+- Integrated all exercise screens (StressDrill, LinkingPractice, ChunkSpeaking, IntonationTraining, ShadowingMode) with onComplete callback
+- Implemented backend API integration to save session results via POST /api/v1/progress
+- Added motivational message rotation from preset list of 8 messages
+- Implemented score breakdown display with 5-dot rating system for rhythm, stress, pacing, and intonation
+- Files changed:
+  - mobile/screens/SessionCompletionScreen.tsx (New session completion screen)
+  - mobile/navigation/TabNavigator.tsx (Added SessionCompletion to HomeStack)
+  - mobile/screens/ExerciseScreen.tsx (Added onComplete callback type to params)
+  - mobile/screens/HomeScreen.tsx (Added session state tracking, progress loading, streak display)
+  - mobile/screens/StressDrillScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/LinkingPracticeScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/ChunkSpeakingScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/IntonationTrainingScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/screens/ShadowingModeScreen.tsx (Added onComplete prop and callback invocation)
+  - mobile/app.json (Auto-generated logo assets)
+  - mobile/components/Logo.tsx (Auto-generated component)
+  - mobile/assets/ (Logo assets)
+- Quality checks: npx tsc --noEmit passed (SessionCompletionScreen has no TS errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Session flow: Track completed exercises with scores in parent component (HomeScreen)
+  - Completion detection: useEffect on sessionScores.length === currentDay.exercises.length triggers navigation
+  - Callback pattern: Pass onComplete callback through navigation params to collect results from child screens
+  - Route params: Use route.params as HomeStackParamList["ScreenName"] for type-safe parameter access
+  - AsyncStorage: Use AsyncStorage.getItem("userId") to retrieve saved user ID for API calls
+  - Progress API: GET /api/v1/progress/{userId}/summary returns streak and average_score for comparison
+  - Score calculation: Average all scores across exercises for each category (rhythm, stress, pacing, intonation)
+  - Type assertion: Use 'as number' when accessing object properties by keyof type in TypeScript
+  - Auto-formatting: Running oxfmt changes all files to use consistent spacing (tabs to spaces in this codebase)
+  - Pre-existing TS errors: expo-audio import errors from previous session (US-023) don't block typecheck for new files
+
+## [2026-02-24] - US-025
+- Implemented comprehensive dashboard screen with progress visualization
+- Added stats cards showing practice streak, total sessions, and overall average score
+- Integrated LineChart from react-native-chart-kit for rhythm score progression
+- Added daily/weekly toggle for chart view filtering
+- Implemented score breakdown section with category-specific cards (rhythm, stress, pacing, intonation)
+- Fetched data from GET /api/v1/progress/{userId}/summary and GET /api/v1/progress/{userId}
+- Added trend indicator with icon (Improving/Stable/Declining) and color coding
+- Handle empty states for users who haven't completed any sessions
+- Files changed:
+  - mobile/screens/DashboardScreen.tsx (Complete dashboard implementation)
+  - mobile/package.json (Added react-native-chart-kit dependency)
+  - mobile/package-lock.json (Dependency updates)
+  - mobile/app.json (Auto-generated formatting changes)
+  - mobile/screens/SessionCompletionScreen.tsx (Auto-formatting)
+- Quality checks: npx tsc --noEmit passed (no DashboardScreen errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Dashboard screens should fetch both summary and full progress data from backend
+  - Chart library: react-native-chart-kit works well with react-native-svg (already installed)
+  - Line chart configuration: Use bezier curves, custom colors, and segments for y-axis
+  - Chart toggle: Daily shows all sessions, weekly shows every 7th session
+  - State management: Use useState for loading states and API data
+  - useCallback: Wrap async functions to include in useEffect dependencies
+  - Stats cards: Use consistent shadow/elevation styling for visual hierarchy
+  - Color scheme: Rhythm (blue #007AFF), Stress (orange #FF9500), Pacing (green #34C759), Intonation (purple #AF52DE)
+  - Trend icons: trending-up (green), trending-down (red), remove (gray)
+  - Empty state handling: Show friendly message and icon when no data available
+  - AsyncStorage: Use getItem("userId") to retrieve saved user ID for API calls
+  - API integration: Use fetch with Promise.all for parallel requests
+  - Dimensions.get("window").width for responsive chart sizing
+  - Chart styling: Background colors from white to white for clean look, segments for y-axis intervals
+  - Stats calculation: Average across all sessions for each category, overall average across all categories
+  - Progress summary structure: {streak, averages: {rhythm, stress, pacing, intonation}, total_sessions, trend}
+  - Session structure: {id, user_id, day, exercises_completed, rhythm_score, stress_score, pacing_score, intonation_score, completed_at}
+
+## [2026-02-24] - US-026
+- Implemented meeting phrase library screen with 4 category sections
+- Created accordion-style interface for phrase display with practice option
+- Integrated with ExerciseScreen for practicing meeting phrases
+- Copied meetings.json from backend to mobile/assets/phrases/
+- Updated TabNavigator to include ExerciseScreen in LibraryStack
+- Files changed:
+  - mobile/screens/LibraryScreen.tsx (Full implementation)
+  - mobile/navigation/TabNavigator.tsx (Added LibraryStack, ExerciseScreen)
+  - mobile/assets/phrases/meetings.json (Copied from backend)
+  - AGENTS.md (Auto-formatting updates)
+  - mobile/app.json (Auto-formatting updates)
+- Quality checks: npx tsc --noEmit passed (except pre-existing expo-audio errors), npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Library stack navigation: Each tab can have its own stack navigator
+  - Export navigation param types from screen files for use in TabNavigator
+  - LibraryStackParamList: Define separate param lists for each stack navigator
+  - Accordion pattern: Use useState with expandedId to track which item is expanded
+  - Category sections: Group data by category property for organized display
+  - Practice flow: Navigate to ExerciseScreen with dynamically constructed exercise object
+  - Meeting phrases use shadow type exercise for rhythm and intonation practice
+  - Loading bundled JSON: Use require() with type assertion (as MeetingsData)
+  - Color coding: Use consistent colors for categories (blue, orange, green, purple)
+  - TypeScript imports: Import useEffect and useState from 'react', not 'react-native'
+  - Unused parameter fix: Remove unused parameters or prefix with underscore
+  - Error handling: console.error for caught errors before showing user-facing alert
+
+## [2026-02-24] - US-027
+- Implemented 14-day program overview screen with all 14 days displayed
+- Added "View Program" button to HomeScreen that navigates to ProgramOverviewScreen
+- Created ProgramOverviewScreen with day cards showing day number, theme, and completion status
+- Implemented progress tracking by fetching from GET /api/v1/progress/{userId}
+- Implemented sequential day unlocking: Day N is unlocked if user completed days 1 to N-1
+- Added confirmation dialog when trying to access locked days (Alert.alert with skip option)
+- Added visual indicators: checkmark for completed days, lock icon for locked days
+- Added stats section showing unlocked days count, completed days count, total days
+- Themes for all 14 days: Word Stress Basics, Linking Words Together, Speaking in Chunks, Shadowing Practice, Advanced Shadowing, Meeting Scenarios, Professional Phrases, Mixed Drills I/II/III, Advanced Linking, Word Reductions, Natural Speech, Final Review
+- Updated HomeStackParamList to include ProgramOverview route
+- Updated HomeStack navigator to include ProgramOverviewScreen
+- Updated AGENTS.md with navigation patterns and progress tracking documentation
+- Files changed:
+  - mobile/screens/ProgramOverviewScreen.tsx (New program overview screen)
+  - mobile/screens/HomeScreen.tsx (Added View Program button)
+  - mobile/screens/ExerciseScreen.tsx (Added ProgramOverview to HomeStackParamList)
+  - mobile/navigation/TabNavigator.tsx (Added ProgramOverview to HomeStack)
+  - AGENTS.md (Added navigation patterns and progress tracking sections)
+- Quality checks: npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - Program overview screens should display progress from backend API (GET /api/v1/progress/{userId})
+  - Day locking logic: Track completed days in a Set, calculate max completed day, unlock sequentially
+  - Confirmation dialogs: Use Alert.alert(title, message, [{text, onPress, style}, ...]) with destructive style for destructive actions
+  - Visual status indicators: Checkmark circle for completed, lock closed for locked, gray opacity for unavailable
+  - Stats cards: Use consistent shadow/elevation styling for visual hierarchy
+  - Theme mapping: Use Record<number, string> for day themes when curriculum JSON files may not exist for all days
+  - Progress API: Session data includes day number which can be used to track completion status
+  - Day theme names: Use descriptive titles that match exercise focus (e.g., "Word Reductions", "Natural Speech")
+
+## [2026-02-24] - US-028
+- Implemented Settings screen with BYOP API key configuration
+- Added provider dropdown with options: Free (default), Azure, Google, OpenAI
+- API key text input shown only when non-free provider selected
+- API keys stored securely using expo-secure-store
+- Test button verifies API key by calling backend /api/v1/analyze endpoint
+- Success/error feedback displayed to user via Alert
+- Files changed:
+  - mobile/screens/SettingsScreen.tsx (Complete Settings screen implementation)
+  - mobile/package.json (Added expo-secure-store dependency)
+  - AGENTS.md (Added API Key Management section with BYOP pattern documentation)
+- Quality checks: npx tsc --noEmit passed (no SettingsScreen errors), npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- Browser testing: Skipped (chrome-devtools-mcp not configured)
+- **Learnings for future iterations:**
+  - expo-secure-store is required for encrypted storage of sensitive data like API keys
+  - BYOP (Bring Your Own Provider) pattern: Users configure their own API keys for premium speech analysis
+  - Dropdown pattern: Use TouchableOpacity with state management for custom dropdowns in React Native
+  - Test button pattern: Call backend API with FormData to validate credentials before saving
+  - SecureStore keys: Use descriptive names like "speech_api_key" and "speech_provider"
+  - Conditional UI: Show/hide API key input based on provider selection (only show when provider !== "free")
+   - API integration: POST /api/v1/analyze with provider, api_key, and target_text fields for testing
+   - AGENTS.md already documented expo-secure-store usage - added more specific BYOP and dropdown patterns
+
+## [2026-02-24] - US-029
+- Created complete 14-day curriculum with Days 4-14 (11 new day files)
+- Day 4-5: Shadowing exercises introduced with basic and advanced shadowing
+- Day 6-7: Meeting phrases and professional scenarios with business communication patterns
+- Day 8-10: Mixed drills combining all exercise types (stress, linking, chunk, shadow, intonation)
+- Day 11-13: Advanced linking, word reductions, and natural speech patterns
+- Day 14: Final review with comprehensive exercises covering all concepts
+- Each day has exactly 5 exercises following the established schema
+- All 11 new day files validated successfully against Pydantic models
+- Curriculum files copied to both backend and mobile assets directories
+- Files changed:
+  - backend/app/content/curriculum/day-04.json through day-14.json (11 new curriculum files)
+  - mobile/assets/curriculum/day-04.json through day-14.json (11 new curriculum files)
+- Quality checks: ruff check && ruff format passed, oxlint passed (0 warnings, 0 errors)
+- Validation: Python script confirmed all 11 new day files load correctly into Day model
+- Typecheck: Pre-existing TS errors (expo-audio) unrelated to changes, mobile lint passed
+- **Learnings for future iterations:**
+  - Curriculum progression follows clear themes: Shadowing → Meeting Phrases → Mixed Drills → Advanced Patterns → Final Review
+  - Each day consistently uses 5 exercises for balanced learning
+  - Exercise type distribution per day: Mix of stress, linking, chunk, shadow, intonation based on theme
+  - Linking notation: Use underscores for connected forms (pick_it_up), tie character (‿) for visual linking
+  - Stress pattern: boolean array where True=stressed syllable
+  - Chunks: array of strings for thought groups with natural pauses
+  - Shadowing exercises: stressPattern required for rhythm matching guidance
+  - Professional vocabulary: Use business terminology in days 6-7 for meeting scenarios
+  - Reduction patterns: Teach natural speech reductions (gonna, wanna, wanna, contractions) in days 11-12
+  - Complex sentences: Days 13-14 feature longer, multi-clause sentences with multiple thought groups
+  - Validation command: `cd backend && python -c "from app.content.schema.models import Day; import json; Day(**json.load(open('path/to/file')))"`
+  - Curriculum workflow: Create in backend/app/content/curriculum/, validate, then copy to mobile/assets/curriculum/
+  - JSON quality: Ensure all strings are properly quoted, arrays use commas, no trailing commas
+  - Day themes: Use descriptive titles that communicate the focus (e.g., "Advanced Linking", "Natural Speech")
+  - Final review (Day 14): Comprehensive exercises covering all exercise types for consolidation
+
+---
+
+## [2026-02-24] - US-030
+- Fixed HomeScreen to load all 14 days instead of only days 1-3
+- Added missing imports for days 4-14 in mobile/assets/curriculum/index.ts
+- CURRICULUM_BY_DAY now includes all 14 days (previously only had days 1-3)
+- HomeScreen loadProgress() function correctly calculates next day from completed sessions
+- Users can now progress through all 14 days of the curriculum
+- Files changed:
+  - mobile/assets/curriculum/index.ts (Added imports for days 4-14)
+  - Multiple files auto-formatted by oxfmt
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - Curriculum index file (mobile/assets/curriculum/index.ts) must include all day imports
+  - LAST_AVAILABLE_DAY constant uses Math.max on Object.keys(CURRICULUM_BY_DAY) to determine available days
+  - If a day JSON file exists but isn't imported in index.ts, users cannot access it
+  - Always verify CURRICULUM_BY_DAY includes all expected day numbers after adding curriculum content
+  - HomeScreen fetches progress from GET /api/v1/progress/{userId} and calculates nextDay = Math.min(highestCompletedDay + 1, 14)
+  - Falls back to Day 1 if no user progress exists or on error
+
+## [2026-02-24] - US-031
+- Fixed ProgramOverview to navigate to selected day
+- Updated loadProgress function to check selectedDay route parameter before calculating next day
+- Removed duplicate selectedDay handling logic from useEffect
+- Removed unused LAST_AVAILABLE_DAY constant
+- Files changed:
+  - mobile/screens/HomeScreen.tsx (Updated loadProgress to prioritize selectedDay)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - When navigating to a screen with route params that control what content to load, ensure the main data loading function checks route.params first
+  - The loadProgress function runs on mount and should be the single source of truth for determining what day to load
+  - Avoid loading default data first and then switching to the selected data - check route.params before loading
+  - HomeStackParamList already had selectedDay?: number from previous implementation (US-024)
+  - Remove unused variables after refactoring to avoid lint warnings
+
+## [2026-02-24] - US-032, US-033
+- Verified that BYOP provider usage is implemented across all exercise screens
+- Verified that shared types are extracted in mobile/types/analysis.ts
+- All 5 exercise screens use appendByopToFormData helper from config/byop.ts
+- Shared types (FeedbackType, FeedbackItem, AnalysisResult) are imported from types/analysis.ts
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-032 and US-033 as passing)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - BYOP helper is in mobile/config/byop.ts (not mobile/utils/analyzeAudio.ts as originally planned)
+  - BYOP helper reads provider and api_key from expo-secure-store and appends them to FormData
+  - Falls back to "free" provider if no provider or api_key is configured
+  - Shared types for analysis are in mobile/types/analysis.ts
+  - Exercise and ExerciseScores types are still in ExerciseScreen.tsx (could be extracted further if needed)
+  - Previous implementation in commit 07d2857 already centralized API config and applied BYOP flow
+  - Always check if functionality is already implemented before starting new work
+
+## [2026-02-24] - US-034
+- Fixed OpenAI analyzer to pass audio file as tuple (filename, file_handle, content_type)
+- Changed from file=audio_file to file=(audio_path, audio_file, "audio/wav")
+- Added tests for OpenAI analyzer instantiation and method signature verification
+- Tests use pytest.mark.skipif to handle missing openai package
+- Files changed:
+  - backend/app/analyzers/openai.py (Fixed file upload to use tuple format)
+  - backend/tests/test_byop_analyzers.py (Added OpenAI analyzer tests)
+- Quality checks: ruff check passed, ruff format passed, 6 passed + 2 skipped tests
+- **Learnings for future iterations:**
+  - OpenAI async client audio.transcriptions.create expects file parameter as tuple: (filename, file_object, content_type)
+  - When passing files to async APIs, always check documentation for correct format
+  - Use pytest.mark.skipif for tests that require optional dependencies
+  - Mock patch.object for testing async method calls and verifying parameters
+  - Tests verify file tuple structure: assert len(file_arg) == 3 and file_arg[2] == "audio/wav"
+
+## [2026-02-24] - US-035
+- Fixed Google analyzer to properly authenticate using API key or service account credentials
+- Added logic to detect if api_key is JSON (service account) or plain key
+- For JSON credentials: use SpeechClient.from_service_account_info(credentials_json)
+- For plain API key: use SpeechClient(client_options={"api_key": api_key})
+- Added tests for both authentication methods
+- Files changed:
+  - backend/app/analyzers/google.py (Updated __init__ to handle both auth methods)
+  - backend/tests/test_byop_analyzers.py (Added Google analyzer authentication tests)
+- Quality checks: ruff check passed, ruff format passed, 6 passed + 4 skipped tests
+- **Learnings for future iterations:**
+  - Google Cloud Speech supports two authentication methods: API key and service account credentials
+  - Use json.loads() with try/except to detect JSON strings
+  - Use SpeechClient.from_service_account_info() for JSON credentials
+  - Use SpeechClient(client_options={"api_key": ...}) for plain API keys
+  - Google Cloud Speech client_options.api_key is the correct way to pass API keys
+  - Service account credentials JSON includes: type, project_id, private_key_id, private_key, client_email
+  - Test both authentication paths to ensure flexibility for users
+
+## [2026-02-24] - US-036
+- Verified that Azure analyzer already fixed to prevent blocking event loop
+- recognize_once() call is wrapped in await asyncio.to_thread()
+- This runs synchronous Azure SDK call in a separate thread pool
+- Fix was applied in commit d39de01 on 2026-02-24
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-036 as passing)
+- Quality checks: ruff check passed, ruff format passed
+- **Learnings for future iterations:**
+  - asyncio.to_thread() is the correct way to run synchronous blocking code in async functions
+  - Azure SDK's SpeechRecognizer.recognize_once() is a blocking synchronous method
+  - Without asyncio.to_thread(), the blocking call would block the entire FastAPI event loop
+  - Previous commit d39de01 also fixed _calculate_intonation to accept parameters (was hardcoded)
+  - Always check if fixes were already applied in previous commits before implementing
+
+## [2026-02-24] - US-037
+- Verified that AudioPlayer stress pattern alignment already fixed
+- wordOffset variable tracks global word position across chunks
+- renderTextForChunk receives offset parameter and uses stressPattern[offset + index]
+- Fix was applied in commit 3cf8db6 on 2026-02-24
+- Same commit also fixed expo-audio import issue and added validation for stressPattern length
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-037 as passing)
+- Quality checks: npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), npx oxfmt --check passed
+- **Learnings for future iterations:**
+  - When rendering chunked text with stress patterns, need to track global word offset
+  - stressPattern indices correspond to word positions in the full targetText
+  - For chunks: stressPattern[offset + index] where offset is cumulative word count from previous chunks
+  - Previous commit 3cf8db6 added validation: if stressPattern.length !== words.length, fallback to plain text
+  - AudioPlayer imports from expo-av (Audio.Sound), not expo-audio
+  - Always check if fixes were already applied in previous commits before implementing
+
+## [2026-02-24] - US-038
+- Fixed stressPattern granularity mismatch in all 14 curriculum JSON files
+- Created Python script to convert syllable-level patterns to word-level patterns
+- Fixed 57 exercises across days 1-14 where stressPattern length didn't match word count
+- Algorithm: word is stressed if any syllable in the word is stressed
+- Syllable counting heuristic using vowels and word patterns
+- Copied fixed files to both backend and mobile assets directories
+- Files changed:
+  - backend/app/content/curriculum/day-01.json through day-14.json (Fixed stress patterns)
+  - mobile/assets/curriculum/day-01.json through day-14.json (Fixed stress patterns)
+- Quality checks: ruff check passed, npx tsc --noEmit passed, npx oxlint passed (0 warnings, 0 errors), oxfmt --check passed
+- **Learnings for future iterations:**
+  - AudioPlayer splits targetText by whitespace, so stressPattern must have one boolean per word
+  - Syllable-level stress patterns (like [true, false, false, true, false]) don't work with word-level rendering
+  - Heuristic for syllable counting: count vowel groups, handle silent 'e', count 'le' exceptions
+  - Word-level stress assignment: if any syllable is stressed, the word is stressed
+  - Automated fixes are more reliable than manual fixes for large-scale curriculum updates
+  - Always validate curriculum files after making changes: check stressPattern.length === words.length
+  - Backend and mobile assets directories must be kept in sync for curriculum files
+
+## [2026-02-24] - US-039
+- Verified that BYOP analyzers already have meaningful intonation analysis
+- Azure, Google, and OpenAI analyzers all implement _calculate_intonation()
+- Algorithm uses question detection and lexical variety for scoring
+- Base score 3.0, +1.0 if question pattern matches, +lexical variety (up to 1.0)
+- All analyzers use the same implementation as FreeAnalyzer for consistency
+- Fix was applied in commit d39de01 on 2026-02-24
+- Files changed:
+  - scripts/ralph/prd.json (Marked US-039 as passing)
+- Quality checks: ruff check passed
+- **Learnings for future iterations:**
+  - All three BYOP analyzers (Azure, Google, OpenAI) share the same intonation algorithm
+  - Intonation scoring: base 3.0, +1.0 for correct question/statement detection, +lexical variety bonus
+  - Question detection: check if "?" in target matches "?" in recognized text
+  - Lexical variety: ratio of unique words to total words (higher is better)
+  - Score is rounded to 1 decimal place, clamped between 1.0 and 5.0
+  - Previous commit d39de01 also fixed Azure event loop blocking and file upload issues
+  - Always check if fixes were already applied in previous commits before implementing

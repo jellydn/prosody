@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        working-directory: backend
+        run: uv sync --dev --frozen
+
+      - name: Lockfile up-to-date
+        working-directory: backend
+        run: uv lock --check
+
+      - name: Lint
+        working-directory: backend
+        run: uv run ruff check . && uv run ruff format --check .
+
+      - name: Run tests
+        working-directory: backend
+        run: uv run pytest -v
+
+  mobile:
+    name: Mobile Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mobile
+        run: npm install
+
+      - name: TypeScript check
+        working-directory: mobile
+        run: npx tsc --noEmit
+
+      - name: Lint
+        working-directory: mobile
+        run: npx oxlint .
+
+      - name: Format check
+        working-directory: mobile
+        run: npx oxfmt --check .

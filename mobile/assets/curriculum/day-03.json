@@ -1,0 +1,73 @@
+{
+  "day": 3,
+  "theme": "Speaking in Chunks",
+  "exercises": [
+    {
+      "id": "day03-ex01",
+      "type": "chunk",
+      "title": "Longer Thoughts",
+      "instruction": "Divide this long sentence into smaller thought groups. Pause at the slashes.",
+      "targetText": "I think we should review the proposal carefully, and then we can make a decision tomorrow.",
+      "stressPattern": null,
+      "chunks": [
+        "I think we should review the proposal carefully,",
+        "and then we can make a decision tomorrow."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "The first chunk introduces the review process",
+        "The second chunk talks about the decision",
+        "Pause briefly after 'carefully' to separate the thoughts"
+      ]
+    },
+    {
+      "id": "day03-ex02",
+      "type": "chunk",
+      "title": "Complex Instructions",
+      "instruction": "Break these instructions into clear chunks. Each chunk should contain a complete idea.",
+      "targetText": "First, save your work, then close the application, and finally restart your computer.",
+      "stressPattern": null,
+      "chunks": [
+        "First, save your work,",
+        "then close the application,",
+        "and finally restart your computer."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Each chunk is a step in the process",
+        "Pause briefly after each step",
+        "The words 'First', 'then', and 'finally' help mark each chunk"
+      ]
+    },
+    {
+      "id": "day03-ex03",
+      "type": "shadow",
+      "title": "Natural Rhythm",
+      "instruction": "Listen to the model and speak along with it. Match the timing and pauses.",
+      "targetText": "I'll get back to you, as soon as possible.",
+      "stressPattern": [true, false, false, false, false, true, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Speak at the same speed as the model",
+        "Pause briefly after 'you'",
+        "Match the stress pattern: get and possible are stressed"
+      ]
+    },
+    {
+      "id": "day03-ex04",
+      "type": "linking",
+      "title": "Linking Within Chunks",
+      "instruction": "Practice linking words within thought groups. Link smoothy: back_to you.",
+      "targetText": "get back to you",
+      "stressPattern": [true, true, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Link 'back-to' smoothly - the k connects to t",
+        "Link 'to-you' smoothly - vowel to vowel connection",
+        "Keep 'get', 'back', and 'you' stressed"
+      ]
+    }
+  ]
+}

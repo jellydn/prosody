@@ -1,0 +1,105 @@
+{
+  "day": 9,
+  "theme": "Mixed Drills II",
+  "exercises": [
+    {
+      "id": "day09-ex01",
+      "type": "shadow",
+      "title": "Professional Confidence",
+      "instruction": "Shadow with confidence. Match the energy and pacing.",
+      "targetText": "I'm confident this approach will work.",
+      "stressPattern": [false, true, false, true, false, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Project confidence in your voice",
+        "Stress: confident, approach, work",
+        "Keep the pacing steady and assured"
+      ]
+    },
+    {
+      "id": "day09-ex02",
+      "type": "linking",
+      "title": "Same Consonant Linking",
+      "instruction": "Practice linking words with the same consonant sound.",
+      "targetText": "Pick the best time for the meeting.",
+      "stressPattern": [true, false, true, false, false, true, false],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Say 'the' only once when linking 'time' + 'the': time_the",
+        "Don't pronounce the 'th' twice",
+        "Stress: Pick, best, time, meeting"
+      ]
+    },
+    {
+      "id": "day09-ex03",
+      "type": "stress",
+      "title": "Contrastive Stress",
+      "instruction": "Use stress to contrast ideas or options.",
+      "targetText": "We're not starting tomorrow, we're starting today.",
+      "stressPattern": [true, false, true, true, false, true, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Extra stress on contrasting words: NOT, tomorrow, starting, TODAY",
+        "Use stronger stress on the second contrasting idea",
+        "Make the contrast clear through vocal emphasis"
+      ]
+    },
+    {
+      "id": "day09-ex04",
+      "type": "chunk",
+      "title": "Cause and Effect",
+      "instruction": "Structure cause and effect statements clearly.",
+      "targetText": "Because of the delay, we need to adjust the timeline. As a result, the deadline will extend by two weeks.",
+      "stressPattern": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "chunks": [
+        "Because of the delay, we need to adjust the timeline.",
+        "As a result, the deadline will extend by two weeks."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Use connectors to mark cause and effect",
+        "Each part is a thought group",
+        "Stress: delay, adjust, timeline, result, deadline, extend, weeks"
+      ]
+    },
+    {
+      "id": "day09-ex05",
+      "type": "shadow",
+      "title": "Expressing Agreement",
+      "instruction": "Shadow agreement phrases. Use a supportive tone.",
+      "targetText": "I completely agree with your assessment.",
+      "stressPattern": [false, true, true, false, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Show agreement through your tone",
+        "Stress: completely, agree, assessment",
+        "Keep 'with your' unstressed and quick"
+      ]
+    }
+  ]
+}

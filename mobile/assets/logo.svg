@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80" fill="none">
+  <!-- Icon: Sound wave + rhythm dots -->
+  <g id="logo-icon">
+    <!-- Sound wave lines -->
+    <path d="M8 40C8 28.96 16.96 20 28 20" stroke="#007AFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M0 40C0 24.54 12.54 12 28 12" stroke="#007AFF" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.5"/>
+    <path d="M80 40C80 51.04 71.04 60 60 60" stroke="#007AFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M88 40C88 55.46 75.46 68 60 68" stroke="#007AFF" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+    <!-- Rhythm dots - representing the beat/coaching aspect -->
+    <circle cx="44" cy="24" r="5" fill="#007AFF" opacity="0.6"/>
+    <circle cx="44" cy="40" r="6" fill="#007AFF"/>
+    <circle cx="44" cy="56" r="5" fill="#007AFF" opacity="0.6"/>
+  </g>
+
+  <!-- Text portion -->
+  <g id="logo-text">
+    <!-- "English" in dark gray -->
+    <text x="100" y="50" font-size="28" font-weight="600" fill="#1a1a1a" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">English </text>
+    <!-- "Rhythm" in primary blue -->
+    <text x="216" y="50" font-size="28" font-weight="600" fill="#007AFF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">Rhythm </text>
+    <!-- "Coach" in dark gray -->
+    <text x="330" y="50" font-size="28" font-weight="600" fill="#1a1a1a" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">Coach</text>
+  </g>
+</svg>

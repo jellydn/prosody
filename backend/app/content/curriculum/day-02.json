@@ -1,0 +1,69 @@
+{
+  "day": 2,
+  "theme": "Linking Words Together",
+  "exercises": [
+    {
+      "id": "day02-ex01",
+      "type": "linking",
+      "title": "Consonant to Vowel",
+      "instruction": "Connect words smoothly. When a word ends with a consonant and the next starts with a vowel, link them: pick‿it‿up.",
+      "targetText": "pick it up",
+      "stressPattern": [true, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Say it as one continuous word: pick-it-up",
+        "Don't pause between words",
+        "The 'k' in pick flows into 'it'"
+      ]
+    },
+    {
+      "id": "day02-ex02",
+      "type": "linking",
+      "title": "Same Consonant Links",
+      "instruction": "When words have the same consonant sound at the boundary, say the sound only once: goo(d) deal.",
+      "targetText": "good deal",
+      "stressPattern": [true, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Don't say 'good-duh' - just hold the d sound longer",
+        "The two 'd' sounds merge into one longer 'd'",
+        "Keep the rhythm smooth and connected"
+      ]
+    },
+    {
+      "id": "day02-ex03",
+      "type": "chunk",
+      "title": "Linked Thought Groups",
+      "instruction": "Break this into thought groups and link words within each group.",
+      "targetText": "I'll send it over, and then you can check it out.",
+      "stressPattern": null,
+      "chunks": [
+        "I'll send it over,",
+        "and then you can check it out."
+      ],
+      "audioUrl": null,
+      "tips": [
+        "Link 'send-it' and 'check-it' smoothly",
+        "Pause briefly at the comma",
+        "Link within each chunk, not between chunks"
+      ]
+    },
+    {
+      "id": "day02-ex04",
+      "type": "stress",
+      "title": "Stress with Linking",
+      "instruction": "Keep the stress pattern clear while linking words smoothly.",
+      "targetText": "turn it on",
+      "stressPattern": [true, false, true],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Emphasize 'turn' and 'on' - make them louder and longer",
+        "Link 'turn-it' and 'it-on' smoothly",
+        "'it' should be quick and unstressed"
+      ]
+    }
+  ]
+}

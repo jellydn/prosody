@@ -1,0 +1,138 @@
+{
+  "day": 13,
+  "theme": "Natural Speech",
+  "exercises": [
+    {
+      "id": "day13-ex01",
+      "type": "shadow",
+      "title": "Conversational Flow",
+      "instruction": "Shadow natural conversation with pauses and emphasis.",
+      "targetText": "You know, I was thinking about our project, and I have some ideas.",
+      "stressPattern": [
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'You know' is a conversation filler, keep it light",
+        "Pause briefly after 'project'",
+        "Stress: thinking, project, have, ideas"
+      ]
+    },
+    {
+      "id": "day13-ex02",
+      "type": "intonation",
+      "title": "Expressing Uncertainty",
+      "instruction": "Use rising intonation to show uncertainty.",
+      "targetText": "I'm not sure if that's the right approach.",
+      "stressPattern": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Voice rises slightly on uncertain statements: \u2197",
+        "Stress: sure, that's, right, approach",
+        "Keep the tone tentative, not confident"
+      ]
+    },
+    {
+      "id": "day13-ex03",
+      "type": "shadow",
+      "title": "Storytelling Pace",
+      "instruction": "Shadow with storytelling pace and emotion.",
+      "targetText": "We tried everything, but nothing worked until we finally found the solution.",
+      "stressPattern": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Use dramatic pauses: 'but nothing worked... until'",
+        "Build up to the solution",
+        "Stress: tried, everything, nothing, worked, finally, found, solution"
+      ]
+    },
+    {
+      "id": "day13-ex04",
+      "type": "linking",
+      "title": "Thoughtful Pauses",
+      "instruction": "Practice natural pauses while thinking.",
+      "targetText": "Well, let me think... I believe we should go ahead.",
+      "stressPattern": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "'Well' is a hesitation marker, keep it short",
+        "Use ellipses to show thinking pause",
+        "Stress: think, believe, go, ahead"
+      ]
+    },
+    {
+      "id": "day13-ex05",
+      "type": "shadow",
+      "title": "Expressing Opinion",
+      "instruction": "Shadow expressing an opinion with conviction.",
+      "targetText": "In my opinion, this is the best option available.",
+      "stressPattern": [
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        true
+      ],
+      "chunks": null,
+      "audioUrl": null,
+      "tips": [
+        "Project confidence in your opinion",
+        "Stress: opinion, best, option, available",
+        "Speak clearly and deliberately"
+      ]
+    }
+  ]
+}
