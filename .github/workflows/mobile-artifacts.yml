@@ -15,8 +15,38 @@ on:
           - ios-simulator
 
 jobs:
+  quality-checks:
+    name: Mobile Quality Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx oxlint .
+
+      - name: Format check
+        run: npx oxfmt --check .
+
   build-android:
     name: Build Android APK
+    needs: quality-checks
     if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'android' }}
     runs-on: ubuntu-latest
     defaults:
@@ -61,6 +91,7 @@ jobs:
 
   build-ios:
     name: Build iOS IPA
+    needs: quality-checks
     if: ${{ github.event.inputs.platform == 'both' || github.event.inputs.platform == 'ios' }}
     runs-on: ubuntu-latest
     defaults:
@@ -105,6 +136,7 @@ jobs:
 
   build-ios-simulator:
     name: Build iOS Simulator App
+    needs: quality-checks
     if: ${{ github.event.inputs.platform == 'ios-simulator' }}
     runs-on: ubuntu-latest
     defaults:
