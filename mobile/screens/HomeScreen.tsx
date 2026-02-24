@@ -17,6 +17,12 @@ type DayData = {
   exercises: Exercise[];
 };
 
+type ProgressSummaryResponse = {
+  streak?: number;
+  average_score?: number | null;
+  averages?: Record<string, number>;
+};
+
 const EXERCISE_ICONS: Record<ExerciseType, string> = {
   stress: "volume-high",
   linking: "link",
@@ -65,11 +71,19 @@ export default function HomeScreen({ route }: HomeScreenProps) {
       ]);
 
       if (summaryResponse.ok) {
-        const data = await summaryResponse.json();
+        const data = (await summaryResponse.json()) as ProgressSummaryResponse;
         setStreak(data.streak || 0);
 
-        if (data.average_score !== null) {
-          setPreviousAverage(data.average_score);
+        const fallbackAverage =
+          data.averages && Object.keys(data.averages).length > 0
+            ? Object.values(data.averages).reduce((acc, value) => acc + value, 0) /
+              Object.values(data.averages).length
+            : undefined;
+        const averageScore =
+          typeof data.average_score === "number" ? data.average_score : fallbackAverage;
+
+        if (averageScore !== undefined) {
+          setPreviousAverage(averageScore);
         }
       }
 
