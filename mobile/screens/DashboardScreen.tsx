@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions, useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useState } from "react";
+import { CommonActions, useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -83,9 +83,12 @@ export default function DashboardScreen() {
     }
   }, [navigation]);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      loadData();
+    }, [loadData]),
+  );
 
   const getChartData = () => {
     if (!sessions.length) {
