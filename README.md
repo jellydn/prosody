@@ -185,6 +185,15 @@ Notes:
 - iOS simulator artifact is generated with EAS profile `ios-simulator` and does not require Apple signing for simulator usage.
 - No store submission is performed by this workflow.
 
+Local EAS build commands:
+
+```bash
+cd mobile
+npx eas build --profile development --platform ios
+npx eas build --profile development --platform android
+npx eas build --platform all  # uses profile "production" by default
+```
+
 ### Content And Audio
 
 See content/audio authoring guide:
