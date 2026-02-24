@@ -110,6 +110,8 @@ def test_get_progress_summary(db):
     assert data["streak"] == 3
     assert data["total_sessions"] == 3
     assert "averages" in data
+    assert "average_score" in data
+    assert data["average_score"] == pytest.approx(4.2, abs=1e-6)
     assert "trend" in data
 
 

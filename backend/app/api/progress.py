@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
@@ -44,6 +44,7 @@ class ProgressResponse(BaseModel):
 class ProgressSummary(BaseModel):
     streak: int
     averages: dict[str, float]
+    average_score: Optional[float]
     total_sessions: int
     trend: str
 
@@ -104,7 +105,13 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
     )
 
     if not sessions:
-        return ProgressSummary(streak=0, averages={}, total_sessions=0, trend="No data")
+        return ProgressSummary(
+            streak=0,
+            averages={},
+            average_score=None,
+            total_sessions=0,
+            trend="No data",
+        )
 
     total_sessions = len(sessions)
 
@@ -114,6 +121,13 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
         "pacing": sum(s.pacing_score for s in sessions) / total_sessions,
         "intonation": sum(s.intonation_score for s in sessions) / total_sessions,
     }
+    average_score = (
+        sum(
+            s.rhythm_score + s.stress_score + s.pacing_score + s.intonation_score
+            for s in sessions
+        )
+        / (total_sessions * 4)
+    )
 
     streak = 0
     if sessions:
@@ -132,13 +146,9 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
             s.rhythm_score + s.stress_score + s.pacing_score + s.intonation_score
             for s in recent_sessions
         ) / (len(recent_sessions) * 4)
-        overall_avg = sum(
-            s.rhythm_score + s.stress_score + s.pacing_score + s.intonation_score
-            for s in sessions
-        ) / (total_sessions * 4)
-        if recent_avg > overall_avg + 0.1:
+        if recent_avg > average_score + 0.1:
             trend = "Improving"
-        elif recent_avg < overall_avg - 0.1:
+        elif recent_avg < average_score - 0.1:
             trend = "Declining"
         else:
             trend = "Stable"
@@ -148,6 +158,7 @@ async def get_progress_summary(user_id: int, db: Session = Depends(get_db)):
     return ProgressSummary(
         streak=streak,
         averages=averages,
+        average_score=average_score,
         total_sessions=total_sessions,
         trend=trend,
     )
