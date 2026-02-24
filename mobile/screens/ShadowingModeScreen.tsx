@@ -212,7 +212,7 @@ export default function ShadowingModeScreen({
           await modelSound.pauseAsync();
           setIsPlayingModel(false);
         } else {
-          await modelSound.playAsync();
+          await modelSound.replayAsync();
           setIsPlayingModel(true);
         }
       } else {

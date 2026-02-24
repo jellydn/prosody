@@ -53,7 +53,7 @@ export default function AudioPlayer({
           await sound.pauseAsync();
           setIsPlaying(false);
         } else {
-          await sound.playAsync();
+          await sound.replayAsync();
           setIsPlaying(true);
         }
       } else {
