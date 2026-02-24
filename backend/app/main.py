@@ -3,7 +3,7 @@ import logging
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.models import init_db
+from app.models import run_migrations
 from app.api.progress import router as progress_router
 from app.api.analyze import router as analyze_router
 from app import worker
@@ -29,8 +29,18 @@ def _parse_cors_origins() -> list[str]:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    init_db()
-    worker.startup()
+    raw_flag = os.getenv("RUN_MIGRATIONS_ON_STARTUP", "true").strip().lower()
+    should_run_migrations = raw_flag in {"1", "true", "yes", "on"}
+    logger = logging.getLogger(__name__)
+
+    if should_run_migrations:
+        logger.info("Running database migrations on startup.")
+        run_migrations()
+    else:
+        logger.info(
+            "Skipping database migrations on startup (RUN_MIGRATIONS_ON_STARTUP=%r).",
+            raw_flag,
+        )
     yield
     worker.shutdown()
 

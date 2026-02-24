@@ -6,17 +6,18 @@ English Rhythm Coach: React Native (Expo/TypeScript) + Python FastAPI.
 
 ## Quick Reference
 
-| Task                | Command                                                              |
-| ------------------- | -------------------------------------------------------------------- |
-| Backend dev         | `just backend-dev`                                                   |
-| Mobile dev          | `just mobile-dev`                                                    |
-| Run all tests       | `just backend-test` / `just mobile-test`                             |
-| Run single test     | `just backend-test-single "name"` / `just mobile-test-single "name"` |
-| Run test file       | `just backend-test-file path` / `just mobile-test-file path`         |
-| Lint/format backend | `just backend-lint`                                                  |
-| TypeScript check    | `just mobile-typecheck`                                              |
-| Lint/format mobile  | `just mobile-lint` / `just mobile-format`                            |
-| All checks          | `just check`                                                         |
+| Task                | Command                                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| Backend dev         | `just backend-dev`                                                                              |
+| Mobile dev          | `just mobile-dev`                                                                               |
+| Run all tests       | `just backend-test` / `just mobile-test`                                                        |
+| Run single test     | `just backend-test-single "name"` / `just mobile-test-single "name"`                            |
+| Run test file       | `just backend-test-file path` / `just mobile-test-file path`                                    |
+| Lint/format backend | `just backend-lint`                                                                             |
+| TypeScript check    | `just mobile-typecheck`                                                                         |
+| Lint/format mobile  | `just mobile-lint` / `just mobile-lint-fix` / `just mobile-format` / `just mobile-format-check` |
+| All checks          | `just check`                                                                                    |
+| Clean cache         | `just clean-backend` / `just clean-mobile`                                                      |
 
 Run `just` or `just --list` to see all commands.
 
@@ -45,9 +46,12 @@ cd mobile
 npx expo start                    # Dev server
 npx tsc --noEmit                  # TypeScript check
 npx oxlint .                      # Lint
+npx oxlint --fix .                # Lint with auto-fix
 npx oxfmt .                       # Format
+npx oxfmt --check .               # Check formatting
 npx jest                          # All tests
 npx jest --testNamePattern="name" # Single test
+npx jest --testPathPattern="file" # Run test file
 ```
 
 ---
@@ -159,8 +163,30 @@ mobile/
 
 ---
 
+## CI & Deployment
+
+```bash
+just check              # Run all quality checks
+just ci                 # Full CI: install + check
+just backend-fly-deploy # Deploy to Fly.io
+just backend-fly-logs   # View Fly.io logs
+```
+
+---
+
 ## Testing
 
 - Test behavior, not implementation
 - Mock at network boundaries
 - Focus on user-facing functionality
+- Use `jest --testPathPattern` to run specific test files
+
+---
+
+## Clean Commands
+
+```bash
+just clean-backend   # Remove Python cache
+just clean-mobile   # Remove node_modules cache
+just clean          # Clean both
+```
