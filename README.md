@@ -49,7 +49,7 @@ Open app → See daily lesson → Listen to example → Record yourself → Get 
 | **Backend**                | Python / FastAPI                                          |
 | **Speech Analysis (Free)** | Whisper + librosa + parselmouth (on-device)               |
 | **Speech Analysis (BYOP)** | Azure Speech / Google Cloud / OpenAI (user's own API key) |
-| **Example Audio**          | ElevenLabs TTS (pre-generated, bundled)                   |
+| **Example Audio**          | Hosted model audio URL or in-app TTS fallback (`audioUrl: null`) |
 | **Database**               | SQLite (MVP) → PostgreSQL (later)                         |
 | **Curriculum**             | JSON files in repo                                        |
 
@@ -65,7 +65,7 @@ english-rhythm-coach/
 │   │   ├── AudioPlayer.tsx
 │   │   ├── AudioRecorder.tsx
 │   │   └── FeedbackCard.tsx
-│   └── assets/              # Bundled audio files
+│   └── assets/              # Curriculum + phrase JSON content
 ├── backend/                 # Python FastAPI server
 │   ├── app/
 │   │   ├── main.py          # FastAPI app entry
@@ -161,6 +161,12 @@ cd mobile
 npx expo install
 npx expo start
 ```
+
+### Content And Audio
+
+See content/audio authoring guide:
+
+- `docs/content-and-audio-workflow.md`
 
 ---
 
