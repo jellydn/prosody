@@ -202,6 +202,12 @@ npx expo install
 npx expo start
 ```
 
+For local development, mobile defaults to `http://localhost:8000` (or `http://10.0.2.2:8000` on Android emulator). You can override explicitly:
+
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 npx expo start
+```
+
 ### Build APK/IPA Artifacts (Sideload)
 
 This repo now includes a GitHub Actions CD workflow at `.github/workflows/mobile-artifacts.yml` that builds downloadable mobile artifacts without App Store / Play Store submission.
@@ -224,9 +230,10 @@ Notes:
 - Android artifact is generated with EAS profile `android-apk`.
 - iOS artifact is generated with EAS profile `ios-ipa` (`distribution: internal`), which still requires valid Apple signing credentials in Expo/EAS for device sideloading.
 - iOS simulator artifact is generated with EAS profile `ios-simulator` and does not require Apple signing for simulator usage.
+- Production artifact profiles (`production`, `android-apk`, `ios-ipa`) are configured to use `https://english-rhythm-coach-api.fly.dev` via `EXPO_PUBLIC_API_BASE_URL`.
 - Bundle/package IDs are profile-based via `mobile/app.config.ts`:
   - `development`, `ios-simulator`: `com.englishrhythmcoach.app`
-  - `production`, `android-apk`, `ios-ipa`: `com.ralph.englishrhythmcoach`
+  - `production`, `android-apk`, `ios-ipa`: `com.dunghd.englishrhythmcoach`
 - No store submission is performed by this workflow.
 
 Local EAS build commands:
