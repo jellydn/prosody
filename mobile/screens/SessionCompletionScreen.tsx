@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { API_BASE_URL } from "../config/api";
 import type { HomeStackParamList } from "./ExerciseScreen";
 
@@ -104,7 +104,11 @@ export default function SessionCompletionScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.celebrationContainer}>
           <Ionicons name="trophy" size={80} color="#FFD700" />
           <Text style={styles.congratsText}>Session Complete!</Text>
@@ -182,7 +186,7 @@ export default function SessionCompletionScreen() {
         <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
           <Text style={styles.doneButtonText}>Done for Today</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -192,9 +196,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F2F2F7",
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  content: {
     padding: 20,
+    paddingBottom: 40,
   },
   celebrationContainer: {
     alignItems: "center",
