@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import * as Speech from "expo-speech";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import FeedbackCard from "../components/FeedbackCard";
@@ -56,6 +57,7 @@ export default function ShadowingModeScreen({
 
   useEffect(() => {
     return () => {
+      void Speech.stop().catch(() => {});
       if (modelSound) modelSound.unloadAsync();
       if (userSound) userSound.unloadAsync();
       if (playbackTimeoutRef.current) clearTimeout(playbackTimeoutRef.current);
@@ -120,9 +122,19 @@ export default function ShadowingModeScreen({
         setModelSound(sound);
         setIsPlayingModel(true);
       } else {
-        playbackTimeoutRef.current = setTimeout(() => {
-          stopRecordingAfterDelay(newRecording, 0);
-        }, 5000);
+        setIsPlayingModel(true);
+        await Speech.speak(exercise.targetText, {
+          language: "en-US",
+          onDone: () => {
+            setIsPlayingModel(false);
+            void stopRecordingAfterDelay(newRecording, 500);
+          },
+          onStopped: () => setIsPlayingModel(false),
+          onError: () => {
+            setIsPlayingModel(false);
+            void stopRecordingAfterDelay(newRecording, 0);
+          },
+        });
       }
     } catch (err) {
       console.error("Failed to start shadowing", err);
@@ -161,6 +173,7 @@ export default function ShadowingModeScreen({
     if (modelSound) {
       await modelSound.stopAsync();
     }
+    await Speech.stop();
 
     if (playbackTimeoutRef.current) {
       clearTimeout(playbackTimeoutRef.current);
@@ -171,17 +184,37 @@ export default function ShadowingModeScreen({
   };
 
   const playModelAudio = async () => {
-    if (!exercise.audioUrl) return;
-
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         playsInSilentModeIOS: true,
       });
 
-      if (modelSound) {
-        await modelSound.replayAsync();
+      if (!exercise.audioUrl) {
+        if (isPlayingModel) {
+          await Speech.stop();
+          setIsPlayingModel(false);
+          return;
+        }
+
         setIsPlayingModel(true);
+        await Speech.speak(exercise.targetText, {
+          language: "en-US",
+          onDone: () => setIsPlayingModel(false),
+          onStopped: () => setIsPlayingModel(false),
+          onError: () => setIsPlayingModel(false),
+        });
+        return;
+      }
+
+      if (modelSound) {
+        if (isPlayingModel) {
+          await modelSound.pauseAsync();
+          setIsPlayingModel(false);
+        } else {
+          await modelSound.playAsync();
+          setIsPlayingModel(true);
+        }
       } else {
         const { sound } = await Audio.Sound.createAsync(
           { uri: exercise.audioUrl },
@@ -270,6 +303,8 @@ export default function ShadowingModeScreen({
   };
 
   const reRecord = () => {
+    void Speech.stop().catch(() => {});
+    setIsPlayingModel(false);
     setRecordedUri(null);
     setShadowingComplete(false);
     setAnalysisResult(null);
