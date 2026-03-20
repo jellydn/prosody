@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -16,10 +17,22 @@ import { API_BASE_URL } from "../config/api";
 import { BYOP_API_KEY_KEY, BYOP_PROVIDER_KEY } from "../config/byop";
 
 const PROVIDERS = [
-  { id: "free", name: "Free (default)" },
-  { id: "azure", name: "Azure Speech Services" },
-  { id: "google", name: "Google Cloud Speech" },
-  { id: "openai", name: "OpenAI Whisper" },
+  { id: "free", name: "Free (default)", keyUrl: null },
+  {
+    id: "azure",
+    name: "Azure Speech Services",
+    keyUrl: "https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/SpeechServices",
+  },
+  {
+    id: "google",
+    name: "Google Cloud Speech",
+    keyUrl: "https://aistudio.google.com/app/apikey",
+  },
+  {
+    id: "openai",
+    name: "OpenAI Whisper",
+    keyUrl: "https://platform.openai.com/api-keys",
+  },
 ] as const;
 
 type Provider = (typeof PROVIDERS)[number]["id"];
@@ -162,6 +175,18 @@ export default function SettingsScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
               />
+              {PROVIDERS.find((p) => p.id === provider)?.keyUrl && (
+                <TouchableOpacity
+                  style={styles.getKeyLink}
+                  onPress={() => {
+                    const url = PROVIDERS.find((p) => p.id === provider)?.keyUrl;
+                    if (url) Linking.openURL(url);
+                  }}
+                >
+                  <Ionicons name="key-outline" size={16} color="#007AFF" />
+                  <Text style={styles.getKeyText}>Get API Key →</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
@@ -272,6 +297,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: "#E5E5EA",
+  },
+  getKeyLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 4,
+  },
+  getKeyText: {
+    fontSize: 14,
+    color: "#007AFF",
+    fontWeight: "500",
   },
   button: {
     flexDirection: "row",
