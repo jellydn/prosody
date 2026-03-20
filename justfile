@@ -79,6 +79,15 @@ mobile-test-single TEST:
 mobile-test-file FILE:
     cd mobile && npx jest --testPathPattern="{{FILE}}"
 
+mobile-prebuild:
+    cd mobile && npx expo prebuild --platform ios
+
+mobile-ios-device:
+    cd mobile && npx expo run:ios --device
+
+mobile-ios-prod:
+    cd mobile && EXPO_PUBLIC_API_BASE_URL=https://prosody.itman.fyi npx expo run:ios --device --no-dev
+
 # Development commands
 dev: backend-dev mobile-dev
     echo "Started both backend and mobile dev servers"
