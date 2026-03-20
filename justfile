@@ -86,7 +86,10 @@ mobile-ios-device:
     cd mobile && npx expo run:ios --device
 
 mobile-ios-prod:
-    cd mobile && EXPO_PUBLIC_API_BASE_URL=https://prosody.itman.fyi npx expo run:ios --device --no-dev
+    cd mobile && EXPO_PUBLIC_API_BASE_URL=https://prosody.itman.fyi npx expo run:ios --device --configuration Release
+
+mobile-ios-open:
+    open mobile/ios/EnglishRhythmCoach.xcworkspace
 
 # Development commands
 dev: backend-dev mobile-dev
