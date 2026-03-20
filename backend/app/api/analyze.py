@@ -23,12 +23,14 @@ SUPPORTED_FORMATS = {
     "audio/x-wav",
     "audio/mpeg",
     "audio/mp4",
+    "audio/m4a",
     "audio/x-m4a",
 }
 
 CONTENT_TYPE_TO_FORMAT = {
     "audio/mpeg": "mp3",
     "audio/mp4": "mp4",
+    "audio/m4a": "m4a",
     "audio/x-m4a": "m4a",
 }
 
