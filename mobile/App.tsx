@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, LogBox, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import TabNavigator from "./navigation/TabNavigator";
 import OnboardingScreen from "./screens/OnboardingScreen";
 
@@ -44,7 +44,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    LogBox.ignoreLogs(["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54."]);
     checkOnboardingStatus();
   }, [checkOnboardingStatus]);
 
