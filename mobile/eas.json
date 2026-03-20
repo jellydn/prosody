@@ -12,7 +12,7 @@
       "environment": "production",
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+        "EXPO_PUBLIC_API_BASE_URL": "https://prosody.itman.fyi"
       },
       "android": {
         "buildType": "apk"
@@ -24,7 +24,7 @@
     "android-apk": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+        "EXPO_PUBLIC_API_BASE_URL": "https://prosody.itman.fyi"
       },
       "android": {
         "buildType": "apk"
@@ -33,7 +33,7 @@
     "ios-ipa": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://english-rhythm-coach-api.fly.dev"
+        "EXPO_PUBLIC_API_BASE_URL": "https://prosody.itman.fyi"
       },
       "ios": {
         "simulator": false
