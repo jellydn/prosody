@@ -1,5 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import {
+  AudioModule,
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  useAudioRecorder,
+} from "expo-audio";
 import * as Speech from "expo-speech";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -22,37 +29,28 @@ export default function ShadowingModeScreen({
   onBack,
   onComplete,
 }: ShadowingModeScreenProps) {
-  const RECORDING_AUDIO_MODE = {
-    allowsRecordingIOS: true,
-    playsInSilentModeIOS: true,
-    shouldDuckAndroid: false,
-    playThroughEarpieceAndroid: false,
-  } as const;
-  const PLAYBACK_AUDIO_MODE = {
-    allowsRecordingIOS: false,
-    playsInSilentModeIOS: true,
-    shouldDuckAndroid: false,
-    playThroughEarpieceAndroid: false,
-  } as const;
-
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isShadowing, setIsShadowing] = useState(false);
-  const [modelSound, setModelSound] = useState<Audio.Sound | null>(null);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [isPlayingModel, setIsPlayingModel] = useState(false);
   const [isPlayingUser, setIsPlayingUser] = useState(false);
-  const [userSound, setUserSound] = useState<Audio.Sound | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [shadowingComplete, setShadowingComplete] = useState(false);
   const playbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isShadowingRef = useRef(false);
+
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const modelPlayer = useAudioPlayer(exercise.audioUrl ?? null);
+  const userPlayer = useAudioPlayer(recordedUri);
+  const modelStatus = useAudioPlayerStatus(modelPlayer);
+  const userStatus = useAudioPlayerStatus(userPlayer);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Audio.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-      if (status !== "granted") {
+      const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+      setHasPermission(granted);
+      if (!granted) {
         Alert.alert(
           "Microphone Permission Required",
           "Please enable microphone access in Settings to record your voice.",
@@ -69,13 +67,40 @@ export default function ShadowingModeScreen({
   }, []);
 
   useEffect(() => {
+    modelPlayer.volume = 1.0;
+    userPlayer.volume = 1.0;
+  }, [modelPlayer, userPlayer]);
+
+  useEffect(() => {
     return () => {
       void Speech.stop().catch(() => {});
-      if (modelSound) modelSound.unloadAsync();
-      if (userSound) userSound.unloadAsync();
       if (playbackTimeoutRef.current) clearTimeout(playbackTimeoutRef.current);
     };
-  }, [modelSound, userSound]);
+  }, []);
+
+  // Track model playback finishing during shadowing
+  const prevModelPlayingRef = useRef(false);
+  useEffect(() => {
+    if (prevModelPlayingRef.current && !modelStatus.playing && isShadowingRef.current) {
+      setIsPlayingModel(false);
+      void stopRecordingAfterDelay(500);
+    }
+    prevModelPlayingRef.current = modelStatus.playing;
+  }, [modelStatus.playing]);
+
+  // Track model playback finishing during standalone playback
+  useEffect(() => {
+    if (!modelStatus.playing && isPlayingModel && !isShadowingRef.current) {
+      setIsPlayingModel(false);
+    }
+  }, [modelStatus.playing, isPlayingModel]);
+
+  // Track user playback finishing
+  useEffect(() => {
+    if (!userStatus.playing && isPlayingUser) {
+      setIsPlayingUser(false);
+    }
+  }, [userStatus.playing, isPlayingUser]);
 
   const startShadowing = async () => {
     if (!hasPermission) {
@@ -84,52 +109,18 @@ export default function ShadowingModeScreen({
     }
 
     try {
-      await Audio.setAudioModeAsync(RECORDING_AUDIO_MODE);
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
 
-      const recordingOptions = {
-        android: {
-          extension: ".m4a",
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: ".m4a",
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: "audio/webm",
-          bitsPerSecond: 128000,
-        },
-      };
-
-      const { recording: newRecording } = await Audio.Recording.createAsync(recordingOptions);
-      setRecording(newRecording);
+      await recorder.prepareToRecordAsync();
+      recorder.record();
       setIsShadowing(true);
+      isShadowingRef.current = true;
       setRecordedUri(null);
       setShadowingComplete(false);
 
       if (exercise.audioUrl) {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: exercise.audioUrl },
-          { shouldPlay: true, volume: 1.0 },
-          (status: any) => {
-            if (status.didJustFinish) {
-              setIsPlayingModel(false);
-              stopRecordingAfterDelay(newRecording, 500);
-            }
-          },
-        );
-        setModelSound(sound);
+        modelPlayer.seekTo(0);
+        modelPlayer.play();
         setIsPlayingModel(true);
       } else {
         setIsPlayingModel(true);
@@ -138,12 +129,12 @@ export default function ShadowingModeScreen({
           volume: 1.0,
           onDone: () => {
             setIsPlayingModel(false);
-            void stopRecordingAfterDelay(newRecording, 500);
+            void stopRecordingAfterDelay(500);
           },
           onStopped: () => setIsPlayingModel(false),
           onError: () => {
             setIsPlayingModel(false);
-            void stopRecordingAfterDelay(newRecording, 0);
+            void stopRecordingAfterDelay(0);
           },
         });
       }
@@ -152,17 +143,17 @@ export default function ShadowingModeScreen({
     }
   };
 
-  const stopRecordingAfterDelay = async (rec: Audio.Recording, delay: number) => {
+  const stopRecordingAfterDelay = async (delay: number) => {
     if (delay > 0) {
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
     try {
-      await rec.stopAndUnloadAsync();
-      const uri = rec.getURI();
+      await recorder.stop();
+      const uri = recorder.uri;
       setRecordedUri(uri);
-      setRecording(null);
       setIsShadowing(false);
+      isShadowingRef.current = false;
       setShadowingComplete(true);
     } catch (err) {
       console.error("Failed to stop recording", err);
@@ -170,20 +161,15 @@ export default function ShadowingModeScreen({
   };
 
   const stopShadowing = async () => {
-    if (recording) {
-      try {
-        await recording.stopAndUnloadAsync();
-        const uri = recording.getURI();
-        setRecordedUri(uri);
-        setRecording(null);
-      } catch (err) {
-        console.error("Failed to stop recording", err);
-      }
+    try {
+      await recorder.stop();
+      const uri = recorder.uri;
+      setRecordedUri(uri);
+    } catch (err) {
+      console.error("Failed to stop recording", err);
     }
 
-    if (modelSound) {
-      await modelSound.stopAsync();
-    }
+    modelPlayer.pause();
     await Speech.stop();
 
     if (playbackTimeoutRef.current) {
@@ -191,12 +177,13 @@ export default function ShadowingModeScreen({
     }
 
     setIsShadowing(false);
+    isShadowingRef.current = false;
     setShadowingComplete(true);
   };
 
   const playModelAudio = async () => {
     try {
-      await Audio.setAudioModeAsync(PLAYBACK_AUDIO_MODE);
+      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
 
       if (!exercise.audioUrl) {
         if (isPlayingModel) {
@@ -216,25 +203,12 @@ export default function ShadowingModeScreen({
         return;
       }
 
-      if (modelSound) {
-        if (isPlayingModel) {
-          await modelSound.pauseAsync();
-          setIsPlayingModel(false);
-        } else {
-          await modelSound.replayAsync();
-          setIsPlayingModel(true);
-        }
+      if (isPlayingModel) {
+        modelPlayer.pause();
+        setIsPlayingModel(false);
       } else {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: exercise.audioUrl },
-          { shouldPlay: true, volume: 1.0 },
-          (status: any) => {
-            if (status.didJustFinish) {
-              setIsPlayingModel(false);
-            }
-          },
-        );
-        setModelSound(sound);
+        modelPlayer.seekTo(0);
+        modelPlayer.play();
         setIsPlayingModel(true);
       }
     } catch (err) {
@@ -246,24 +220,11 @@ export default function ShadowingModeScreen({
     if (!recordedUri) return;
 
     try {
-      await Audio.setAudioModeAsync(PLAYBACK_AUDIO_MODE);
+      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
 
-      if (userSound) {
-        await userSound.replayAsync();
-        setIsPlayingUser(true);
-      } else {
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: recordedUri },
-          { shouldPlay: true, volume: 1.0 },
-          (status: any) => {
-            if (status.didJustFinish) {
-              setIsPlayingUser(false);
-            }
-          },
-        );
-        setUserSound(sound);
-        setIsPlayingUser(true);
-      }
+      userPlayer.seekTo(0);
+      userPlayer.play();
+      setIsPlayingUser(true);
     } catch (err) {
       console.error("Failed to play user recording", err);
     }
@@ -314,10 +275,6 @@ export default function ShadowingModeScreen({
     setRecordedUri(null);
     setShadowingComplete(false);
     setAnalysisResult(null);
-    if (userSound) {
-      userSound.unloadAsync();
-      setUserSound(null);
-    }
   };
 
   const renderRhythmDots = () => {

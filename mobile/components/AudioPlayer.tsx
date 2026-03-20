@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio, type AVPlaybackStatus } from "expo-av";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as Speech from "expo-speech";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface AudioPlayerProps {
@@ -17,63 +17,57 @@ export default function AudioPlayer({
   stressPattern,
   chunks,
 }: AudioPlayerProps) {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const player = useAudioPlayer(audioUrl);
+  const status = useAudioPlayerStatus(player);
+  const wasPlaying = useRef(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  useEffect(() => {
+    if (wasPlaying.current && !status.playing) {
+      wasPlaying.current = false;
+    }
+    if (status.playing) {
+      wasPlaying.current = true;
+    }
+  }, [status.playing]);
 
   useEffect(() => {
     return () => {
       void Speech.stop().catch(() => {});
-      if (sound) {
-        void sound.unloadAsync().catch(() => {});
-      }
     };
-  }, [sound]);
+  }, []);
+
+  const isPlaying = audioUrl ? status.playing : isSpeaking;
 
   const playSound = async () => {
     try {
       if (!audioUrl) {
-        if (isPlaying) {
+        if (isSpeaking) {
           await Speech.stop();
-          setIsPlaying(false);
+          setIsSpeaking(false);
           return;
         }
 
-        setIsPlaying(true);
+        setIsSpeaking(true);
         await Speech.speak(targetText, {
           language: "en-US",
-          onDone: () => setIsPlaying(false),
-          onStopped: () => setIsPlaying(false),
-          onError: () => setIsPlaying(false),
+          onDone: () => setIsSpeaking(false),
+          onStopped: () => setIsSpeaking(false),
+          onError: () => setIsSpeaking(false),
         });
         return;
       }
 
-      if (sound) {
-        if (isPlaying) {
-          await sound.pauseAsync();
-          setIsPlaying(false);
-        } else {
-          await sound.playAsync();
-          setIsPlaying(true);
-        }
+      if (status.playing) {
+        player.pause();
       } else {
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: audioUrl },
-          { shouldPlay: true },
-          onPlaybackStatusUpdate,
-        );
-        setSound(newSound);
-        setIsPlaying(true);
+        if (status.currentTime >= status.duration && status.duration > 0) {
+          player.seekTo(0);
+        }
+        player.play();
       }
     } catch (error) {
       console.error("Error playing sound:", error);
-      setIsPlaying(false);
-    }
-  };
-
-  const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded && status.didJustFinish) {
-      setIsPlaying(false);
     }
   };
 

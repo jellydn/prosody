@@ -22,7 +22,6 @@
     "expo": "~55.0.3",
     "expo-asset": "~55.0.8",
     "expo-audio": "~55.0.8",
-    "expo-av": "^16.0.8",
     "expo-dev-client": "~55.0.10",
     "expo-font": "~55.0.4",
     "expo-secure-store": "~55.0.8",

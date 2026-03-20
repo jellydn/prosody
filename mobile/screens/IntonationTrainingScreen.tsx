@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Audio } from "expo-av";
+import { setAudioModeAsync } from "expo-audio";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AudioPlayer from "../components/AudioPlayer";
@@ -30,7 +30,7 @@ export default function IntonationTrainingScreen({
   const cleanupRecording = useCallback(async () => {
     if (recordedUri) {
       try {
-        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+        await setAudioModeAsync({ allowsRecording: false });
       } catch (err) {
         console.error("Error cleaning up audio mode:", err);
       }
