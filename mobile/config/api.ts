@@ -1,6 +1,6 @@
 import { NativeModules, Platform } from "react-native";
 
-const FALLBACK_API_BASE_URL = "http://localhost:8000";
+const FALLBACK_API_BASE_URL = "https://prosody.itman.fyi";
 const ANDROID_EMULATOR_API_BASE_URL = "http://10.0.2.2:8000";
 
 function trimTrailingSlash(url: string): string {
