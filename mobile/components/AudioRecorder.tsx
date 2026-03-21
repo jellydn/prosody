@@ -29,8 +29,14 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
 	const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 	const recorderState = useAudioRecorderState(recorder, 200);
 
-	const player = useAudioPlayer(recordedUri);
+	const player = useAudioPlayer(null);
 	const playerStatus = useAudioPlayerStatus(player);
+
+	useEffect(() => {
+		if (recordedUri) {
+			player.replace(recordedUri);
+		}
+	}, [recordedUri, player]);
 
 	const stopRecordingRef = useRef<(() => Promise<void>) | undefined>(undefined);
 

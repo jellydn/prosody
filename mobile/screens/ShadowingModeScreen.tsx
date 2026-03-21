@@ -42,9 +42,15 @@ export default function ShadowingModeScreen({
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const modelPlayer = useAudioPlayer(exercise.audioUrl ?? null);
-  const userPlayer = useAudioPlayer(recordedUri);
+  const userPlayer = useAudioPlayer(null);
   const modelStatus = useAudioPlayerStatus(modelPlayer);
   const userStatus = useAudioPlayerStatus(userPlayer);
+
+  useEffect(() => {
+    if (recordedUri) {
+      userPlayer.replace(recordedUri);
+    }
+  }, [recordedUri, userPlayer]);
 
   useEffect(() => {
     (async () => {
