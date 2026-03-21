@@ -33,7 +33,7 @@ const PROVIDERS = [
 	{
 		id: "google",
 		name: "Google Cloud Speech",
-		keyUrl: "https://aistudio.google.com/app/apikey",
+		keyUrl: "https://console.cloud.google.com/apis/credentials",
 	},
 	{
 		id: "openai",
