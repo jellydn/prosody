@@ -6,7 +6,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi==0.131.0",
     "uvicorn[standard]==0.41.0",
-    "sqlalchemy==2.0.46",
+    "sqlalchemy==2.0.49",
     "pydub==0.25.1",
     "python-multipart==0.0.22",
     "pydantic==2.12.5",
