@@ -13,7 +13,7 @@ dependencies = [
     "librosa==0.11.0",
     "praat-parselmouth==0.4.7",
     "numpy==2.2.6",
-    "azure-cognitiveservices-speech==1.48.2",
+    "azure-cognitiveservices-speech==1.49.1",
     "google-cloud-speech==2.36.1",
     "openai==2.22.0",
     "PyJWT==2.8.0",
@@ -22,11 +22,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-azure = ["azure-cognitiveservices-speech==1.48.2"]
+azure = ["azure-cognitiveservices-speech==1.49.1"]
 google = ["google-cloud-speech==2.36.1"]
 openai = ["openai==2.22.0"]
 all = [
-    "azure-cognitiveservices-speech==1.48.2",
+    "azure-cognitiveservices-speech==1.49.1",
     "google-cloud-speech==2.36.1",
     "openai==2.22.0",
 ]
