@@ -35,7 +35,7 @@ all = [
 dev = [
     "pytest==8.4.2",
     "pytest-asyncio==1.2.0",
-    "ruff==0.15.2",
+    "ruff==0.15.12",
     "httpx==0.28.1",
 ]
 
