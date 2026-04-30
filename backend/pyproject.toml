@@ -8,7 +8,7 @@ dependencies = [
     "uvicorn[standard]==0.41.0",
     "sqlalchemy==2.0.46",
     "pydub==0.25.1",
-    "python-multipart==0.0.22",
+    "python-multipart==0.0.27",
     "pydantic==2.12.5",
     "librosa==0.11.0",
     "praat-parselmouth==0.4.7",
