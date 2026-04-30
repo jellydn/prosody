@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Backend API for English Rhythm Coach"
 requires-python = ">=3.10"
 dependencies = [
-    "fastapi==0.131.0",
+    "fastapi==0.136.1",
     "uvicorn[standard]==0.41.0",
     "sqlalchemy==2.0.46",
     "pydub==0.25.1",
