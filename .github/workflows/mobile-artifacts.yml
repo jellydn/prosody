@@ -49,6 +49,9 @@ jobs:
         run: npx oxfmt --check .
 
       - name: Run tests
+        run: npm test --if-present -- --runInBand
+
+      - name: Progress queue tests
         run: npm run test:progress
 
   build-android:
