@@ -120,6 +120,37 @@ def test_get_progress_summary_no_data(db):
     assert response.status_code == 404
 
 
+def test_progress_submission_replay_and_conflict(db):
+    user = {
+        "native_language": "Vietnamese",
+        "english_level": "Intermediate",
+        "goal": "Meetings",
+    }
+    first_user = client.post("/api/v1/users", json=user).json()["user_id"]
+    second_user = client.post("/api/v1/users", json=user).json()["user_id"]
+    payload = {
+        "user_id": first_user,
+        "submission_id": "fb431cb1-f8e9-428a-a84f-c71f5c89a61c",
+        "day": 2,
+        "exercises_completed": 3,
+        "rhythm_score": 2.3,
+        "stress_score": 3.4,
+        "pacing_score": 4.1,
+        "intonation_score": 1.5,
+    }
+    first = client.post("/api/v1/progress", json=payload)
+    replay = client.post("/api/v1/progress", json=payload)
+    assert first.status_code == replay.status_code == 201
+    assert first.json()["id"] == replay.json()["id"]
+    assert (
+        client.post("/api/v1/progress", json={**payload, "day": 3}).status_code == 409
+    )
+    other = client.post("/api/v1/progress", json={**payload, "user_id": second_user})
+    assert other.status_code == 201
+    assert other.json()["id"] != first.json()["id"]
+    assert len(client.get(f"/api/v1/progress/{first_user}").json()) == 1
+
+
 if __name__ == "__main__":
     import sys
 

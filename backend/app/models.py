@@ -6,6 +6,7 @@ from sqlalchemy import (
     Float,
     DateTime,
     ForeignKey,
+    Index,
 )
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from datetime import datetime, timezone
@@ -37,9 +38,13 @@ class User(Base):
 
 class SessionResult(Base):
     __tablename__ = "session_results"
+    __table_args__ = (
+        Index("uq_progress_user_submission", "user_id", "submission_id", unique=True),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    submission_id = Column(String(36), nullable=True)
     day = Column(Integer, nullable=False)
     exercises_completed = Column(Integer, nullable=False)
     rhythm_score = Column(Float, nullable=False)
