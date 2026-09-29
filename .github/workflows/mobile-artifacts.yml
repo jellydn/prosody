@@ -49,7 +49,7 @@ jobs:
         run: npx oxfmt --check .
 
       - name: Run tests
-        run: npx jest --passWithNoTests
+        run: npm test
 
   build-android:
     name: Build Android APK
