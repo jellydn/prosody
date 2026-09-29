@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, renderAsync, screen } from "@testing-library/react-native";
 import type { ComponentProps } from "react";
 import HomeScreen from "./HomeScreen";
 
@@ -31,7 +31,7 @@ afterEach(() => {
   global.fetch = originalFetch;
 });
 
-function renderHome(selectedDay: number | undefined, completedDays: number[]) {
+async function renderHome(selectedDay: number | undefined, completedDays: number[]) {
   global.fetch = jest.fn(async (url) => ({
     ok: true,
     json: async () =>
@@ -41,40 +41,40 @@ function renderHome(selectedDay: number | undefined, completedDays: number[]) {
     route: { key: "home", name: "HomeMain", params: { selectedDay } },
     navigation: mockNavigation,
   } as unknown as ComponentProps<typeof HomeScreen>;
-  render(<HomeScreen {...props} />);
+  await renderAsync(<HomeScreen {...props} />);
 }
 
 it.each([0, -1, 1.5, 15, NaN, Infinity, 7])(
   "falls back to day 1 for invalid or missing selected day %s",
   async (day) => {
-    renderHome(day, [4]);
-    expect(await screen.findByText("Day 1 of 14")).toBeTruthy();
+    await renderHome(day, [4]);
+    expect(screen.getByText("Day 1 of 14")).toBeTruthy();
   },
 );
 
 it.each([1, 14])("loads valid selected day %s", async (day) => {
-  renderHome(day, [4]);
-  expect(await screen.findByText(`Day ${day} of 14`)).toBeTruthy();
+  await renderHome(day, [4]);
+  expect(screen.getByText(`Day ${day} of 14`)).toBeTruthy();
 });
 
 it("ignores invalid history entries when selecting the next day", async () => {
-  renderHome(undefined, [-4, 2, NaN, 400]);
-  expect(await screen.findByText("Day 3 of 14")).toBeTruthy();
+  await renderHome(undefined, [-4, 2, NaN, 400]);
+  expect(screen.getByText("Day 3 of 14")).toBeTruthy();
 });
 
 it("falls back when the next curriculum day is missing", async () => {
-  renderHome(undefined, [6]);
-  expect(await screen.findByText("Day 1 of 14")).toBeTruthy();
+  await renderHome(undefined, [6]);
+  expect(screen.getByText("Day 1 of 14")).toBeTruthy();
 });
 
 it("caps completed progress at the final day", async () => {
-  renderHome(undefined, [14]);
-  expect(await screen.findByText("Day 14 of 14")).toBeTruthy();
+  await renderHome(undefined, [14]);
+  expect(screen.getByText("Day 14 of 14")).toBeTruthy();
 });
 
 it("opens an exercise from the fallback day", async () => {
-  renderHome(-1, []);
-  await screen.findByText("Day 1 of 14");
+  await renderHome(-1, []);
+  expect(screen.getByText("Day 1 of 14")).toBeTruthy();
   const { CURRICULUM_BY_DAY } = jest.requireActual("../assets/curriculum");
   const exercise = CURRICULUM_BY_DAY[1].exercises[0];
   fireEvent.press(screen.getByText(exercise.title));
