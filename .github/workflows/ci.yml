@@ -58,6 +58,10 @@ jobs:
         working-directory: mobile
         run: npx tsc --noEmit
 
+      - name: Run tests
+        working-directory: mobile
+        run: npm test -- --runInBand
+
       - name: Lint
         working-directory: mobile
         run: npx oxlint .
