@@ -60,7 +60,7 @@ jobs:
 
       - name: Progress queue tests
         working-directory: mobile
-        run: npm test
+        run: npm run test:progress
 
       - name: Lint
         working-directory: mobile
