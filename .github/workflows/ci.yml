@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   backend:
@@ -52,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile
-        run: npm install
+        run: npm ci
 
       - name: TypeScript check
         working-directory: mobile
