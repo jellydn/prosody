@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
 )
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.engine import make_url
 from datetime import datetime, timezone
 import os
 
@@ -18,10 +19,33 @@ class Base(DeclarativeBase):
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/app.db")
 
-engine_connect_args = (
-    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-)
-engine = create_engine(DATABASE_URL, connect_args=engine_connect_args)
+
+def _pool_setting(name: str, default: int, minimum: int) -> int:
+    try:
+        value = int(os.getenv(name, str(default)))
+    except ValueError:
+        raise ValueError(f"{name} must be an integer >= {minimum}") from None
+    if value < minimum:
+        raise ValueError(f"{name} must be an integer >= {minimum}")
+    return value
+
+
+def create_database_engine(database_url: str):
+    backend = make_url(database_url).get_backend_name()
+    if backend == "sqlite":
+        return create_engine(database_url, connect_args={"check_same_thread": False})
+    if backend == "postgresql":
+        return create_engine(
+            database_url,
+            pool_size=_pool_setting("DB_POOL_SIZE", 5, 1),
+            max_overflow=_pool_setting("DB_MAX_OVERFLOW", 5, 0),
+            pool_timeout=_pool_setting("DB_POOL_TIMEOUT", 30, 1),
+            pool_pre_ping=True,
+        )
+    return create_engine(database_url)
+
+
+engine = create_database_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
