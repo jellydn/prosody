@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 
@@ -20,6 +22,7 @@ class UserCreateResponse(BaseModel):
 
 
 class ProgressCreateRequest(BaseModel):
+    submission_id: UUID | None = None
     user_id: int = Field(..., gt=0)
     day: int = Field(..., gt=0)
     exercises_completed: int = Field(..., ge=0)
@@ -74,17 +77,39 @@ async def create_progress(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
 
-    session_result = SessionResult(
-        user_id=request.user_id,
-        day=request.day,
-        exercises_completed=request.exercises_completed,
-        rhythm_score=request.rhythm_score,
-        stress_score=request.stress_score,
-        pacing_score=request.pacing_score,
-        intonation_score=request.intonation_score,
-    )
+    payload = request.model_dump(mode="json")
+
+    def replay():
+        if request.submission_id is None:
+            return None
+        existing = (
+            db.query(SessionResult)
+            .filter_by(
+                user_id=request.user_id, submission_id=str(request.submission_id)
+            )
+            .first()
+        )
+        if existing is None:
+            return None
+        if any(getattr(existing, key) != value for key, value in payload.items()):
+            raise HTTPException(
+                status_code=409,
+                detail="Submission ID already used for different progress",
+            )
+        return {"message": "Progress saved successfully", "id": existing.id}
+
+    if result := replay():
+        return result
+    session_result = SessionResult(**payload)
     db.add(session_result)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # A concurrent request can commit the same key after the initial lookup.
+        db.rollback()
+        if result := replay():
+            return result
+        raise
     db.refresh(session_result)
     return {"message": "Progress saved successfully", "id": session_result.id}
 

@@ -2,8 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { randomUUID } from "expo-crypto";
+import { useRef, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { API_BASE_URL } from "../config/api";
+import { progressQueue } from "../services/progressSync";
 import type { HomeStackParamList } from "./ExerciseScreen";
 
 interface ExerciseScore {
@@ -30,6 +32,9 @@ export default function SessionCompletionScreen() {
   const route = useRoute();
   const { day, scores, streak, previousAverage } =
     route.params as HomeStackParamList["SessionCompletion"];
+  const [submissionId] = useState(randomUUID);
+  const saving = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const calculateAverageScore = () => {
     if (scores.length === 0) return 0;
@@ -54,37 +59,37 @@ export default function SessionCompletionScreen() {
     MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
 
   const handleDone = async () => {
+    if (saving.current) return;
+    saving.current = true;
+    setIsSaving(true);
     try {
       const userId = await AsyncStorage.getItem("userId");
-      if (!userId) {
+      if (!userId || !Number.isSafeInteger(Number(userId)) || Number(userId) <= 0) {
         Alert.alert("Error", "User ID not found. Please complete onboarding.");
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/progress`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: parseInt(userId),
-          day,
-          exercises_completed: scores.length,
-          rhythm_score: calculateCategoryAverage("rhythm_score"),
-          stress_score: calculateCategoryAverage("stress_score"),
-          pacing_score: calculateCategoryAverage("pacing_score"),
-          intonation_score: calculateCategoryAverage("intonation_score"),
-        }),
+      await progressQueue.enqueue({
+        submission_id: submissionId,
+        user_id: Number(userId),
+        day,
+        exercises_completed: scores.length,
+        rhythm_score: calculateCategoryAverage("rhythm_score"),
+        stress_score: calculateCategoryAverage("stress_score"),
+        pacing_score: calculateCategoryAverage("pacing_score"),
+        intonation_score: calculateCategoryAverage("intonation_score"),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      navigation.navigate("HomeMain");
+      void progressQueue.sync();
+      navigation.reset({ index: 0, routes: [{ name: "HomeMain" }] });
     } catch (err) {
       console.error("Error saving progress:", err);
-      Alert.alert("Save Failed", "Could not save your progress. Please try again.");
+      Alert.alert(
+        "Save Failed",
+        "Progress could not be saved on this device. Check device storage and try again before leaving this screen.",
+      );
+    } finally {
+      saving.current = false;
+      setIsSaving(false);
     }
   };
 
@@ -183,8 +188,10 @@ export default function SessionCompletionScreen() {
           <Text style={styles.motivationText}>{motivationalMessage}</Text>
         </View>
 
-        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={styles.doneButtonText}>Done for Today</Text>
+        <TouchableOpacity style={styles.doneButton} onPress={handleDone} disabled={isSaving}>
+          <Text style={styles.doneButtonText}>
+            {isSaving ? "Saving on device…" : "Done for Today"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
