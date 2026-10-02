@@ -89,20 +89,27 @@ export default function HomeScreen({ route }: HomeScreenProps) {
 
       let dayToLoad = 1;
 
-      if (route.params?.selectedDay && route.params.selectedDay in CURRICULUM_BY_DAY) {
+      if (route.params?.selectedDay !== undefined) {
         dayToLoad = route.params.selectedDay;
       } else if (sessionsResponse.ok) {
         const sessions = (await sessionsResponse.json()) as Array<{
           day: number;
         }>;
-        const completedDays = new Set(sessions.map((session) => session.day));
+        const completedDays = new Set(
+          sessions
+            .map((session) => session.day)
+            .filter((day) => Number.isInteger(day) && Object.hasOwn(CURRICULUM_BY_DAY, day)),
+        );
         const highestCompletedDay =
           completedDays.size > 0 ? Math.max(...Array.from(completedDays)) : 0;
         const nextDay = Math.min(highestCompletedDay + 1, 14);
         dayToLoad = nextDay;
       }
 
-      setCurrentDay(CURRICULUM_BY_DAY[dayToLoad as keyof typeof CURRICULUM_BY_DAY] as DayData);
+      const day = Number.isInteger(dayToLoad)
+        ? CURRICULUM_BY_DAY[dayToLoad as keyof typeof CURRICULUM_BY_DAY]
+        : undefined;
+      setCurrentDay((day ?? CURRICULUM_BY_DAY[1]) as DayData);
     } catch (err) {
       console.error("Error loading progress:", err);
       setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
