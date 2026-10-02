@@ -217,8 +217,10 @@ the running app explicitly, run `amp orb portal 8082 --title 'Prosody'`.
 Use the exact HTTPS URL printed by Amp; do not use the orb's private address.
 
 - **Browser on iPhone:** open the app Portal in Safari and sign in to Amp with
-  access to this thread. Complete onboarding, practice, and check progress.
-  Allow microphone access when prompted. Browser testing is not native testing.
+  access to this thread. Complete onboarding, browse exercises, and check
+  progress. Browser testing is not native testing. The existing exercise upload
+  code uses React Native file objects, not browser Blobs; browser recording and
+  scoring are not supported by this preview. Use the native client for that flow.
 - **API:** open the `/docs` link printed by ensure. App requests use the same
   origin through Metro's opt-in `DEV_API_PROXY_URL` proxy, because authenticated
   Portals do not support cross-origin browser preflight requests.
