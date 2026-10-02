@@ -18,7 +18,7 @@ if (process.env.DEV_API_PROXY_URL) {
   });
   config.server.enhanceMiddleware = (middleware) => (request, response, next) => {
     const path = request.url.split("?")[0];
-    if (/^\/api\//.test(path) || ["/health", "/docs", "/openapi.json"].includes(path)) {
+    if (path.startsWith("/api/") || ["/health", "/docs", "/openapi.json"].includes(path)) {
       proxy.web(request, response);
     } else {
       middleware(request, response, next);
