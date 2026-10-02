@@ -208,6 +208,49 @@ For local development, mobile defaults to `http://localhost:8000` (or `http://10
 EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 npx expo start
 ```
 
+### Test through an Amp Orb Portal
+
+Install dependencies with `just backend-install` and `npm ci --prefix mobile`,
+then run `amp orb services ensure` from the repository root. The tracked
+`.amp/services.yaml` starts the API and Expo web/development server. To register
+the running app explicitly, run `amp orb portal 8082 --title 'Prosody'`.
+Use the exact HTTPS URL printed by Amp; do not use the orb's private address.
+
+- **Browser on iPhone:** open the app Portal in Safari and sign in to Amp with
+  access to this thread. Complete onboarding, practice, and check progress.
+  Allow microphone access when prompted. Browser testing is not native testing.
+- **API:** open the `/docs` link printed by ensure. App requests use the same
+  origin through Metro's opt-in `DEV_API_PROXY_URL` proxy, because authenticated
+  Portals do not support cross-origin browser preflight requests.
+- **Native development client:** rebuild the app after native dependency or
+  asset changes. A native client cannot use Safari's Amp sign-in cookie. For a
+  short test, the thread owner must explicitly select **Portal Options → Make
+  Public**, choose a short expiry, then enter the app's HTTPS Portal URL in the
+  development client's launcher. Do not use Expo Go to verify the native splash.
+  This access change is not automatic. Confirm `/health` works without an Amp
+  sign-in before trying the native client. The server advertises its public
+  bundle URL and embeds the same API origin; restart it if that URL changes.
+
+The API uses an isolated SQLite database at `/tmp/prosody-portal.db`; it is not
+production data or a durable backup. Use synthetic profiles and recordings only.
+Making the Portal public exposes these test endpoints and data to anyone with
+the link. Keep paid provider keys out of test sessions. Restore private access
+after testing. Orb sleep can interrupt a session; opening the Portal wakes it.
+
+The approved launcher icon is an opaque 1024px image. The Android adaptive icon
+has extra padding for launcher masks. iOS uses the full portrait splash with
+aspect-fit scaling; Android's system splash uses the symbol, followed by the
+full portrait image while app storage loads. No fixed startup delay is added.
+Wide or tall screens can have dark margins so the logo and tagline stay intact.
+Native splash behavior must be checked in a rebuilt Release app, not only Metro
+or a development client. iOS currently uses Expo's legacy full-screen splash
+option; review this configuration when upgrading Expo.
+
+On a Mac with the existing iPhone checkout, preserve personal signing and the
+local Podfile deployment-target fix. Run Expo prebuild **without `--clean`** to
+update assets, then install pods and rebuild in Xcode. A clean prebuild can erase
+that local iOS 15.1 Podfile fix. This orb does not change that Mac checkout.
+
 ### Test on Your iPhone with a Personal Team (like Oak)
 
 Use a local Xcode build, not an EAS IPA, for free Apple Account testing. You need
