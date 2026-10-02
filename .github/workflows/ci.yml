@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: mobile
-        run: npm install
+        run: npm ci
 
       - name: TypeScript check
         working-directory: mobile
@@ -60,6 +60,10 @@ jobs:
       - name: Progress queue tests
         working-directory: mobile
         run: npm run test:progress
+
+      - name: Run tests
+        working-directory: mobile
+        run: npm test -- --runInBand
 
       - name: Lint
         working-directory: mobile
