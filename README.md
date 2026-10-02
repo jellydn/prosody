@@ -208,6 +208,82 @@ For local development, mobile defaults to `http://localhost:8000` (or `http://10
 EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 npx expo start
 ```
 
+### Test on Your iPhone with a Personal Team (like Oak)
+
+Use a local Xcode build, not an EAS IPA, for free Apple Account testing. You need
+a Mac with current Xcode and its iOS platform installed, Node.js 20.19.4 or newer,
+CocoaPods, and an iPhone connected by USB for the first install.
+
+1. Add your Apple Account in **Xcode → Settings → Accounts** and accept any Apple
+   developer agreements. A free **Personal Team** is enough for direct testing.
+2. Connect and trust the iPhone. Enable **Settings → Privacy & Security → Developer
+   Mode**, restart the phone, and confirm the prompt.
+3. From this repository on your Mac, install dependencies and generate the native
+   project:
+
+   ```bash
+   git switch main
+   git pull --ff-only
+   npm ci --prefix mobile
+   just mobile-prebuild
+   just mobile-ios-open
+   ```
+
+   Open the generated `.xcworkspace`, not `.xcodeproj`, because React Native uses
+   CocoaPods. The generated `mobile/ios/` directory is intentionally not committed.
+4. In Xcode, select the application target under **Signing & Capabilities**, enable
+   **Automatically manage signing**, and select your Personal Team. If the bundle
+   ID is unavailable, use a unique local value such as `com.yourname.prosody.dev`.
+   Do not commit a personal team ID or signing credentials. A later Expo prebuild
+   can reset edits made only in the generated project.
+5. Start a test backend on your Mac in a separate terminal:
+
+   ```bash
+   just backend-install
+   just backend-dev
+   ```
+
+   Use disposable development data. Startup applies the committed migrations.
+   Connect the phone and Mac to the same trusted Wi-Fi network, permit local
+   network access, and allow port 8000 through the Mac firewall if prompted.
+6. Build and install the development app with your Mac's LAN address:
+
+   ```bash
+   cd mobile
+   EXPO_PUBLIC_API_BASE_URL="http://<MAC_LAN_IP>:8000" npx expo run:ios --device
+   ```
+
+   Replace `<MAC_LAN_IP>` with your Mac's Wi-Fi address and select the connected
+   iPhone. Keep Metro running for the development build.
+   `localhost` on the phone is the phone itself, not your Mac.
+
+For a standalone Release build, first use a reachable HTTPS test API with a valid
+certificate and the current backend migrations. Replace `<YOUR_TEST_API>` with
+that API's hostname, then run:
+
+```bash
+cd mobile
+EXPO_PUBLIC_API_BASE_URL="https://<YOUR_TEST_API>" \
+  npx expo run:ios --device --configuration Release
+```
+
+This embeds the JavaScript bundle, so Metro is not needed after installation.
+The API URL is embedded at build time; rebuild to change it. The existing
+`just mobile-ios-prod` command uses `https://prosody.itman.fyi`; check that service
+and its certificate before using it. Do not disable TLS verification to work
+around an expired certificate.
+
+Test microphone permission, recording/playback, and a full practice session.
+For offline progress, finish a session offline, tap Done twice, then reconnect:
+one saved session should sync once. Repeat after restarting the app. Deploy the
+idempotent progress backend before using retry-enabled clients against a shared
+API. Native dependency changes such as NetInfo or Expo Crypto require a rebuild.
+
+Free Personal Team profiles normally expire after seven days; reconnect and
+rebuild to renew the app. This is not TestFlight, App Store, or general IPA
+distribution. EAS internal iOS distribution is a separate signed-device workflow
+and generally requires a paid Apple Developer team and registered devices.
+
 ### Build APK/IPA Artifacts (Sideload)
 
 This repo now includes a GitHub Actions CD workflow at `.github/workflows/mobile-artifacts.yml` that builds downloadable mobile artifacts without App Store / Play Store submission.
