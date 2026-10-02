@@ -3,8 +3,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import TabNavigator from "./navigation/TabNavigator";
 import OnboardingScreen from "./screens/OnboardingScreen";
+import { startProgressSync } from "./services/progressSync";
+import ProgressSyncStatus from "./components/ProgressSyncStatus";
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +50,8 @@ export default function App() {
     checkOnboardingStatus();
   }, [checkOnboardingStatus]);
 
+  useEffect(startProgressSync, []);
+
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -56,14 +61,19 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialRouteName={hasCompletedOnboarding ? "Main" : "Onboarding"}
-      >
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Main" component={TabNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <SafeAreaView edges={["top"]}>
+          <ProgressSyncStatus />
+        </SafeAreaView>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName={hasCompletedOnboarding ? "Main" : "Onboarding"}
+        >
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="Main" component={TabNavigator} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

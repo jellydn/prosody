@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
@@ -49,7 +49,10 @@ jobs:
         run: npx oxfmt --check .
 
       - name: Run tests
-        run: npx jest --passWithNoTests
+        run: npm test --if-present -- --runInBand
+
+      - name: Progress queue tests
+        run: npm run test:progress
 
   build-android:
     name: Build Android APK
@@ -66,7 +69,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
@@ -111,7 +114,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 
@@ -165,7 +168,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: mobile/package-lock.json
 

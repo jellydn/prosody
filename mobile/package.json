@@ -8,6 +8,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "test": "jest",
+    "test:progress": "tsx --test services/*.node-test.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
@@ -16,12 +18,14 @@
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "11.5.2",
     "@react-navigation/bottom-tabs": "^7.14.0",
     "@react-navigation/native": "^7.1.28",
     "@react-navigation/native-stack": "^7.13.0",
     "expo": "~55.0.3",
     "expo-asset": "~55.0.8",
     "expo-audio": "~55.0.8",
+    "expo-crypto": "~55.0.19",
     "expo-dev-client": "~55.0.10",
     "expo-font": "~55.0.4",
     "expo-secure-store": "~55.0.8",
@@ -35,8 +39,17 @@
     "react-native-svg": "15.15.3"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
+    "jest": "^29.7.0",
+    "jest-expo": "55.0.0",
     "react-native-svg-transformer": "^1.5.3",
+    "react-test-renderer": "19.2.0",
+    "tsx": "^4.23.15",
     "typescript": "~5.9.2"
+  },
+  "jest": {
+    "preset": "jest-expo"
   }
 }
