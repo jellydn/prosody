@@ -42,7 +42,8 @@
             "enableFullScreenImage_legacy": true
           }
         }
-      ]
+      ],
+      "./plugins/withIosScenes"
     ],
     "extra": {
       "eas": {
