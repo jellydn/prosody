@@ -17,7 +17,7 @@ dependencies = [
     "azure-cognitiveservices-speech==1.52.0",
     "google-cloud-speech==2.41.0",
     "openai==2.54.0",
-    "PyJWT==2.8.0",
+    "PyJWT==2.15.1",
     "protobuf>=5.0",
     "alembic>=1.18.4",
 ]
