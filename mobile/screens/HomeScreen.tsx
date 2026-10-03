@@ -6,9 +6,10 @@ import type {
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CURRICULUM_BY_DAY } from "../assets/curriculum";
 import { API_BASE_URL } from "../config/api";
+import { apiErrorMessage, apiRequest } from "../services/apiRequest";
 import type { Exercise, ExerciseScores, ExerciseType, HomeStackParamList } from "./ExerciseScreen";
 
 type DayData = {
@@ -65,36 +66,30 @@ export default function HomeScreen({ route }: HomeScreenProps) {
         return;
       }
 
-      const [summaryResponse, sessionsResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/progress/${userId}/summary`),
-        fetch(`${API_BASE_URL}/api/v1/progress/${userId}`),
+      const [data, sessions] = await Promise.all([
+        apiRequest<ProgressSummaryResponse>(`${API_BASE_URL}/api/v1/progress/${userId}/summary`),
+        apiRequest<Array<{ day: number }>>(`${API_BASE_URL}/api/v1/progress/${userId}`),
       ]);
 
-      if (summaryResponse.ok) {
-        const data = (await summaryResponse.json()) as ProgressSummaryResponse;
-        setStreak(data.streak || 0);
+      setStreak(data.streak || 0);
 
-        const fallbackAverage =
-          data.averages && Object.keys(data.averages).length > 0
-            ? Object.values(data.averages).reduce((acc, value) => acc + value, 0) /
-              Object.values(data.averages).length
-            : undefined;
-        const averageScore =
-          typeof data.average_score === "number" ? data.average_score : fallbackAverage;
+      const fallbackAverage =
+        data.averages && Object.keys(data.averages).length > 0
+          ? Object.values(data.averages).reduce((acc, value) => acc + value, 0) /
+            Object.values(data.averages).length
+          : undefined;
+      const averageScore =
+        typeof data.average_score === "number" ? data.average_score : fallbackAverage;
 
-        if (averageScore !== undefined) {
-          setPreviousAverage(averageScore);
-        }
+      if (averageScore !== undefined) {
+        setPreviousAverage(averageScore);
       }
 
       let dayToLoad = 1;
 
       if (route.params?.selectedDay !== undefined) {
         dayToLoad = route.params.selectedDay;
-      } else if (sessionsResponse.ok) {
-        const sessions = (await sessionsResponse.json()) as Array<{
-          day: number;
-        }>;
+      } else {
         const completedDays = new Set(
           sessions
             .map((session) => session.day)
@@ -112,7 +107,23 @@ export default function HomeScreen({ route }: HomeScreenProps) {
       setCurrentDay((day ?? CURRICULUM_BY_DAY[1]) as DayData);
     } catch (err) {
       console.error("Error loading progress:", err);
-      setCurrentDay(CURRICULUM_BY_DAY[1] as DayData);
+      const selectedDay = route.params?.selectedDay;
+      const fallback =
+        selectedDay !== undefined && Number.isInteger(selectedDay)
+          ? CURRICULUM_BY_DAY[selectedDay as keyof typeof CURRICULUM_BY_DAY]
+          : undefined;
+      setCurrentDay(
+        (previous) =>
+          (fallback as DayData | undefined) ?? previous ?? (CURRICULUM_BY_DAY[1] as DayData),
+      );
+      Alert.alert(
+        "Progress unavailable",
+        `${apiErrorMessage(err)} You can still practice downloaded lessons.`,
+        [
+          { text: "Continue", style: "cancel" },
+          { text: "Retry", onPress: () => void loadProgress() },
+        ],
+      );
     }
   }, [navigation, route.params?.selectedDay]);
 

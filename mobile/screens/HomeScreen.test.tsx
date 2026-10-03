@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fireEvent, renderAsync, screen } from "@testing-library/react-native";
 import type { ComponentProps } from "react";
+import { Alert } from "react-native";
 import HomeScreen from "./HomeScreen";
 
 const mockNavigate = jest.fn();
@@ -28,12 +29,14 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   global.fetch = originalFetch;
 });
 
 async function renderHome(selectedDay: number | undefined, completedDays: number[]) {
   global.fetch = jest.fn(async (url) => ({
     ok: true,
+    headers: { get: () => "application/json" },
     json: async () =>
       String(url).endsWith("/summary") ? {} : completedDays.map((day) => ({ day })),
   })) as jest.Mock;
@@ -79,4 +82,27 @@ it("opens an exercise from the fallback day", async () => {
   const exercise = CURRICULUM_BY_DAY[1].exercises[0];
   fireEvent.press(screen.getByText(exercise.title));
   expect(mockNavigate).toHaveBeenCalledWith("ExerciseScreen", { exercise, source: "home" });
+});
+
+it("keeps the selected bundled lesson available when the API is offline", async () => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
+  jest.spyOn(Alert, "alert").mockImplementation(() => {});
+  global.fetch = jest.fn().mockRejectedValue(new TypeError("offline"));
+  const props = {
+    route: { key: "home", name: "HomeMain", params: { selectedDay: 4 } },
+    navigation: mockNavigation,
+  } as unknown as ComponentProps<typeof HomeScreen>;
+  const view = await renderAsync(<HomeScreen {...props} />);
+  expect(screen.getByText("Day 4 of 14")).toBeTruthy();
+  expect(Alert.alert).toHaveBeenCalledWith(
+    "Progress unavailable",
+    expect.stringContaining("internet connection"),
+    expect.arrayContaining([
+      expect.objectContaining({ text: "Retry", onPress: expect.any(Function) }),
+    ]),
+  );
+  await view.rerenderAsync(
+    <HomeScreen {...props} route={{ ...props.route, params: { selectedDay: 6 } }} />,
+  );
+  expect(screen.getByText("Day 6 of 14")).toBeTruthy();
 });

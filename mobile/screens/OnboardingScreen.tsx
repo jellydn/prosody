@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Logo } from "../components/Logo";
 import { API_BASE_URL } from "../config/api";
+import { ApiError, apiErrorMessage, apiRequest } from "../services/apiRequest";
 
 const NATIVE_LANGUAGES = [
   { code: "vi", name: "Vietnamese" },
@@ -74,7 +75,7 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
         goal: goal!,
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
+      const data = await apiRequest<{ user_id: number }>(`${API_BASE_URL}/api/v1/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,19 +87,17 @@ export default function OnboardingScreen({ navigation }: OnboardingScreenProps) 
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        await AsyncStorage.multiSet([
-          ["userProfile", JSON.stringify(profile)],
-          ["userId", data.user_id.toString()],
-        ]);
-        navigation.replace("Main");
-      } else {
-        throw new Error("Failed to create profile");
+      if (!Number.isInteger(data?.user_id) || data.user_id <= 0) {
+        throw new ApiError("The server returned an invalid profile. Please try again later.");
       }
+      await AsyncStorage.multiSet([
+        ["userProfile", JSON.stringify(profile)],
+        ["userId", data.user_id.toString()],
+      ]);
+      navigation.replace("Main");
     } catch (error) {
-      await AsyncStorage.multiRemove(["userProfile", "userId"]);
-      Alert.alert("Error", "Failed to complete setup. Please try again.", [{ text: "OK" }]);
+      await AsyncStorage.multiRemove(["userProfile", "userId"]).catch(() => {});
+      Alert.alert("Setup unavailable", apiErrorMessage(error), [{ text: "OK" }]);
       console.error("Onboarding error:", error);
     } finally {
       setIsLoading(false);

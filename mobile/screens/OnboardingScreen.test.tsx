@@ -43,7 +43,11 @@ it("does not submit an incomplete profile", async () => {
 });
 
 it("saves the returned identity and selected profile before entering the app", async () => {
-  global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ user_id: 73 }) });
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    headers: { get: () => "application/json" },
+    json: async () => ({ user_id: 73 }),
+  });
   await renderOnboarding();
   await selectProfile();
   await fireEventAsync.press(screen.getByText("Get Started"));
@@ -71,7 +75,7 @@ it("saves the returned identity and selected profile before entering the app", a
 
 it("clears partial setup and stays on onboarding after a failed request", async () => {
   jest.spyOn(console, "error").mockImplementation(() => {});
-  global.fetch = jest.fn().mockResolvedValue({ ok: false });
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503 });
   await renderOnboarding();
   await selectProfile();
   await fireEventAsync.press(screen.getByText("Get Started"));
@@ -79,8 +83,38 @@ it("clears partial setup and stays on onboarding after a failed request", async 
   expect(AsyncStorage.multiRemove).toHaveBeenCalledWith(["userProfile", "userId"]);
   expect(AsyncStorage.multiSet).not.toHaveBeenCalled();
   expect(replace).not.toHaveBeenCalled();
-  expect(Alert.alert).toHaveBeenCalledWith("Error", "Failed to complete setup. Please try again.", [
-    { text: "OK" },
-  ]);
+  expect(Alert.alert).toHaveBeenCalledWith(
+    "Setup unavailable",
+    "The server is unavailable. Please try again later.",
+    [{ text: "OK" }],
+  );
   expect(screen.getByText("Get Started")).toBeEnabled();
+});
+
+it("keeps profile choices after a network failure and allows a successful manual retry", async () => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
+  global.fetch = jest
+    .fn()
+    .mockRejectedValueOnce(new TypeError("Network request failed"))
+    .mockResolvedValueOnce({
+      ok: true,
+      headers: { get: () => "application/json" },
+      json: async () => ({ user_id: 91 }),
+    });
+  await renderOnboarding();
+  await selectProfile();
+  await fireEventAsync.press(screen.getByText("Get Started"));
+  expect(replace).not.toHaveBeenCalled();
+  expect(Alert.alert).toHaveBeenCalledWith(
+    "Setup unavailable",
+    expect.stringContaining("internet connection"),
+    expect.any(Array),
+  );
+  expect(global.fetch).toHaveBeenCalledTimes(1);
+  await fireEventAsync.press(screen.getByText("Get Started"));
+  expect(replace).toHaveBeenCalledWith("Main");
+  expect(AsyncStorage.multiSet).toHaveBeenCalledWith(expect.arrayContaining([["userId", "91"]]));
+  expect(jest.mocked(global.fetch).mock.calls[1][1]?.body).toBe(
+    jest.mocked(global.fetch).mock.calls[0][1]?.body,
+  );
 });

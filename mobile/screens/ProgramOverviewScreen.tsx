@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { API_BASE_URL } from "../config/api";
+import { apiErrorMessage, apiRequest } from "../services/apiRequest";
 import type { HomeStackParamList } from "./ExerciseScreen";
 
 export type ProgramOverviewScreenProps = NativeStackScreenProps<
@@ -55,12 +56,9 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/progress/${userId}`);
-      if (!response.ok) {
-        return;
-      }
-
-      const data = await response.json();
+      const data = await apiRequest<Array<{ day: number }>>(
+        `${API_BASE_URL}/api/v1/progress/${userId}`,
+      );
       const completedDays = new Set<number>(data.map((session: { day: number }) => session.day));
 
       const maxDay = completedDays.size > 0 ? Math.max(...completedDays) + 1 : 1;
@@ -79,6 +77,10 @@ export default function ProgramOverviewScreen({ navigation }: ProgramOverviewScr
       setDays(dayCards);
     } catch (err) {
       console.error("Error loading progress:", err);
+      Alert.alert("Progress unavailable", apiErrorMessage(err), [
+        { text: "Cancel", style: "cancel" },
+        { text: "Retry", onPress: () => void loadProgress() },
+      ]);
     }
   }, [navigation]);
 

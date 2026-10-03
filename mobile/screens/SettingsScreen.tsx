@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { API_BASE_URL } from "../config/api";
 import { BYOP_API_KEY_KEY, BYOP_PROVIDER_KEY } from "../config/byop";
+import { apiErrorMessage, apiRequest } from "../services/apiRequest";
 
 const PROVIDERS = [
   { id: "free", name: "Free (default)", keyUrl: null },
@@ -159,24 +160,21 @@ export default function SettingsScreen() {
         headers["X-Provider-Api-Key"] = apiKey;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
-        method: "POST",
-        body: formData,
-        headers,
-      });
+      await apiRequest(
+        `${API_BASE_URL}/api/v1/analyze`,
+        {
+          method: "POST",
+          body: formData,
+          headers,
+        },
+        60000,
+      );
 
-      if (response.ok) {
-        setTestStep("success");
-      } else {
-        const errorData = await response.json().catch(() => null);
-        const detail = errorData?.detail || `Server error (${response.status})`;
-        setTestStep("error");
-        setTestError(detail);
-      }
+      setTestStep("success");
     } catch (err) {
       console.error("Test failed:", err);
       setTestStep("error");
-      setTestError("Failed to connect to server");
+      setTestError(apiErrorMessage(err));
     }
   };
 
