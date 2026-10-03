@@ -16,7 +16,7 @@ dependencies = [
     "numpy==2.2.6",
     "azure-cognitiveservices-speech==1.52.0",
     "google-cloud-speech==2.41.0",
-    "openai==2.22.0",
+    "openai==2.54.0",
     "PyJWT==2.8.0",
     "protobuf>=5.0",
     "alembic>=1.18.4",
@@ -25,11 +25,11 @@ dependencies = [
 [project.optional-dependencies]
 azure = ["azure-cognitiveservices-speech==1.52.0"]
 google = ["google-cloud-speech==2.41.0"]
-openai = ["openai==2.22.0"]
+openai = ["openai==2.54.0"]
 all = [
     "azure-cognitiveservices-speech==1.52.0",
     "google-cloud-speech==2.41.0",
-    "openai==2.22.0",
+    "openai==2.54.0",
 ]
 
 [dependency-groups]
