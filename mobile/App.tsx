@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { Image, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import TabNavigator from "./navigation/TabNavigator";
 import OnboardingScreen from "./screens/OnboardingScreen";
@@ -54,8 +54,13 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={{ flex: 1, backgroundColor: "#100b50" }}>
+        <Image
+          source={require("./assets/splash.png")}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="contain"
+          accessibilityLabel="Prosody. Find your rhythm. Loading."
+        />
       </View>
     );
   }

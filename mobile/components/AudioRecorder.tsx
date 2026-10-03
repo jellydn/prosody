@@ -61,7 +61,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
   }, []);
 
   useEffect(() => {
-    let pulseInterval: NodeJS.Timeout | null = null;
+    let pulseInterval: ReturnType<typeof setInterval> | null = null;
 
     if (recorderState.isRecording) {
       pulseInterval = setInterval(() => {

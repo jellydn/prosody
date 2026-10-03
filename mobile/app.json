@@ -7,11 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#007AFF"
-    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -21,7 +16,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#100b50"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -30,7 +25,25 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-audio", "expo-font", "expo-asset", "expo-secure-store"],
+    "plugins": [
+      "expo-audio",
+      "expo-font",
+      "expo-asset",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#100b50",
+          "image": "./assets/icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "ios": {
+            "image": "./assets/splash.png",
+            "enableFullScreenImage_legacy": true
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "3b25ceb8-1c89-4b6e-a10b-a0750be1e6d7"

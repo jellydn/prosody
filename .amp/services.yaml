@@ -1,0 +1,27 @@
+services:
+  api:
+    cwd: backend
+    command: uv run uvicorn app.main:app --host 0.0.0.0 --port "$PORT"
+    port: 8000
+    health: /health
+    env:
+      DATABASE_URL: sqlite:////tmp/prosody-portal.db
+      RUN_MIGRATIONS_ON_STARTUP: "true"
+  mobile:
+    cwd: mobile
+    command: >-
+      EXPO_PACKAGER_PROXY_URL="$PUBLIC_URL"
+      EXPO_PUBLIC_API_BASE_URL="$PUBLIC_URL"
+      npx expo start --web --dev-client --host lan --port "$PORT"
+    port: 8082
+    health: /status
+    env:
+      CI: "1"
+      DEV_API_PROXY_URL: http://127.0.0.1:8000
+    portal:
+      title: Prosody
+      description: Sign in to Amp in Safari. Uses an isolated test database.
+    portals:
+      - url: /docs
+        title: Prosody API
+        description: API documentation on the same authenticated origin.
