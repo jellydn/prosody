@@ -7,6 +7,7 @@ import AudioRecorder from "../components/AudioRecorder";
 import FeedbackCard from "../components/FeedbackCard";
 import { API_BASE_URL } from "../config/api";
 import { appendByopToFormData } from "../config/byop";
+import { apiErrorMessage, apiRequest } from "../services/apiRequest";
 import type { AnalysisResult } from "../types/analysis";
 import type { Exercise, ExerciseScores } from "./ExerciseScreen";
 
@@ -64,24 +65,25 @@ export default function ChunkSpeakingScreen({
       formData.append("target_text", exercise.targetText);
       const byopHeaders = await appendByopToFormData(formData);
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          ...byopHeaders,
+      const result = await apiRequest<AnalysisResult>(
+        `${API_BASE_URL}/api/v1/analyze`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            ...byopHeaders,
+          },
         },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+        60000,
+      );
       setAnalysisResult(result);
     } catch (err) {
       console.error("Error analyzing recording:", err);
-      Alert.alert("Analysis Failed", "Could not analyze your recording. Please try again.");
+      Alert.alert("Analysis Failed", apiErrorMessage(err), [
+        { text: "Cancel", style: "cancel" },
+        { text: "Retry", onPress: () => void analyzeRecording(uri) },
+      ]);
     } finally {
       setIsAnalyzing(false);
     }

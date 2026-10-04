@@ -253,6 +253,13 @@ local Podfile deployment-target fix. Run Expo prebuild **without `--clean`** to
 update assets, then install pods and rebuild in Xcode. A clean prebuild can erase
 that local iOS 15.1 Podfile fix. This orb does not change that Mac checkout.
 
+The `withIosScenes` config plugin moves Expo SDK 55 startup into a scene-owned
+window. This fixes the iOS 27 startup trap in
+`UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption`. The plugin and
+Swift scene delegate are source files, so this fix survives Expo prebuild. Review
+or remove this backport when upgrading to Expo's built-in scene support. The
+plugin stops with an error if the generated AppDelegate template changes.
+
 ### Test on Your iPhone with a Personal Team (like Oak)
 
 Use a local Xcode build, not an EAS IPA, for free Apple Account testing. You need

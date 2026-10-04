@@ -4,6 +4,7 @@ import { CommonActions, useFocusEffect, useNavigation } from "@react-navigation/
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { API_BASE_URL } from "../config/api";
+import { apiErrorMessage, apiRequest } from "../services/apiRequest";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -47,8 +49,11 @@ export default function DashboardScreen() {
   const [sessions, setSessions] = useState<SessionResult[]>([]);
   const [chartView, setChartView] = useState<"daily" | "weekly">("daily");
   const [userId, setUserId] = useState<number | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   const loadData = useCallback(async () => {
+    setLoading(true);
+    setLoadFailed(false);
     try {
       const savedUserId = await AsyncStorage.getItem("userId");
       if (!savedUserId) {
@@ -65,19 +70,20 @@ export default function DashboardScreen() {
       }
       setUserId(parseInt(savedUserId, 10));
 
-      const [summaryRes, sessionsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/progress/${savedUserId}/summary`),
-        fetch(`${API_BASE_URL}/api/v1/progress/${savedUserId}`),
+      const [summaryData, sessionsData] = await Promise.all([
+        apiRequest<ProgressSummary>(`${API_BASE_URL}/api/v1/progress/${savedUserId}/summary`),
+        apiRequest<SessionResult[]>(`${API_BASE_URL}/api/v1/progress/${savedUserId}`),
       ]);
 
-      if (summaryRes.ok && sessionsRes.ok) {
-        const summaryData = await summaryRes.json();
-        const sessionsData = await sessionsRes.json();
-        setSummary(summaryData);
-        setSessions(sessionsData);
-      }
+      setSummary(summaryData);
+      setSessions(sessionsData);
     } catch (error) {
+      setLoadFailed(true);
       console.error("Error loading dashboard data:", error);
+      Alert.alert("Progress unavailable", apiErrorMessage(error), [
+        { text: "Cancel", style: "cancel" },
+        { text: "Retry", onPress: () => void loadData() },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -160,8 +166,14 @@ export default function DashboardScreen() {
     return (
       <View style={styles.centered}>
         <Ionicons name="bar-chart-outline" size={64} color="#C7C7CC" />
-        <Text style={styles.emptyText}>No progress data yet</Text>
-        <Text style={styles.subText}>Complete your first session to see your stats</Text>
+        <Text style={styles.emptyText}>
+          {loadFailed ? "Progress unavailable" : "No progress data yet"}
+        </Text>
+        <Text style={styles.subText}>
+          {loadFailed
+            ? "Return to this tab to retry. Your saved progress is unchanged."
+            : "Complete your first session to see your stats"}
+        </Text>
       </View>
     );
   }
