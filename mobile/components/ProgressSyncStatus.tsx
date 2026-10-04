@@ -8,6 +8,8 @@ export default function ProgressSyncStatus() {
     progressQueue.getStatus,
     progressQueue.getStatus,
   );
+  if (status === "Progress is synced." || status === "Checking progress sync…") return null;
+
   return (
     <View style={styles.container}>
       <Text accessibilityLiveRegion="polite" style={styles.text}>
