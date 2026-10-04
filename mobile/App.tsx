@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useCallback, useEffect, useState } from "react";
 import { Image, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import TabNavigator from "./navigation/TabNavigator";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import { startProgressSync } from "./services/progressSync";
@@ -68,9 +68,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <SafeAreaView edges={["top"]}>
-          <ProgressSyncStatus />
-        </SafeAreaView>
+        <ProgressSyncStatus />
         <Stack.Navigator
           screenOptions={{ headerShown: false }}
           initialRouteName={hasCompletedOnboarding ? "Main" : "Onboarding"}

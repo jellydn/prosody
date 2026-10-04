@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { progressQueue } from "../services/progressSync";
 
 export default function ProgressSyncStatus() {
@@ -11,14 +12,16 @@ export default function ProgressSyncStatus() {
   if (status === "Progress is synced." || status === "Checking progress sync…") return null;
 
   return (
-    <View style={styles.container}>
-      <Text accessibilityLiveRegion="polite" style={styles.text}>
-        {status}
-      </Text>
-      <TouchableOpacity accessibilityRole="button" onPress={() => void progressQueue.sync()}>
-        <Text style={styles.retry}>Retry sync</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView edges={["top"]}>
+      <View style={styles.container}>
+        <Text accessibilityLiveRegion="polite" style={styles.text}>
+          {status}
+        </Text>
+        <TouchableOpacity accessibilityRole="button" onPress={() => void progressQueue.sync()}>
+          <Text style={styles.retry}>Retry sync</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
