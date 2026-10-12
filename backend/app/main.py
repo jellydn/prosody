@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.models import run_migrations
 from app.api.progress import router as progress_router
 from app.api.analyze import router as analyze_router
+from app import worker
 
 
 def _configure_logging() -> None:
@@ -41,6 +42,7 @@ async def lifespan(_: FastAPI):
             raw_flag,
         )
     yield
+    worker.shutdown()
 
 
 app = FastAPI(
