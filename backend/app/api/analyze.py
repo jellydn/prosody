@@ -124,6 +124,7 @@ async def analyze_audio(
 
         if audio.content_type not in {"audio/wav", "audio/x-wav"}:
             from pydub import AudioSegment
+            from app.worker import get_pool, AnalysisQueueFullError
 
             source_format = CONTENT_TYPE_TO_FORMAT.get(audio.content_type)
             if not source_format:
@@ -137,13 +138,22 @@ async def analyze_audio(
                     detail=f"Unsupported conversion content type: {audio.content_type}",
                 )
 
+            def _convert(path: str, fmt: str) -> None:
+                seg = AudioSegment.from_file(path, format=fmt)
+                seg.export(path, format="wav")
+
             try:
-                audio_segment = AudioSegment.from_file(temp_path, format=source_format)
-                audio_segment.export(temp_path, format="wav")
+                await get_pool().run(_convert, temp_path, source_format)
                 logger.info(
                     "Audio converted to wav provider=%s source_format=%s",
                     resolved_provider,
                     source_format,
+                )
+            except AnalysisQueueFullError:
+                logger.warning("Analysis queue full provider=%s", resolved_provider)
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Server is busy, please try again later",
                 )
             except Exception:
                 logger.exception(
